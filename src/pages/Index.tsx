@@ -175,6 +175,7 @@ const Index = () => {
     
     // Now register the user with all collected data
     try {
+      setLoading(true);
       const [firstName, ...lastNameParts] = onboardingData.name.split(' ');
       const lastName = lastNameParts.join(' ');
       
@@ -184,6 +185,11 @@ const Index = () => {
         lastName,
         location: onboardingData.location
       });
+
+      // Check if we have all required data
+      if (!onboardingData.email || !onboardingData.password || !onboardingData.name) {
+        throw new Error('Missing required registration data');
+      }
       
       const { data, error } = await supabase.auth.signUp({
         email: onboardingData.email,
@@ -200,15 +206,33 @@ const Index = () => {
 
       if (error) {
         console.error('Registration error:', error);
-        alert('Registration failed: ' + error.message);
-        return;
+        throw error;
       }
 
       console.log('User registered successfully:', data);
       setOnboardingStep('completion');
     } catch (error) {
       console.error('Registration error:', error);
-      alert('Registration failed. Please try again.');
+      let errorMessage = 'Registration failed. Please try again.';
+      
+      if (error instanceof Error) {
+        if (error.message.includes('Load failed')) {
+          errorMessage = 'Network connection failed. Please check your internet connection and try again.';
+        } else if (error.message.includes('Invalid email')) {
+          errorMessage = 'Invalid email address. Please check your email format.';
+        } else if (error.message.includes('Password')) {
+          errorMessage = 'Password requirements not met. Please try a stronger password.';
+        } else {
+          errorMessage = `Registration failed: ${error.message}`;
+        }
+      }
+      
+      alert(errorMessage);
+      
+      // Reset to form step so user can try again
+      setOnboardingStep('form');
+    } finally {
+      setLoading(false);
     }
   };
 
