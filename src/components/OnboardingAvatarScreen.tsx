@@ -65,58 +65,73 @@ export default function OnboardingAvatarScreen({ onBack, onProceed }: Onboarding
     };
   }, []);
 
-  // Fast HEIC to JPEG conversion using Canvas and FileReader
+  // Simplified HEIC to JPEG conversion using Canvas
   const convertHeicToJpeg = async (file: File): Promise<File> => {
     return new Promise((resolve, reject) => {
-      console.log('Starting HEIC conversion with Canvas method...');
+      console.log('Starting HEIC conversion for:', file.name);
       setIsProcessing(true);
       
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
+      // Create object URL from the HEIC file
+      const objectUrl = URL.createObjectURL(file);
       const img = new Image();
       
       img.onload = () => {
         try {
-          // Set canvas dimensions
+          console.log('HEIC image loaded, creating canvas...');
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          
+          if (!ctx) {
+            throw new Error('Could not get canvas context');
+          }
+          
+          // Set canvas dimensions to match image
           canvas.width = img.naturalWidth;
           canvas.height = img.naturalHeight;
           
+          console.log('Canvas created:', canvas.width, 'x', canvas.height);
+          
           // Draw image to canvas
-          ctx?.drawImage(img, 0, 0);
+          ctx.drawImage(img, 0, 0);
           
           // Convert to JPEG blob
           canvas.toBlob((blob) => {
             if (blob) {
               const convertedFile = new File(
                 [blob], 
-                file.name.replace(/\.heic$/i, '.jpg'), 
+                file.name.replace(/\.(heic|HEIC|heif|HEIF)$/i, '.jpg'), 
                 { 
                   type: 'image/jpeg',
                   lastModified: Date.now()
                 }
               );
-              console.log('HEIC conversion successful:', convertedFile.name, convertedFile.type);
+              console.log('HEIC conversion successful:', convertedFile.name, convertedFile.type, 'Size:', convertedFile.size);
+              URL.revokeObjectURL(objectUrl);
               resolve(convertedFile);
             } else {
+              console.error('Failed to create blob from canvas');
+              URL.revokeObjectURL(objectUrl);
               reject(new Error('Failed to convert HEIC to JPEG'));
             }
-          }, 'image/jpeg', 0.85);
+          }, 'image/jpeg', 0.9); // High quality JPEG
         } catch (error) {
           console.error('Canvas conversion error:', error);
+          URL.revokeObjectURL(objectUrl);
           reject(error);
         } finally {
           setIsProcessing(false);
         }
       };
       
-      img.onerror = () => {
-        console.error('Failed to load HEIC image');
+      img.onerror = (error) => {
+        console.error('Failed to load HEIC image:', error);
+        URL.revokeObjectURL(objectUrl);
         setIsProcessing(false);
-        reject(new Error('Failed to load HEIC image'));
+        reject(new Error('Browser cannot decode HEIC image'));
       };
       
-      // Create object URL for the image
-      img.src = URL.createObjectURL(file);
+      console.log('Loading HEIC image...');
+      img.src = objectUrl;
     });
   };
 
@@ -190,10 +205,17 @@ export default function OnboardingAvatarScreen({ onBack, onProceed }: Onboarding
   };
 
   const isHeicFile = (file: File): boolean => {
-    return file.type === 'image/heic' || 
+    const isHeic = file.type === 'image/heic' || 
            file.type === 'image/HEIC' ||
+           file.type === 'image/heif' ||
+           file.type === 'image/HEIF' ||
            file.name.toLowerCase().endsWith('.heic') ||
-           file.name.toLowerCase().endsWith('.HEIC');
+           file.name.toLowerCase().endsWith('.HEIC') ||
+           file.name.toLowerCase().endsWith('.heif') ||
+           file.name.toLowerCase().endsWith('.HEIF');
+    
+    console.log('HEIC detection - File:', file.name, 'Type:', file.type, 'Is HEIC:', isHeic);
+    return isHeic;
   };
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -211,16 +233,11 @@ export default function OnboardingAvatarScreen({ onBack, onProceed }: Onboarding
         console.log('HEIC file detected, starting conversion...');
         try {
           processedFile = await convertHeicToJpeg(file);
-          console.log('HEIC conversion completed successfully');
+          console.log('HEIC conversion completed successfully:', processedFile.name);
         } catch (conversionError) {
-          console.warn('First conversion method failed, trying alternative:', conversionError);
-          try {
-            processedFile = await processHeicFile(file);
-            console.log('Alternative HEIC conversion completed');
-          } catch (secondError) {
-            console.error('Both conversion methods failed:', secondError);
-            throw new Error('Failed to convert HEIC image. Please try a different format.');
-          }
+          console.error('HEIC conversion failed:', conversionError);
+          alert('This HEIC image cannot be converted. Please try saving it as a JPEG first or use a different image.');
+          return;
         }
       }
       
