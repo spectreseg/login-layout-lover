@@ -73,12 +73,13 @@ export default function OnboardingLocationScreen({ onBack, onProceed }: Onboardi
 
   const handleProceed = () => {
     console.log('Proceed clicked - locationGranted:', locationGranted, 'locationData:', locationData);
+    
     if (locationGranted && locationData) {
       console.log('Proceeding with location:', locationData);
       onProceed({location: locationData});
     } else {
-      console.log('Cannot proceed - location not granted or data missing');
-      alert('Please enable location services first.');
+      console.log('Proceeding without location');
+      onProceed({location: 'not_provided'});
     }
   };
 
