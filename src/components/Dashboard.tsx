@@ -756,7 +756,7 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
                         {isUserInFinishedList(post.finished_by, user?.id) ? (
                           <Button 
                             size="sm" 
-                            className="flex-1 text-sm h-9 bg-green-500 hover:bg-green-500 text-white font-bold cursor-not-allowed font-inter font-medium border-0 dark:bg-green-600 dark:hover:bg-green-600 dark:text-white" 
+                            className="flex-1 text-sm h-9 bg-green-700 hover:bg-green-700 text-white font-bold cursor-not-allowed font-inter font-medium border-0 dark:bg-green-800 dark:hover:bg-green-800 dark:text-white" 
                             disabled
                           >
                             <CheckCircle className="h-4 w-4 mr-2" />
