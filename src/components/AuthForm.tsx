@@ -36,7 +36,8 @@ export default function AuthForm({
       {/* Logo Section - positioned to straddle background and form */}
       <div className="absolute -top-12 sm:-top-16 md:-top-20 left-1/2 transform -translate-x-1/2 z-20">
         <div className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 relative">
-          <img src="/lovable-uploads/00927cad-9b22-41ba-9858-efcf7069f623.png" alt="Tiger Logo" className="w-full h-full object-contain drop-shadow-lg" />
+          <div className="absolute inset-0 rounded-full bg-purple-500/30 blur-md scale-110"></div>
+          <img src="/lovable-uploads/00927cad-9b22-41ba-9858-efcf7069f623.png" alt="Tiger Logo" className="w-full h-full object-contain drop-shadow-lg relative z-10" />
         </div>
       </div>
       {/* Tab Navigation */}
@@ -51,47 +52,127 @@ export default function AuthForm({
 
       {/* Form Content */}
       <div className="p-6 sm:p-8 md:p-10">
-        <div className="text-center mb-6 sm:mb-8 md:mb-10">
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-medium text-gray-800 mb-3">
-            Welcome Back
-          </h2>
-          <p className="text-sm sm:text-base md:text-lg text-gray-600 font-normal">
-            Sign in to your account to continue
-          </p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              <Mail className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />
+        {mode === 'login' ? (
+          <>
+            <div className="text-center mb-6 sm:mb-8 md:mb-10">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-medium text-gray-800 mb-3">
+                Welcome Back
+              </h2>
+              <p className="text-sm sm:text-base md:text-lg text-gray-600 font-normal">
+                Sign in to your account to continue
+              </p>
             </div>
-            <input type="email" name="email" placeholder="Email Address" value={formData.email} onChange={handleInputChange} className="w-full pl-12 sm:pl-14 pr-4 sm:pr-5 py-3 sm:py-4 md:py-5 text-base sm:text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-smooth bg-gray-50 text-gray-800 placeholder-gray-500 font-normal" required />
-          </div>
 
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              <Lock className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />
+            <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Mail className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />
+                </div>
+                <input type="email" name="email" placeholder="Email Address" value={formData.email} onChange={handleInputChange} className="w-full pl-12 sm:pl-14 pr-4 sm:pr-5 py-3 sm:py-4 md:py-5 text-base sm:text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-smooth bg-gray-50 text-gray-800 placeholder-gray-500 font-normal" required />
+              </div>
+
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Lock className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />
+                </div>
+                <input type={showPassword ? 'text' : 'password'} name="password" placeholder="Password" value={formData.password} onChange={handleInputChange} className="w-full pl-12 sm:pl-14 pr-12 sm:pr-14 py-3 sm:py-4 md:py-5 text-base sm:text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-smooth bg-gray-50 text-gray-800 placeholder-gray-500 font-normal" required />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 pr-4 flex items-center text-purple-600 hover:text-purple-700 transition-colors">
+                  {showPassword ? <EyeOff className="h-5 w-5 sm:h-6 sm:w-6" /> : <Eye className="h-5 w-5 sm:h-6 sm:w-6" />}
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <label className="flex items-center">
+                  <input type="checkbox" className="h-5 w-5 text-purple-600 focus:ring-purple-500 border-gray-300 rounded" />
+                  <span className="ml-3 text-sm sm:text-base text-gray-600 font-normal">Remember me</span>
+                </label>
+                <button type="button" className="text-sm sm:text-base text-purple-600 hover:text-purple-700 transition-colors font-normal">
+                  Forgot password?
+                </button>
+              </div>
+
+              <button type="submit" className="w-full bg-purple-600 text-white py-3 sm:py-4 md:py-5 px-6 text-base sm:text-lg rounded-xl font-semibold hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-smooth transform hover:scale-[1.02] active:scale-[0.98] shadow-lg">
+                Sign In
+              </button>
+            </form>
+          </>
+        ) : (
+          <>
+            <div className="text-center mb-6 sm:mb-8 md:mb-10">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-medium text-gray-800 mb-3">
+                Join TigerBites
+              </h2>
+              <p className="text-sm sm:text-base md:text-lg text-gray-600 font-normal">
+                Let's get you set up with your new account
+              </p>
             </div>
-            <input type={showPassword ? 'text' : 'password'} name="password" placeholder="Password" value={formData.password} onChange={handleInputChange} className="w-full pl-12 sm:pl-14 pr-12 sm:pr-14 py-3 sm:py-4 md:py-5 text-base sm:text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-smooth bg-gray-50 text-gray-800 placeholder-gray-500 font-normal" required />
-            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 pr-4 flex items-center text-purple-600 hover:text-purple-700 transition-colors">
-              {showPassword ? <EyeOff className="h-5 w-5 sm:h-6 sm:w-6" /> : <Eye className="h-5 w-5 sm:h-6 sm:w-6" />}
-            </button>
-          </div>
 
-          <div className="flex items-center justify-between">
-            <label className="flex items-center">
-              <input type="checkbox" className="h-5 w-5 text-purple-600 focus:ring-purple-500 border-gray-300 rounded" />
-              <span className="ml-3 text-sm sm:text-base text-gray-600 font-normal">Remember me</span>
-            </label>
-            <button type="button" className="text-sm sm:text-base text-purple-600 hover:text-purple-700 transition-colors font-normal">
-              Forgot password?
-            </button>
-          </div>
+            <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="relative">
+                  <input type="text" name="firstName" placeholder="First Name" className="w-full px-4 py-3 sm:py-4 md:py-5 text-base sm:text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-smooth bg-gray-50 text-gray-800 placeholder-gray-500 font-normal" required />
+                </div>
+                <div className="relative">
+                  <input type="text" name="lastName" placeholder="Last Name" className="w-full px-4 py-3 sm:py-4 md:py-5 text-base sm:text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-smooth bg-gray-50 text-gray-800 placeholder-gray-500 font-normal" required />
+                </div>
+              </div>
 
-          <button type="submit" className="w-full bg-purple-600 text-white py-3 sm:py-4 md:py-5 px-6 text-base sm:text-lg rounded-xl font-semibold hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-smooth transform hover:scale-[1.02] active:scale-[0.98] shadow-lg">
-            Sign In
-          </button>
-        </form>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Mail className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />
+                </div>
+                <input type="email" name="email" placeholder="Email Address" className="w-full pl-12 sm:pl-14 pr-4 sm:pr-5 py-3 sm:py-4 md:py-5 text-base sm:text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-smooth bg-gray-50 text-gray-800 placeholder-gray-500 font-normal" required />
+              </div>
+
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Lock className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />
+                </div>
+                <input type={showPassword ? 'text' : 'password'} name="password" placeholder="Create Password" className="w-full pl-12 sm:pl-14 pr-12 sm:pr-14 py-3 sm:py-4 md:py-5 text-base sm:text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-smooth bg-gray-50 text-gray-800 placeholder-gray-500 font-normal" required />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 pr-4 flex items-center text-purple-600 hover:text-purple-700 transition-colors">
+                  {showPassword ? <EyeOff className="h-5 w-5 sm:h-6 sm:w-6" /> : <Eye className="h-5 w-5 sm:h-6 sm:w-6" />}
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="text-base sm:text-lg font-medium text-gray-800">Account Type</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <label className="relative">
+                    <input type="radio" name="accountType" value="student" className="peer sr-only" defaultChecked />
+                    <div className="p-4 border-2 border-gray-300 rounded-xl cursor-pointer transition-all peer-checked:border-purple-500 peer-checked:bg-purple-50 hover:border-purple-400">
+                      <div className="text-center">
+                        <div className="text-lg mb-1">🎓</div>
+                        <div className="font-medium text-gray-800">Student</div>
+                        <div className="text-sm text-gray-600">Order food delivery</div>
+                      </div>
+                    </div>
+                  </label>
+                  <label className="relative">
+                    <input type="radio" name="accountType" value="restaurant" className="peer sr-only" />
+                    <div className="p-4 border-2 border-gray-300 rounded-xl cursor-pointer transition-all peer-checked:border-purple-500 peer-checked:bg-purple-50 hover:border-purple-400">
+                      <div className="text-center">
+                        <div className="text-lg mb-1">🍽️</div>
+                        <div className="font-medium text-gray-800">Restaurant</div>
+                        <div className="text-sm text-gray-600">Sell your food</div>
+                      </div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <div className="flex items-start">
+                <input type="checkbox" className="h-5 w-5 text-purple-600 focus:ring-purple-500 border-gray-300 rounded mt-1" required />
+                <span className="ml-3 text-sm sm:text-base text-gray-600 font-normal">
+                  I agree to the <button type="button" className="text-purple-600 hover:text-purple-700 underline">Terms of Service</button> and <button type="button" className="text-purple-600 hover:text-purple-700 underline">Privacy Policy</button>
+                </span>
+              </div>
+
+              <button type="submit" className="w-full bg-purple-600 text-white py-3 sm:py-4 md:py-5 px-6 text-base sm:text-lg rounded-xl font-semibold hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-smooth transform hover:scale-[1.02] active:scale-[0.98] shadow-lg">
+                Create Account
+              </button>
+            </form>
+          </>
+        )}
       </div>
 
       {/* Decorative elements */}
