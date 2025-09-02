@@ -57,7 +57,7 @@ export default function OnboardingCompletionScreen({ onComplete }: OnboardingCom
           {/* Monte mascot with heart */}
           <div className={`flex-shrink-0 transition-transform duration-1000 ease-out ${tigerVisible ? 'translate-y-0' : 'translate-y-full'}`}>
             <img
-              src="/lovable-uploads/f2e93921-b378-4727-a335-9cf285ad15c1.png"
+              src="/lovable-uploads/monte-tiger-heart.png"
               alt="Monte the Tiger with Heart"
               className="w-[350px] h-[350px] md:w-[550px] md:h-[550px] object-contain drop-shadow-2xl"
               onLoad={() => console.log('Tiger heart image loaded successfully')}
