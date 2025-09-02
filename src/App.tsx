@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import ShareFood from "./pages/ShareFood";
 import Notifications from "./pages/Notifications";
+import FindFood from "./pages/FindFood";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/dashboard" element={<Index />} />
           <Route path="/share-food" element={<ShareFood />} />
           <Route path="/notifications" element={<Notifications />} />
+          <Route path="/find-food" element={<FindFood />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

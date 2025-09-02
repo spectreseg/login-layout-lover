@@ -503,6 +503,8 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
       setShowExpiredPosts(false);
     } else if (item.label === 'Notifications') {
       navigate('/notifications');
+    } else if (item.label === 'Find Food') {
+      navigate('/find-food');
     }
     // Add other navigation logic here as needed
   };
