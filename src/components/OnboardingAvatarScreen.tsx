@@ -235,33 +235,7 @@ export default function OnboardingAvatarScreen({ onBack, onProceed }: Onboarding
   };
 
   const handleUpload = async () => {
-    if (selectedFile && user) {
-      try {
-        setIsProcessing(true);
-        console.log('Uploading avatar:', selectedFile.name);
-        
-        const avatarUrl = await uploadAvatar(selectedFile);
-        
-        if (avatarUrl) {
-          toast({
-            title: "Avatar uploaded!",
-            description: "Your profile picture has been saved.",
-          });
-          console.log('Avatar uploaded successfully:', avatarUrl);
-        }
-      } catch (error) {
-        console.error('Avatar upload failed:', error);
-        toast({
-          title: "Upload failed",
-          description: "Failed to upload avatar. You can add it later.",
-          variant: "destructive",
-        });
-      } finally {
-        setIsProcessing(false);
-      }
-    }
-    
-    // Always proceed to next step
+    // Just proceed with the selected file - actual upload happens after registration
     onProceed({avatar: selectedFile});
   };
 

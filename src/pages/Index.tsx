@@ -166,10 +166,12 @@ const Index = () => {
   };
 
   const handleAvatarProceed = async (avatarData?: {avatar: File | null}) => {
+    let avatarFile = null;
     if (avatarData?.avatar) {
+      avatarFile = avatarData.avatar;
       setOnboardingData(prev => ({
         ...prev,
-        avatar: avatarData.avatar
+        avatar: avatarFile
       }));
     }
     
@@ -183,7 +185,8 @@ const Index = () => {
         email: onboardingData.email,
         firstName,
         lastName,
-        location: onboardingData.location
+        location: onboardingData.location,
+        hasAvatar: !!avatarFile
       });
 
       // Check if we have all required data
@@ -210,6 +213,52 @@ const Index = () => {
       }
 
       console.log('User registered successfully:', data);
+      
+      // Upload avatar after successful registration if we have one
+      if (avatarFile && data.user) {
+        try {
+          console.log('Uploading avatar for new user:', data.user.id);
+          
+          // Create a unique filename
+          const fileExt = avatarFile.name.split('.').pop();
+          const fileName = `avatar-${data.user.id}-${Date.now()}.${fileExt}`;
+          
+          // Upload to storage
+          const { data: uploadData, error: uploadError } = await supabase.storage
+            .from('avatars')
+            .upload(fileName, avatarFile, {
+              cacheControl: '3600',
+              upsert: true
+            });
+
+          if (uploadError) {
+            console.error('Avatar upload error:', uploadError);
+          } else {
+            console.log('Avatar uploaded successfully:', uploadData.path);
+            
+            // Get the public URL
+            const { data: { publicUrl } } = supabase.storage
+              .from('avatars')
+              .getPublicUrl(uploadData.path);
+            
+            // Update the user's profile with the avatar URL
+            const { error: profileError } = await supabase
+              .from('profiles')
+              .update({ avatar_url: publicUrl })
+              .eq('user_id', data.user.id);
+              
+            if (profileError) {
+              console.error('Profile update error:', profileError);
+            } else {
+              console.log('Profile updated with avatar URL:', publicUrl);
+            }
+          }
+        } catch (avatarError) {
+          console.error('Avatar processing error:', avatarError);
+          // Don't fail registration if avatar upload fails
+        }
+      }
+      
       setOnboardingStep('completion');
     } catch (error) {
       console.error('Registration error:', error);
@@ -237,8 +286,9 @@ const Index = () => {
   };
 
   const handleCompletionFinish = () => {
+    console.log('Registration completed, clearing onboarding and resetting to dashboard');
     setOnboardingStep('none');
-    console.log('Registration completed, navigating to dashboard');
+    setOnboardingData({ name: '', email: '', password: '', location: '', avatar: null });
   };
 
   console.log('Current state - authMode:', authMode, 'onboardingStep:', onboardingStep, 'user:', user?.id);
