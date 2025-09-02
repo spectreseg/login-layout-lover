@@ -38,13 +38,10 @@ const Index = () => {
   if (showOnboarding) {
     console.log('Rendering onboarding screen');
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 relative">
-        <StarryBackground />
-        <OnboardingScreen 
-          onBack={handleOnboardingBack}
-          onProceed={handleOnboardingProceed}
-        />
-      </div>
+      <OnboardingScreen 
+        onBack={handleOnboardingBack}
+        onProceed={handleOnboardingProceed}
+      />
     );
   }
 
