@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import SpeechBubble from './SpeechBubble';
 
@@ -15,20 +16,20 @@ export default function OnboardingScreen({ onBack, onProceed }: OnboardingScreen
     const timer = setTimeout(() => {
       console.log('Triggering animations');
       setShowAnimations(true);
-    }, 100);
+    }, 500); // Increased delay to ensure proper mounting
     return () => clearTimeout(timer);
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen px-6 py-8 relative overflow-hidden">
-      {/* Speech Bubble */}
-      <div className={`mb-8 transition-all duration-1000 delay-1000 ${
+    <div className="min-h-screen flex flex-col items-center justify-center px-6 py-8 relative overflow-hidden bg-black">
+      {/* Speech Bubble - fades in */}
+      <div className={`mb-8 transition-all duration-1000 delay-1500 ${
         showAnimations ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
       }`}>
         <SpeechBubble text="Hi, I'm Monte. I'll help with registration. Ready to proceed?" />
       </div>
 
-      {/* Tiger Character */}
+      {/* Tiger Character - flies up from bottom */}
       <div className={`mb-12 transition-all duration-1000 ease-out ${
         showAnimations ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
       }`}>
@@ -36,11 +37,13 @@ export default function OnboardingScreen({ onBack, onProceed }: OnboardingScreen
           src="/lovable-uploads/monte-tiger-full.png" 
           alt="Monte the Tiger" 
           className="w-64 h-64 sm:w-80 sm:h-80 object-contain"
+          onLoad={() => console.log('Tiger image loaded successfully')}
+          onError={() => console.log('Tiger image failed to load')}
         />
       </div>
 
-      {/* Action Buttons */}
-      <div className={`flex gap-6 transition-all duration-1000 delay-1200 ease-out ${
+      {/* Action Buttons - fly up together */}
+      <div className={`flex gap-6 transition-all duration-1000 delay-2000 ease-out ${
         showAnimations ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
       }`}>
         <button
