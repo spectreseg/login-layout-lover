@@ -279,8 +279,8 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {activePosts.map((post) => (
-              <Card key={post.id} className="bg-card border-border/30 hover:border-border/50 transition-all duration-200 hover:shadow-sm overflow-hidden">
-                <div className="aspect-[4/3] bg-muted/20 relative overflow-hidden group">
+              <Card key={post.id} className="bg-card border-border/30 hover:border-border/50 transition-all duration-200 hover:shadow-sm overflow-hidden group">
+                <div className="aspect-[4/3] bg-muted/20 relative overflow-hidden">
                   <img 
                     src={post.image} 
                     alt={post.title}
