@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Camera, User } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useUserProfile } from '@/hooks/useUserProfile';
+import { useToast } from '@/hooks/use-toast';
 
 interface OnboardingAvatarScreenProps {
   onBack: () => void;
@@ -14,6 +17,17 @@ export default function OnboardingAvatarScreen({ onBack, onProceed }: Onboarding
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const { toast } = useToast();
+  
+  // Get current user
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+    });
+  }, []);
+  
+  const { uploadAvatar } = useUserProfile(user);
 
   useEffect(() => {
     console.log('OnboardingAvatarScreen mounted');
@@ -219,14 +233,35 @@ export default function OnboardingAvatarScreen({ onBack, onProceed }: Onboarding
     }
   };
 
-  const handleUpload = () => {
-    if (selectedFile) {
-      console.log('Uploading avatar:', selectedFile.name);
-      onProceed();
-    } else {
-      // Allow proceeding without avatar
-      onProceed();
+  const handleUpload = async () => {
+    if (selectedFile && user) {
+      try {
+        setIsProcessing(true);
+        console.log('Uploading avatar:', selectedFile.name);
+        
+        const avatarUrl = await uploadAvatar(selectedFile);
+        
+        if (avatarUrl) {
+          toast({
+            title: "Avatar uploaded!",
+            description: "Your profile picture has been saved.",
+          });
+          console.log('Avatar uploaded successfully:', avatarUrl);
+        }
+      } catch (error) {
+        console.error('Avatar upload failed:', error);
+        toast({
+          title: "Upload failed",
+          description: "Failed to upload avatar. You can add it later.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsProcessing(false);
+      }
     }
+    
+    // Always proceed to next step
+    onProceed();
   };
 
   // Cleanup preview URL on component unmount

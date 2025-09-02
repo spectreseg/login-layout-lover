@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AuthForm from '@/components/AuthForm';
 import StarryBackground from '@/components/StarryBackground';
 import OnboardingScreen from '@/components/OnboardingScreen';
@@ -8,15 +8,41 @@ import OnboardingLocationScreen from '@/components/OnboardingLocationScreen';
 import OnboardingAvatarScreen from '@/components/OnboardingAvatarScreen';
 import OnboardingCompletionScreen from '@/components/OnboardingCompletionScreen';
 import Dashboard from '@/components/Dashboard';
+import { supabase } from '@/integrations/supabase/client';
+import { User, Session } from '@supabase/supabase-js';
 
 const Index = () => {
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const [onboardingStep, setOnboardingStep] = useState<'none' | 'intro' | 'form' | 'password' | 'location' | 'avatar' | 'completion'>('none');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Handle authentication state changes
+  useEffect(() => {
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.id);
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
+      }
+    );
+
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const handleLogin = () => {
-    console.log('Login attempted');
-    setIsLoggedIn(true);
+    console.log('Login attempted - auth handled by AuthForm');
+    // Authentication is now handled by AuthForm
   };
 
   const handleToggleMode = (mode: 'login' | 'register') => {
@@ -103,11 +129,20 @@ const Index = () => {
 
   const handleCompletionFinish = () => {
     setOnboardingStep('none');
-    setIsLoggedIn(true);
     console.log('Registration completed, navigating to dashboard');
   };
 
-  console.log('Current state - authMode:', authMode, 'onboardingStep:', onboardingStep);
+  console.log('Current state - authMode:', authMode, 'onboardingStep:', onboardingStep, 'user:', user?.id);
+
+  // Show loading state while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center relative">
+        <StarryBackground />
+        <div className="text-white text-xl">Loading...</div>
+      </div>
+    );
+  }
 
   // Preload all onboarding images for smooth transitions
   const preloadImages = () => {
@@ -129,6 +164,12 @@ const Index = () => {
   React.useEffect(() => {
     preloadImages();
   }, []);
+
+  // Show dashboard if user is authenticated and not in onboarding
+  if (user && onboardingStep === 'none') {
+    console.log('Rendering dashboard');
+    return <Dashboard />;
+  }
 
   // Show first onboarding screen
   if (onboardingStep === 'intro') {
@@ -156,12 +197,6 @@ const Index = () => {
         />
       </div>
     );
-  }
-
-  // Show dashboard if user is logged in
-  if (isLoggedIn) {
-    console.log('Rendering dashboard');
-    return <Dashboard />;
   }
 
   // Show completion onboarding screen

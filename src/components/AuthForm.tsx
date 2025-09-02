@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface AuthFormProps {
   mode: 'login' | 'register';
@@ -12,19 +14,77 @@ export default function AuthForm({
   onLogin
 }: AuthFormProps) {
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     email: '',
-    password: ''
+    password: '',
+    firstName: '',
+    lastName: '',
+    accountType: 'student'
   });
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
   };
-  const handleSubmit = (e: React.FormEvent) => {
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onLogin();
+    setLoading(true);
+
+    try {
+      if (mode === 'login') {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: formData.email,
+          password: formData.password,
+        });
+
+        if (error) throw error;
+
+        if (data.user) {
+          toast({
+            title: "Welcome back!",
+            description: "You've been successfully logged in.",
+          });
+          onLogin();
+        }
+      } else {
+        const { data, error } = await supabase.auth.signUp({
+          email: formData.email,
+          password: formData.password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/`,
+            data: {
+              first_name: formData.firstName,
+              last_name: formData.lastName,
+              account_type: formData.accountType,
+            }
+          }
+        });
+
+        if (error) throw error;
+
+        if (data.user) {
+          toast({
+            title: "Account created!",
+            description: "Please check your email to verify your account.",
+          });
+          // Start onboarding flow
+          onToggleMode('register');
+        }
+      }
+    } catch (error: any) {
+      toast({
+        title: "Authentication Error",
+        description: error.message || "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
   return <div className="bg-white rounded-2xl shadow-2xl w-full relative overflow-visible mt-16 sm:mt-20 md:mt-24">
       {/* TigerBites Text */}
@@ -91,8 +151,12 @@ export default function AuthForm({
                 </button>
               </div>
 
-              <button type="submit" className="w-full bg-purple-600 text-white py-3 sm:py-4 md:py-5 px-6 text-base sm:text-lg rounded-xl font-semibold hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-smooth transform hover:scale-[1.02] active:scale-[0.98] shadow-lg">
-                Sign In
+              <button 
+                type="submit" 
+                disabled={loading}
+                className="w-full bg-purple-600 text-white py-3 sm:py-4 md:py-5 px-6 text-base sm:text-lg rounded-xl font-semibold hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-smooth transform hover:scale-[1.02] active:scale-[0.98] shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              >
+                {loading ? 'Signing In...' : 'Sign In'}
               </button>
             </form>
           </>
@@ -110,10 +174,26 @@ export default function AuthForm({
             <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
               <div className="grid grid-cols-2 gap-4">
                 <div className="relative">
-                  <input type="text" name="firstName" placeholder="First Name" className="w-full px-4 py-3 sm:py-4 md:py-5 text-base sm:text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-smooth bg-gray-50 text-gray-800 placeholder-gray-500 font-normal" required />
+                  <input 
+                    type="text" 
+                    name="firstName" 
+                    placeholder="First Name" 
+                    value={formData.firstName}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 sm:py-4 md:py-5 text-base sm:text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-smooth bg-gray-50 text-gray-800 placeholder-gray-500 font-normal" 
+                    required 
+                  />
                 </div>
                 <div className="relative">
-                  <input type="text" name="lastName" placeholder="Last Name" className="w-full px-4 py-3 sm:py-4 md:py-5 text-base sm:text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-smooth bg-gray-50 text-gray-800 placeholder-gray-500 font-normal" required />
+                  <input 
+                    type="text" 
+                    name="lastName" 
+                    placeholder="Last Name" 
+                    value={formData.lastName}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 sm:py-4 md:py-5 text-base sm:text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-smooth bg-gray-50 text-gray-800 placeholder-gray-500 font-normal" 
+                    required 
+                  />
                 </div>
               </div>
 
@@ -121,14 +201,30 @@ export default function AuthForm({
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <Mail className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />
                 </div>
-                <input type="email" name="email" placeholder="Email Address" className="w-full pl-12 sm:pl-14 pr-4 sm:pr-5 py-3 sm:py-4 md:py-5 text-base sm:text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-smooth bg-gray-50 text-gray-800 placeholder-gray-500 font-normal" required />
+                <input 
+                  type="email" 
+                  name="email" 
+                  placeholder="Email Address" 
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="w-full pl-12 sm:pl-14 pr-4 sm:pr-5 py-3 sm:py-4 md:py-5 text-base sm:text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-smooth bg-gray-50 text-gray-800 placeholder-gray-500 font-normal" 
+                  required 
+                />
               </div>
 
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <Lock className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />
                 </div>
-                <input type={showPassword ? 'text' : 'password'} name="password" placeholder="Create Password" className="w-full pl-12 sm:pl-14 pr-12 sm:pr-14 py-3 sm:py-4 md:py-5 text-base sm:text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-smooth bg-gray-50 text-gray-800 placeholder-gray-500 font-normal" required />
+                <input 
+                  type={showPassword ? 'text' : 'password'} 
+                  name="password" 
+                  placeholder="Create Password" 
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  className="w-full pl-12 sm:pl-14 pr-12 sm:pr-14 py-3 sm:py-4 md:py-5 text-base sm:text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-smooth bg-gray-50 text-gray-800 placeholder-gray-500 font-normal" 
+                  required 
+                />
                 <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 pr-4 flex items-center text-purple-600 hover:text-purple-700 transition-colors">
                   {showPassword ? <EyeOff className="h-5 w-5 sm:h-6 sm:w-6" /> : <Eye className="h-5 w-5 sm:h-6 sm:w-6" />}
                 </button>
@@ -138,7 +234,14 @@ export default function AuthForm({
                 <h3 className="text-base sm:text-lg font-medium text-gray-800">Account Type</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <label className="relative">
-                    <input type="radio" name="accountType" value="student" className="peer sr-only" defaultChecked />
+                    <input 
+                      type="radio" 
+                      name="accountType" 
+                      value="student" 
+                      checked={formData.accountType === 'student'}
+                      onChange={handleInputChange}
+                      className="peer sr-only" 
+                    />
                     <div className="p-4 border-2 border-gray-300 rounded-xl cursor-pointer transition-all peer-checked:border-purple-500 peer-checked:bg-purple-50 hover:border-purple-400">
                       <div className="text-center">
                         <div className="text-lg mb-1">🎓</div>
@@ -148,7 +251,14 @@ export default function AuthForm({
                     </div>
                   </label>
                   <label className="relative">
-                    <input type="radio" name="accountType" value="restaurant" className="peer sr-only" />
+                    <input 
+                      type="radio" 
+                      name="accountType" 
+                      value="restaurant" 
+                      checked={formData.accountType === 'restaurant'}
+                      onChange={handleInputChange}
+                      className="peer sr-only" 
+                    />
                     <div className="p-4 border-2 border-gray-300 rounded-xl cursor-pointer transition-all peer-checked:border-purple-500 peer-checked:bg-purple-50 hover:border-purple-400">
                       <div className="text-center">
                         <div className="text-lg mb-1">🍽️</div>
@@ -167,8 +277,12 @@ export default function AuthForm({
                 </span>
               </div>
 
-              <button type="submit" className="w-full bg-purple-600 text-white py-3 sm:py-4 md:py-5 px-6 text-base sm:text-lg rounded-xl font-semibold hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-smooth transform hover:scale-[1.02] active:scale-[0.98] shadow-lg">
-                Create Account
+              <button 
+                type="submit" 
+                disabled={loading}
+                className="w-full bg-purple-600 text-white py-3 sm:py-4 md:py-5 px-6 text-base sm:text-lg rounded-xl font-semibold hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-smooth transform hover:scale-[1.02] active:scale-[0.98] shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              >
+                {loading ? 'Creating Account...' : 'Create Account'}
               </button>
             </form>
           </>
