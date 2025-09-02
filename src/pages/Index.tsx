@@ -3,10 +3,12 @@ import AuthForm from '@/components/AuthForm';
 import StarryBackground from '@/components/StarryBackground';
 import OnboardingScreen from '@/components/OnboardingScreen';
 import OnboardingFormScreen from '@/components/OnboardingFormScreen';
+import OnboardingPasswordScreen from '@/components/OnboardingPasswordScreen';
+import OnboardingLocationScreen from '@/components/OnboardingLocationScreen';
 
 const Index = () => {
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
-  const [onboardingStep, setOnboardingStep] = useState<'none' | 'intro' | 'form'>('none');
+  const [onboardingStep, setOnboardingStep] = useState<'none' | 'intro' | 'form' | 'password' | 'location'>('none');
 
   const handleLogin = () => {
     console.log('Login attempted');
@@ -23,7 +25,11 @@ const Index = () => {
   };
 
   const handleOnboardingBack = () => {
-    if (onboardingStep === 'form') {
+    if (onboardingStep === 'location') {
+      setOnboardingStep('password');
+    } else if (onboardingStep === 'password') {
+      setOnboardingStep('form');
+    } else if (onboardingStep === 'form') {
       setOnboardingStep('intro');
     } else {
       setOnboardingStep('none');
@@ -35,6 +41,12 @@ const Index = () => {
     if (onboardingStep === 'intro') {
       console.log('Moving to form step');
       setOnboardingStep('form');
+    } else if (onboardingStep === 'form') {
+      console.log('Moving to password step');
+      setOnboardingStep('password');
+    } else if (onboardingStep === 'password') {
+      console.log('Moving to location step');
+      setOnboardingStep('location');
     } else {
       setOnboardingStep('none');
       // Here you would proceed to the actual registration completion
@@ -47,9 +59,26 @@ const Index = () => {
   };
 
   const handleFormProceed = () => {
+    setOnboardingStep('password');
+    console.log('Moving to password step');
+  };
+
+  const handlePasswordBack = () => {
+    setOnboardingStep('form');
+  };
+
+  const handlePasswordProceed = () => {
+    setOnboardingStep('location');
+    console.log('Moving to location step');
+  };
+
+  const handleLocationBack = () => {
+    setOnboardingStep('password');
+  };
+
+  const handleLocationProceed = () => {
     setOnboardingStep('none');
-    // Complete the registration process
-    console.log('Registration form completed');
+    console.log('Registration completed');
   };
 
   console.log('Current state - authMode:', authMode, 'onboardingStep:', onboardingStep);
@@ -77,6 +106,34 @@ const Index = () => {
         <OnboardingFormScreen 
           onBack={handleFormBack}
           onProceed={handleFormProceed}
+        />
+      </div>
+    );
+  }
+
+  // Show password onboarding screen
+  if (onboardingStep === 'password') {
+    console.log('Rendering password onboarding screen');
+    return (
+      <div className="min-h-screen relative">
+        <StarryBackground />
+        <OnboardingPasswordScreen 
+          onBack={handlePasswordBack}
+          onProceed={handlePasswordProceed}
+        />
+      </div>
+    );
+  }
+
+  // Show location onboarding screen
+  if (onboardingStep === 'location') {
+    console.log('Rendering location onboarding screen');
+    return (
+      <div className="min-h-screen relative">
+        <StarryBackground />
+        <OnboardingLocationScreen 
+          onBack={handleLocationBack}
+          onProceed={handleLocationProceed}
         />
       </div>
     );
