@@ -110,14 +110,14 @@ const FindFood = () => {
   
   const [filterMode, setFilterMode] = useState<'nearby' | 'all' | 'my'>('all');
 
-  // Dummy posts with Sewanee locations for demo
+  // Dummy posts with exact Sewanee locations for demo
   const dummyPosts = [
     {
       id: 'dummy-1',
       user_id: 'dummy-user-1',
       title: 'Homemade Margherita Pizza',
       description: 'Fresh basil, mozzarella, and tomato sauce on homemade dough. Made too much for dinner tonight!',
-      location: 'Tuckaway Cafe',
+      location: 'Stirling Coffee House',
       servings: '6-8 slices',
       image_url: '/assets/dummy-pizza-DzZu7eHL.jpg',
       created_at: new Date().toISOString(),
@@ -143,7 +143,7 @@ const FindFood = () => {
       user_id: 'dummy-user-3', 
       title: 'Seasonal Fruit Bowl',
       description: 'Fresh strawberries, blueberries, and kiwi from the farmers market. Great for sharing!',
-      location: 'Sewanee Market',
+      location: 'Blue Chair Tavern',
       servings: '8-10 people',
       image_url: '/assets/dummy-fruit-Dk5_c-Co.jpg',
       created_at: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
