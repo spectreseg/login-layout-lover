@@ -532,8 +532,9 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
 
   // Helper function to check if user is in finished list
   const isUserInFinishedList = (finishedBy: string[] | null | undefined, userId: string | undefined) => {
-    if (!finishedBy || !userId) return false;
-    return finishedBy.includes(userId);
+    if (!finishedBy) return false;
+    const effectiveUserId = userId || 'current-user'; // Use same fallback as in handlers
+    return finishedBy.includes(effectiveUserId);
   };
 
   const displayName = profile?.first_name
