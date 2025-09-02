@@ -27,9 +27,19 @@ export default function AuthForm({ mode, onToggleMode, onLogin }: AuthFormProps)
   };
 
   return (
-    <div className="bg-card rounded-2xl shadow-auth-form w-full relative overflow-hidden">
+    <div className="bg-card rounded-2xl shadow-auth-form w-full relative overflow-hidden backdrop-blur-sm bg-opacity-95">
+      {/* Logo Section */}
+      <div className="flex justify-center pt-6 sm:pt-8 md:pt-10">
+        <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 relative">
+          <img 
+            src="/lovable-uploads/00927cad-9b22-41ba-9858-efcf7069f623.png"
+            alt="Tiger Logo"
+            className="w-full h-full object-contain"
+          />
+        </div>
+      </div>
       {/* Tab Navigation */}
-      <div className="flex border-b border-auth-gray-300 mt-12 sm:mt-16 md:mt-20">
+      <div className="flex border-b border-auth-gray-300 mt-4 sm:mt-6 md:mt-8">
         <button
           onClick={() => onToggleMode('login')}
           className={`flex-1 py-2 sm:py-3 md:py-4 px-2 sm:px-4 md:px-6 text-xs sm:text-sm md:text-base text-center font-medium transition-smooth ${
