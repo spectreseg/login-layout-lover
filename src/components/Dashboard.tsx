@@ -1,5 +1,5 @@
 import React from 'react';
-import { LogOut, TrendingUp, Map, Plus, Bell, Settings, Moon, Sun, MapPin, Clock, Users, ChevronRight } from 'lucide-react';
+import { LogOut, TrendingUp, Map, Plus, Bell, Settings, Moon, Sun, MapPin, Clock, Users, ChevronRight, CheckCircle, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
@@ -30,6 +30,7 @@ interface FoodPost {
   expires_at: string;
   created_at: string;
   user_id: string;
+  finished_by?: string[] | null;
   profiles?: {
     first_name: string | null;
     last_name: string | null;
@@ -87,7 +88,7 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
       // Fetch active posts
       const { data: activeData, error: activeError } = await supabase
         .from('food_posts')
-        .select('*')
+        .select('*, finished_by')
         .gt('expires_at', now)
         .order('created_at', { ascending: false });
 
@@ -115,7 +116,7 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
       // Fetch expired posts
       const { data: expiredData, error: expiredError } = await supabase
         .from('food_posts')
-        .select('*')
+        .select('*, finished_by')
         .lte('expires_at', now)
         .order('created_at', { ascending: false });
 
@@ -141,7 +142,7 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
       if (user) {
         const { data: myData, error: myError } = await supabase
           .from('food_posts')
-          .select('*')
+          .select('*, finished_by')
           .eq('user_id', user.id)
           .order('created_at', { ascending: false });
 
@@ -169,6 +170,86 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
       console.error('Error in fetchPosts:', error);
     }
   }, [user]);
+
+  // Handle marking post as finished
+  const handleMarkAsFinished = async (postId: string) => {
+    if (!user) return;
+
+    try {
+      // Get current post data
+      const { data: currentPost, error: fetchError } = await supabase
+        .from('food_posts')
+        .select('finished_by')
+        .eq('id', postId)
+        .single();
+
+      if (fetchError) {
+        console.error('Error fetching post:', fetchError);
+        return;
+      }
+
+      const currentFinishedBy = currentPost.finished_by || [];
+      
+      // Check if user already marked as finished
+      if (currentFinishedBy.includes(user.id)) {
+        alert('You have already marked this post as finished!');
+        return;
+      }
+
+      // Add user to finished_by array
+      const updatedFinishedBy = [...currentFinishedBy, user.id];
+
+      const { error } = await supabase
+        .from('food_posts')
+        .update({ finished_by: updatedFinishedBy })
+        .eq('id', postId);
+
+      if (error) {
+        console.error('Error marking as finished:', error);
+        alert('Failed to mark as finished. Please try again.');
+        return;
+      }
+
+      // Refresh posts
+      fetchPosts();
+      
+      if (updatedFinishedBy.length >= 3) {
+        alert('This post has been marked as finished by 3 users and is now expired!');
+      }
+    } catch (error) {
+      console.error('Error in handleMarkAsFinished:', error);
+      alert('Failed to mark as finished. Please try again.');
+    }
+  };
+
+  // Handle deleting post
+  const handleDeletePost = async (postId: string) => {
+    if (!user) return;
+
+    const confirmed = window.confirm('Are you sure you want to delete this post?');
+    if (!confirmed) return;
+
+    try {
+      const { error } = await supabase
+        .from('food_posts')
+        .delete()
+        .eq('id', postId)
+        .eq('user_id', user.id); // Ensure only owner can delete
+
+      if (error) {
+        console.error('Error deleting post:', error);
+        alert('Failed to delete post. Please try again.');
+        return;
+      }
+
+      // Refresh posts
+      fetchPosts();
+      alert('Post deleted successfully!');
+    } catch (error) {
+      console.error('Error in handleDeletePost:', error);
+      alert('Failed to delete post. Please try again.');
+    }
+  };
 
   // Dummy posts with properly generated images
   const dummyPosts = [
@@ -484,7 +565,7 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
                     setShowMyPosts(false);
                     setShowExpiredPosts(false);
                   }}
-                  className="flex items-center gap-2 px-4 py-2 text-sm font-inter font-medium text-white bg-purple-500 hover:bg-purple-600 rounded-lg transition-colors duration-200"
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-inter font-medium text-foreground hover:text-foreground/80 transition-colors duration-200"
                 >
                   Active Posts
                   <ChevronRight className="h-4 w-4" />
@@ -573,15 +654,42 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
                       <div className="text-sm text-foreground/70 font-medium">
                         by {getPosterName(post)}
                       </div>
+                      {post.finished_by && post.finished_by.length > 0 && (
+                        <div className="text-xs text-muted-foreground">
+                          {post.finished_by.length} user(s) marked as finished
+                        </div>
+                      )}
                     </div>
 
                     <div className="flex gap-3 pt-3">
-                      <Button variant="ghost" size="sm" className="flex-1 text-sm h-9 text-primary font-inter font-medium">
-                        View Details
-                      </Button>
-                      <Button size="sm" className="flex-1 text-sm h-9 bg-primary hover:bg-primary/90 font-inter font-medium">
-                        I'm On My Way!
-                      </Button>
+                      {user && post.user_id === user.id ? (
+                        // Show delete button for own posts
+                        <Button 
+                          variant="destructive" 
+                          size="sm" 
+                          className="flex-1 text-sm h-9 font-inter font-medium"
+                          onClick={() => handleDeletePost(post.id)}
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete Post
+                        </Button>
+                      ) : (
+                        // Show action buttons for other users' posts
+                        <>
+                          <Button variant="ghost" size="sm" className="flex-1 text-sm h-9 text-primary font-inter font-medium">
+                            View Details
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            className="flex-1 text-sm h-9 bg-primary hover:bg-primary/90 font-inter font-medium"
+                            onClick={() => handleMarkAsFinished(post.id)}
+                            disabled={post.finished_by?.includes(user?.id || '') || showExpiredPosts}
+                          >
+                            <CheckCircle className="h-4 w-4 mr-2" />
+                            {post.finished_by?.includes(user?.id || '') ? 'Marked!' : 'Mark as Finished'}
+                          </Button>
+                        </>
+                      )}
                     </div>
                   </div>
                 </CardContent>
