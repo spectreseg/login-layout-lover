@@ -699,7 +699,18 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
                         <Button 
                           size="sm" 
                           className="flex-1 text-sm h-9 bg-primary hover:bg-primary/90 font-inter font-medium"
-                          onClick={() => handleMarkAsFinished(post.id)}
+                          onClick={() => {
+                            console.log('Button clicked for post:', post.id);
+                            console.log('Post data:', post);
+                            console.log('User ID:', user?.id);
+                            console.log('Button disabled?', post.finished_by?.includes(user?.id || '') || showExpiredPosts);
+                            if (post.id.startsWith('dummy-')) {
+                              console.log('This is a dummy post, no action taken');
+                              alert('This is a demo post. Try clicking on a real post!');
+                              return;
+                            }
+                            handleMarkAsFinished(post.id);
+                          }}
                           disabled={post.finished_by?.includes(user?.id || '') || showExpiredPosts}
                         >
                           {post.finished_by?.includes(user?.id || '') ? (
