@@ -171,6 +171,117 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
     }
   }, [user]);
 
+  // Dummy posts with properly generated images
+  const dummyPosts = [
+    {
+      id: 'dummy-1',
+      user_id: 'dummy-user-1',
+      title: 'Homemade Margherita Pizza',
+      description: 'Fresh basil, mozzarella, and tomato sauce on homemade dough. Made too much for dinner tonight!',
+      location: 'Downtown Apartment',
+      servings: '6-8 slices',
+      image_url: dummyPizzaImage,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      expires_at: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(), // expires in 4 hours
+      finished_by: [] as string[],
+      profiles: { first_name: 'Marco', last_name: 'Rossi', avatar_url: null }
+    },
+    {
+      id: 'dummy-2', 
+      user_id: 'dummy-user-2',
+      title: 'Fresh Garden Salad',
+      description: 'Mixed greens with cherry tomatoes, cucumbers, and house vinaigrette. Perfect for a healthy lunch!',
+      location: 'University Campus',
+      servings: '4-6 people',
+      image_url: dummySaladImage,
+      created_at: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), // 1 hour ago
+      updated_at: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
+      expires_at: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString(), // expires in 8 hours
+      finished_by: [] as string[],
+      profiles: { first_name: 'Sarah', last_name: 'Johnson', avatar_url: null }
+    },
+    {
+      id: 'dummy-3',
+      user_id: 'dummy-user-3', 
+      title: 'Seasonal Fruit Bowl',
+      description: 'Fresh strawberries, blueberries, and kiwi from the farmers market. Great for sharing!',
+      location: 'Community Center',
+      servings: '8-10 people',
+      image_url: dummyFruitImage,
+      created_at: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(), // 3 hours ago
+      updated_at: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
+      expires_at: new Date(Date.now() + 5 * 60 * 60 * 1000).toISOString(), // expires in 5 hours
+      finished_by: [] as string[],
+      profiles: { first_name: 'Emma', last_name: 'Chen', avatar_url: null }
+    },
+    {
+      id: 'dummy-4',
+      user_id: 'dummy-user-4',
+      title: 'Gourmet Sandwiches',
+      description: 'Turkey, avocado, and sprouts on artisan sourdough. Made for office lunch but have extras!',
+      location: 'Business District',
+      servings: '4 sandwiches',
+      image_url: dummySandwichesImage,
+      created_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), // 5 hours ago
+      updated_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
+      expires_at: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), // expired 1 hour ago
+      finished_by: [] as string[],
+      profiles: { first_name: 'David', last_name: 'Miller', avatar_url: null }
+    },
+    {
+      id: 'dummy-5',
+      user_id: 'dummy-user-5',
+      title: 'Everything Bagels',
+      description: 'Fresh baked everything bagels with cream cheese and lox. Perfect for weekend brunch!',
+      location: 'Local Bakery',
+      servings: '8 bagels',
+      image_url: dummyBagelsImage,
+      created_at: new Date(Date.now() - 7 * 60 * 60 * 1000).toISOString(), // 7 hours ago
+      updated_at: new Date(Date.now() - 7 * 60 * 60 * 1000).toISOString(),
+      expires_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // expired 2 hours ago
+      finished_by: [] as string[],
+      profiles: { first_name: 'Lisa', last_name: 'Anderson', avatar_url: null }
+    },
+    {
+      id: 'dummy-6',
+      user_id: 'dummy-user-6',
+      title: 'Creamy Italian Pasta',
+      description: 'Penne with herbs, vegetables, and parmesan. Comfort food at its finest!',
+      location: 'Little Italy',
+      servings: '6-8 people',
+      image_url: dummyPastaImage,
+      created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
+      updated_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+      expires_at: new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString(), // expires in 6 hours
+      finished_by: [] as string[],
+      profiles: { first_name: 'Antonio', last_name: 'Gonzalez', avatar_url: null }
+    }
+  ];
+
+  // Handle marking dummy posts as finished (for UI demo)
+  const [dummyPostsState, setDummyPostsState] = React.useState(dummyPosts);
+  
+  const handleMarkDummyAsFinished = (postId: string) => {
+    console.log('Handling dummy post mark as finished:', postId);
+    
+    setDummyPostsState(prevPosts => 
+      prevPosts.map(post => {
+        if (post.id === postId) {
+          const currentFinishedBy = post.finished_by || [];
+          if (!currentFinishedBy.includes(user?.id || 'current-user')) {
+            const updatedFinishedBy = [...currentFinishedBy, user?.id || 'current-user'];
+            console.log('Updated dummy post finished_by:', updatedFinishedBy);
+            return { ...post, finished_by: updatedFinishedBy };
+          }
+        }
+        return post;
+      })
+    );
+    
+    console.log('Demo: Marked dummy post as finished!');
+  };
+
   // Handle marking post as finished
   const handleMarkAsFinished = async (postId: string) => {
     if (!user) {
@@ -266,88 +377,6 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
       alert('Failed to delete post. Please try again.');
     }
   };
-
-  // Dummy posts with properly generated images
-  const dummyPosts = [
-    {
-      id: 'dummy-1',
-      user_id: 'dummy-user-1',
-      title: 'Homemade Margherita Pizza',
-      description: 'Fresh basil, mozzarella, and tomato sauce on homemade dough. Made too much for dinner tonight!',
-      location: 'Downtown Apartment',
-      servings: '6-8 slices',
-      image_url: dummyPizzaImage,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      expires_at: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(), // expires in 4 hours
-      profiles: { first_name: 'Marco', last_name: 'Rossi', avatar_url: null }
-    },
-    {
-      id: 'dummy-2', 
-      user_id: 'dummy-user-2',
-      title: 'Fresh Garden Salad',
-      description: 'Mixed greens with cherry tomatoes, cucumbers, and house vinaigrette. Perfect for a healthy lunch!',
-      location: 'University Campus',
-      servings: '4-6 people',
-      image_url: dummySaladImage,
-      created_at: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), // 1 hour ago
-      updated_at: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
-      expires_at: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString(), // expires in 8 hours
-      profiles: { first_name: 'Sarah', last_name: 'Johnson', avatar_url: null }
-    },
-    {
-      id: 'dummy-3',
-      user_id: 'dummy-user-3', 
-      title: 'Seasonal Fruit Bowl',
-      description: 'Fresh strawberries, blueberries, and kiwi from the farmers market. Great for sharing!',
-      location: 'Community Center',
-      servings: '8-10 people',
-      image_url: dummyFruitImage,
-      created_at: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(), // 3 hours ago
-      updated_at: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
-      expires_at: new Date(Date.now() + 5 * 60 * 60 * 1000).toISOString(), // expires in 5 hours
-      profiles: { first_name: 'Emma', last_name: 'Chen', avatar_url: null }
-    },
-    {
-      id: 'dummy-4',
-      user_id: 'dummy-user-4',
-      title: 'Gourmet Sandwiches',
-      description: 'Turkey, avocado, and sprouts on artisan sourdough. Made for office lunch but have extras!',
-      location: 'Business District',
-      servings: '4 sandwiches',
-      image_url: dummySandwichesImage,
-      created_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), // 5 hours ago
-      updated_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-      expires_at: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), // expired 1 hour ago
-      profiles: { first_name: 'David', last_name: 'Miller', avatar_url: null }
-    },
-    {
-      id: 'dummy-5',
-      user_id: 'dummy-user-5',
-      title: 'Everything Bagels',
-      description: 'Fresh baked everything bagels with cream cheese and lox. Perfect for weekend brunch!',
-      location: 'Local Bakery',
-      servings: '8 bagels',
-      image_url: dummyBagelsImage,
-      created_at: new Date(Date.now() - 7 * 60 * 60 * 1000).toISOString(), // 7 hours ago
-      updated_at: new Date(Date.now() - 7 * 60 * 60 * 1000).toISOString(),
-      expires_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // expired 2 hours ago
-      profiles: { first_name: 'Lisa', last_name: 'Anderson', avatar_url: null }
-    },
-    {
-      id: 'dummy-6',
-      user_id: 'dummy-user-6',
-      title: 'Creamy Italian Pasta',
-      description: 'Penne with herbs, vegetables, and parmesan. Comfort food at its finest!',
-      location: 'Little Italy',
-      servings: '6-8 people',
-      image_url: dummyPastaImage,
-      created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
-      updated_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-      expires_at: new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString(), // expires in 6 hours
-      profiles: { first_name: 'Antonio', last_name: 'Gonzalez', avatar_url: null }
-    }
-  ];
 
   React.useEffect(() => {
     if (user) {
@@ -604,9 +633,9 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
               if (showMyPosts) {
                 postsToShow = myPosts;
               } else if (showExpiredPosts) {
-                postsToShow = [...expiredPosts, ...dummyPosts.filter(post => new Date(post.expires_at) < new Date())];
+                postsToShow = [...expiredPosts, ...dummyPostsState.filter(post => new Date(post.expires_at) < new Date())];
               } else {
-                postsToShow = [...activePosts, ...dummyPosts.filter(post => new Date(post.expires_at) > new Date())];
+                postsToShow = [...activePosts, ...dummyPostsState.filter(post => new Date(post.expires_at) > new Date())];
               }
               
               console.log('Final posts to show:', postsToShow);
@@ -699,16 +728,25 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
                         <Button 
                           size="sm" 
                           className="flex-1 text-sm h-9 bg-primary hover:bg-primary/90 font-inter font-medium"
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            console.log('=== BUTTON CLICKED ===');
                             console.log('Button clicked for post:', post.id);
                             console.log('Post data:', post);
                             console.log('User ID:', user?.id);
+                            console.log('User object:', user);
                             console.log('Button disabled?', post.finished_by?.includes(user?.id || '') || showExpiredPosts);
+                            console.log('showExpiredPosts:', showExpiredPosts);
+                            console.log('finished_by array:', post.finished_by);
+                            
                             if (post.id.startsWith('dummy-')) {
-                              console.log('This is a dummy post, no action taken');
-                              alert('This is a demo post. Try clicking on a real post!');
+                              console.log('This is a dummy post, calling handleMarkDummyAsFinished');
+                              handleMarkDummyAsFinished(post.id);
                               return;
                             }
+                            
+                            console.log('This is a real post, calling handleMarkAsFinished');
                             handleMarkAsFinished(post.id);
                           }}
                           disabled={post.finished_by?.includes(user?.id || '') || showExpiredPosts}
