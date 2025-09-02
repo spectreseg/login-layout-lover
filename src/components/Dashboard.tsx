@@ -371,10 +371,8 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
         alert('This post has been marked as finished by 3 users and is now automatically expired!');
       }
 
-      // Refresh posts to ensure consistency (but delay it to avoid overriding local state)
-      setTimeout(() => {
-        fetchPosts();
-      }, 100);
+      // Don't refresh posts automatically to maintain button state
+      // fetchPosts() will be called naturally when user navigates or performs other actions
     } catch (error) {
       console.error('Error in handleMarkAsFinished:', error);
       alert('Failed to mark as finished. Please try again.');
@@ -767,7 +765,7 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
                         ) : (
                           <Button 
                             size="sm" 
-                            className="flex-1 text-sm h-9 bg-primary hover:bg-primary/90 text-white font-inter font-medium dark:text-white"
+                            className="flex-1 text-sm h-9 bg-primary hover:bg-primary/90 text-white font-inter font-medium dark:text-black"
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
