@@ -11,6 +11,8 @@ export default function OnboardingLocationScreen({ onBack, onProceed }: Onboardi
   const [bubbleVisible, setBubbleVisible] = useState(false);
   const [formVisible, setFormVisible] = useState(false);
   const [buttonsVisible, setButtonsVisible] = useState(false);
+  const [locationGranted, setLocationGranted] = useState(false);
+  const [locationData, setLocationData] = useState('');
 
   useEffect(() => {
     console.log('OnboardingLocationScreen mounted');
@@ -52,18 +54,25 @@ export default function OnboardingLocationScreen({ onBack, onProceed }: Onboardi
       navigator.geolocation.getCurrentPosition(
         (position) => {
           console.log('Location granted:', position.coords);
-          onProceed({location: `${position.coords.latitude},${position.coords.longitude}`});
+          setLocationGranted(true);
+          setLocationData(`${position.coords.latitude},${position.coords.longitude}`);
         },
         (error) => {
           console.log('Location denied:', error);
           alert('Location access is required to continue. Please allow location access and try again.');
-          // Don't proceed - location is mandatory
         }
       );
     } else {
       console.log('Geolocation not supported');
       alert('Geolocation is not supported by your browser. Please use a modern browser.');
-      // Don't proceed - geolocation is mandatory
+    }
+  };
+
+  const handleProceed = () => {
+    if (locationGranted && locationData) {
+      onProceed({location: locationData});
+    } else {
+      alert('Please enable location services first.');
     }
   };
 
@@ -125,50 +134,78 @@ export default function OnboardingLocationScreen({ onBack, onProceed }: Onboardi
             <div className="w-full max-w-md">
               <button
                 onClick={handleLocationRequest}
-                className="w-full px-6 py-3 bg-gray-200 text-gray-700 rounded-xl text-base font-semibold hover:bg-gray-300 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-gray-300 flex items-center justify-center gap-2"
+                className={`w-full px-6 py-3 rounded-xl text-base font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 flex items-center justify-center gap-2 ${
+                  locationGranted 
+                    ? 'bg-green-200 text-green-700 border-green-300' 
+                    : 'bg-gray-200 text-gray-700 border-gray-300 hover:bg-gray-300'
+                }`}
+                disabled={locationGranted}
               >
                 <MapPin size={20} />
-                Use my location
+                {locationGranted ? 'Location Enabled ✓' : 'Use my location'}
               </button>
             </div>
             
-            {/* Location button takes full width - no skip button */}
-            <div className="w-full max-w-md flex justify-center">
+            {/* Proceed button - right side */}
+            <div className={`transition-all duration-700 ease-out ${buttonsVisible ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}`}>
               <button
-                onClick={handleLocationRequest}
-                className="px-8 py-3 bg-gray-200 text-gray-700 rounded-xl text-base font-semibold hover:bg-gray-300 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-gray-300 flex items-center justify-center gap-2"
+                onClick={handleProceed}
+                className={`px-6 py-2 rounded-xl text-sm font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 ${
+                  locationGranted
+                    ? 'bg-purple-600 text-white border-purple-600 hover:bg-purple-700'
+                    : 'bg-gray-300 text-gray-500 border-gray-300 cursor-not-allowed'
+                }`}
+                disabled={!locationGranted}
               >
-                <MapPin size={20} />
-                Enable Location Services
+                Proceed
               </button>
             </div>
           </div>
         </div>
 
-          {/* Mobile layout */}
-          <div className="md:hidden">
-            {/* Location button container */}
-            <div className={`w-full max-w-md mx-auto mb-8 transition-all duration-700 ease-out ${formVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
-              <button
-                onClick={handleLocationRequest}
-                className="w-full px-6 py-3 bg-gray-200 text-gray-700 rounded-xl text-base font-semibold hover:bg-gray-300 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-gray-300 flex items-center justify-center gap-2"
-              >
-                <MapPin size={20} />
-                Enable Location Services
-              </button>
-            </div>
-
-            {/* Back button only - no skip */}
-            <div className={`flex justify-center w-full max-w-md mx-auto transition-all duration-700 ease-out ${buttonsVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
-              <button
-                onClick={onBack}
-                type="button"
-                className="w-full bg-white text-purple-600 px-6 py-3 rounded-xl text-base font-semibold hover:bg-purple-50 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-purple-300"
-              >
-                Back
-              </button>
-            </div>
+        {/* Mobile layout */}
+        <div className="md:hidden">
+          {/* Location button container */}
+          <div className={`w-full max-w-md mx-auto mb-8 transition-all duration-700 ease-out ${formVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
+            <button
+              onClick={handleLocationRequest}
+              className={`w-full px-6 py-3 rounded-xl text-base font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 flex items-center justify-center gap-2 ${
+                locationGranted 
+                  ? 'bg-green-200 text-green-700 border-green-300' 
+                  : 'bg-gray-200 text-gray-700 border-gray-300 hover:bg-gray-300'
+              }`}
+              disabled={locationGranted}
+            >
+              <MapPin size={20} />
+              {locationGranted ? 'Location Enabled ✓' : 'Use my location'}
+            </button>
           </div>
+
+          {/* Mobile buttons */}
+          <div className={`flex flex-col gap-3 w-full max-w-md mx-auto transition-all duration-700 ease-out ${buttonsVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
+            {/* Proceed button */}
+            <button
+              onClick={handleProceed}
+              className={`w-full px-6 py-3 rounded-xl text-base font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 ${
+                locationGranted
+                  ? 'bg-purple-600 text-white border-purple-600 hover:bg-purple-700'
+                  : 'bg-gray-300 text-gray-500 border-gray-300 cursor-not-allowed'
+              }`}
+              disabled={!locationGranted}
+            >
+              Proceed
+            </button>
+            
+            {/* Back button */}
+            <button
+              onClick={onBack}
+              type="button"
+              className="w-full bg-white text-purple-600 px-6 py-3 rounded-xl text-base font-semibold hover:bg-purple-50 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-purple-300"
+            >
+              Back
+            </button>
+          </div>
+        </div>
         
       </div>
     </div>
