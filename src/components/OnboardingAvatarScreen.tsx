@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Camera } from 'lucide-react';
+import { Camera, User } from 'lucide-react';
+import heic2any from 'heic2any';
 
 interface OnboardingAvatarScreenProps {
   onBack: () => void;
@@ -12,6 +13,8 @@ export default function OnboardingAvatarScreen({ onBack, onProceed }: Onboarding
   const [formVisible, setFormVisible] = useState(false);
   const [buttonsVisible, setButtonsVisible] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     console.log('OnboardingAvatarScreen mounted');
@@ -48,11 +51,58 @@ export default function OnboardingAvatarScreen({ onBack, onProceed }: Onboarding
     };
   }, []);
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const convertHeicToJpeg = async (file: File): Promise<File> => {
+    try {
+      console.log('Converting HEIC file...');
+      setIsProcessing(true);
+      const convertedBlob = await heic2any({
+        blob: file,
+        toType: 'image/jpeg',
+        quality: 0.8
+      }) as Blob;
+      
+      return new File([convertedBlob], file.name.replace(/\.heic$/i, '.jpg'), {
+        type: 'image/jpeg',
+        lastModified: file.lastModified
+      });
+    } catch (error) {
+      console.error('HEIC conversion failed:', error);
+      throw new Error('Failed to convert HEIC image');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const createPreviewUrl = (file: File): string => {
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    return URL.createObjectURL(file);
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      setSelectedFile(file);
-      console.log('File selected:', file.name);
+      try {
+        setIsProcessing(true);
+        let processedFile = file;
+        
+        // Check if it's a HEIC file and convert it
+        if (file.type === 'image/heic' || file.name.toLowerCase().endsWith('.heic')) {
+          processedFile = await convertHeicToJpeg(file);
+          console.log('HEIC file converted successfully');
+        }
+        
+        setSelectedFile(processedFile);
+        const preview = createPreviewUrl(processedFile);
+        setPreviewUrl(preview);
+        console.log('File selected:', processedFile.name);
+      } catch (error) {
+        console.error('Error processing file:', error);
+        alert('Failed to process the selected image. Please try a different file.');
+      } finally {
+        setIsProcessing(false);
+      }
     }
   };
 
@@ -65,6 +115,15 @@ export default function OnboardingAvatarScreen({ onBack, onProceed }: Onboarding
       onProceed();
     }
   };
+
+  // Cleanup preview URL on component unmount
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
 
   return (
     <div className="min-h-screen relative z-10 overflow-hidden">
@@ -122,17 +181,38 @@ export default function OnboardingAvatarScreen({ onBack, onProceed }: Onboarding
             <div className="w-full max-w-md">
               <input
                 type="file"
-                accept="image/*"
+                accept="image/*,.heic"
                 onChange={handleFileUpload}
                 className="hidden"
                 id="avatar-upload"
+                disabled={isProcessing}
               />
               <label
                 htmlFor="avatar-upload"
-                className="w-full px-6 py-3 bg-gray-200 text-gray-700 rounded-xl text-base font-semibold hover:bg-gray-300 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-gray-300 flex items-center justify-center gap-2 cursor-pointer"
+                className={`w-full px-6 py-4 bg-gray-200 text-gray-700 rounded-xl text-base font-semibold hover:bg-gray-300 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-gray-300 flex flex-col items-center justify-center gap-3 cursor-pointer ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
-                <Camera size={20} />
-                {selectedFile ? `Selected: ${selectedFile.name}` : 'Upload'}
+                {previewUrl ? (
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white shadow-md">
+                      <img 
+                        src={previewUrl} 
+                        alt="Avatar preview" 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <span className="text-sm">Change Avatar</span>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="w-16 h-16 rounded-full bg-gray-300 flex items-center justify-center">
+                      <User size={32} className="text-gray-500" />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Camera size={20} />
+                      {isProcessing ? 'Processing...' : 'Upload Avatar'}
+                    </div>
+                  </div>
+                )}
               </label>
             </div>
             
@@ -154,17 +234,38 @@ export default function OnboardingAvatarScreen({ onBack, onProceed }: Onboarding
           <div className={`w-full max-w-md mx-auto mb-8 transition-all duration-700 ease-out ${formVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
             <input
               type="file"
-              accept="image/*"
+              accept="image/*,.heic"
               onChange={handleFileUpload}
               className="hidden"
               id="avatar-upload-mobile"
+              disabled={isProcessing}
             />
             <label
               htmlFor="avatar-upload-mobile"
-              className="w-full px-6 py-3 bg-gray-200 text-gray-700 rounded-xl text-base font-semibold hover:bg-gray-300 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-gray-300 flex items-center justify-center gap-2 cursor-pointer"
+              className={`w-full px-6 py-4 bg-gray-200 text-gray-700 rounded-xl text-base font-semibold hover:bg-gray-300 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-gray-300 flex flex-col items-center justify-center gap-3 cursor-pointer ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
-              <Camera size={20} />
-              {selectedFile ? `Selected: ${selectedFile.name}` : 'Upload'}
+              {previewUrl ? (
+                <div className="flex flex-col items-center gap-3">
+                  <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white shadow-md">
+                    <img 
+                      src={previewUrl} 
+                      alt="Avatar preview" 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <span className="text-sm">Change Avatar</span>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center gap-2">
+                  <div className="w-16 h-16 rounded-full bg-gray-300 flex items-center justify-center">
+                    <User size={32} className="text-gray-500" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Camera size={20} />
+                    {isProcessing ? 'Processing...' : 'Upload Avatar'}
+                  </div>
+                </div>
+              )}
             </label>
           </div>
 
