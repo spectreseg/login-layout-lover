@@ -119,11 +119,41 @@ export default function OnboardingFormScreen({ onBack, onProceed }: OnboardingFo
           
         </div>
 
-        {/* Form container with side buttons */}
-        <div className={`w-full max-w-4xl mx-auto mb-8 transition-all duration-700 ease-out ${formVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
-          <div className="flex items-center justify-center gap-8">
+        {/* Form container */}
+        <div className={`w-full max-w-md mx-auto mb-8 transition-all duration-700 ease-out ${formVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <input
+                type="text"
+                placeholder="Full name"
+                value={formData.name}
+                onChange={(e) => handleInputChange('name', e.target.value)}
+                className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                required
+              />
+            </div>
+            <div>
+              <input
+                type="email"
+                placeholder="your.name@sewanee.edu"
+                value={formData.email}
+                onChange={(e) => handleEmailChange(e.target.value)}
+                className={`w-full px-4 py-3 bg-gray-100 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all ${
+                  formData.email && !formData.email.endsWith('@sewanee.edu') 
+                    ? 'border-2 border-red-500' 
+                    : 'border border-gray-300'
+                }`}
+                required
+              />
+            </div>
+          </form>
+        </div>
+
+        {/* Desktop buttons - positioned on sides */}
+        <div className={`hidden md:flex w-full max-w-4xl mx-auto mb-8 transition-all duration-700 ease-out ${buttonsVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
+          <div className="flex items-center justify-center gap-8 w-full">
             {/* Back button - left side */}
-            <div className={`transition-all duration-700 ease-out ${buttonsVisible ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}`}>
+            <div>
               <button
                 onClick={onBack}
                 type="button"
@@ -133,36 +163,11 @@ export default function OnboardingFormScreen({ onBack, onProceed }: OnboardingFo
               </button>
             </div>
             
-            {/* Form container - center */}
-            <form onSubmit={handleSubmit} className="space-y-4 w-full max-w-md">
-              <div>
-                <input
-                  type="text"
-                  placeholder="Full name"
-                  value={formData.name}
-                  onChange={(e) => handleInputChange('name', e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                  required
-                />
-              </div>
-              <div>
-                <input
-                  type="email"
-                  placeholder="your.name@sewanee.edu"
-                  value={formData.email}
-                  onChange={(e) => handleEmailChange(e.target.value)}
-                  className={`w-full px-4 py-3 bg-gray-100 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all ${
-                    formData.email && !formData.email.endsWith('@sewanee.edu') 
-                      ? 'border-2 border-red-500' 
-                      : 'border border-gray-300'
-                  }`}
-                  required
-                />
-              </div>
-            </form>
+            {/* Spacer to push buttons to sides */}
+            <div className="flex-1"></div>
             
             {/* Proceed button - right side */}
-            <div className={`transition-all duration-700 ease-out ${buttonsVisible ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}`}>
+            <div>
               <button
                 onClick={handleSubmit}
                 className="bg-purple-600 text-white px-6 py-2 rounded-xl text-sm font-semibold hover:bg-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-purple-600"
@@ -171,6 +176,26 @@ export default function OnboardingFormScreen({ onBack, onProceed }: OnboardingFo
               </button>
             </div>
           </div>
+        </div>
+
+        {/* Mobile buttons - positioned at bottom */}
+        <div className={`md:hidden flex flex-col gap-3 w-full max-w-md mx-auto transition-all duration-700 ease-out ${buttonsVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
+          {/* Proceed button first on mobile */}
+          <button
+            onClick={handleSubmit}
+            className="w-full bg-purple-600 text-white px-6 py-3 rounded-xl text-base font-semibold hover:bg-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-purple-600"
+          >
+            Proceed
+          </button>
+          
+          {/* Back button second on mobile */}
+          <button
+            onClick={onBack}
+            type="button"
+            className="w-full bg-white text-purple-600 px-6 py-3 rounded-xl text-base font-semibold hover:bg-purple-50 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-purple-300"
+          >
+            Back
+          </button>
         </div>
         
       </div>

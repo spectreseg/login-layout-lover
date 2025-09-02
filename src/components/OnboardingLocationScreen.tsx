@@ -105,11 +105,22 @@ export default function OnboardingLocationScreen({ onBack, onProceed }: Onboardi
           
         </div>
 
-        {/* Button container */}
-        <div className={`w-full max-w-4xl mx-auto mb-8 transition-all duration-700 ease-out ${formVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
-          <div className="flex items-center justify-center gap-8">
+        {/* Location button container */}
+        <div className={`w-full max-w-md mx-auto mb-8 transition-all duration-700 ease-out ${formVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
+          <button
+            onClick={handleLocationRequest}
+            className="w-full px-6 py-3 bg-gray-200 text-gray-700 rounded-xl text-base font-semibold hover:bg-gray-300 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-gray-300 flex items-center justify-center gap-2"
+          >
+            <MapPin size={20} />
+            Use my location
+          </button>
+        </div>
+
+        {/* Desktop buttons - positioned on sides */}
+        <div className={`hidden md:flex w-full max-w-4xl mx-auto mb-8 transition-all duration-700 ease-out ${buttonsVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
+          <div className="flex items-center justify-center gap-8 w-full">
             {/* Back button - left side */}
-            <div className={`transition-all duration-700 ease-out ${buttonsVisible ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}`}>
+            <div>
               <button
                 onClick={onBack}
                 type="button"
@@ -119,19 +130,11 @@ export default function OnboardingLocationScreen({ onBack, onProceed }: Onboardi
               </button>
             </div>
             
-            {/* Location button - center */}
-            <div className="w-full max-w-md">
-              <button
-                onClick={handleLocationRequest}
-                className="w-full px-6 py-3 bg-gray-200 text-gray-700 rounded-xl text-base font-semibold hover:bg-gray-300 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-gray-300 flex items-center justify-center gap-2"
-              >
-                <MapPin size={20} />
-                Use my location
-              </button>
-            </div>
+            {/* Spacer to push buttons to sides */}
+            <div className="flex-1"></div>
             
             {/* Proceed button - right side */}
-            <div className={`transition-all duration-700 ease-out ${buttonsVisible ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}`}>
+            <div>
               <button
                 onClick={onProceed}
                 className="bg-purple-600 text-white px-6 py-2 rounded-xl text-sm font-semibold hover:bg-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-purple-600"
@@ -140,6 +143,26 @@ export default function OnboardingLocationScreen({ onBack, onProceed }: Onboardi
               </button>
             </div>
           </div>
+        </div>
+
+        {/* Mobile buttons - positioned at bottom */}
+        <div className={`md:hidden flex flex-col gap-3 w-full max-w-md mx-auto transition-all duration-700 ease-out ${buttonsVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
+          {/* Proceed button first on mobile */}
+          <button
+            onClick={onProceed}
+            className="w-full bg-purple-600 text-white px-6 py-3 rounded-xl text-base font-semibold hover:bg-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-purple-600"
+          >
+            Proceed
+          </button>
+          
+          {/* Back button second on mobile */}
+          <button
+            onClick={onBack}
+            type="button"
+            className="w-full bg-white text-purple-600 px-6 py-3 rounded-xl text-base font-semibold hover:bg-purple-50 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-purple-300"
+          >
+            Back
+          </button>
         </div>
         
       </div>
