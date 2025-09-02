@@ -1,5 +1,5 @@
 import React from 'react';
-import { LogOut, TrendingUp, Map, Plus, Bell, Settings, Moon, Sun, MapPin, Clock, Users } from 'lucide-react';
+import { LogOut, TrendingUp, Map, Plus, Bell, Settings, Moon, Sun, MapPin, Clock, Users, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { User, Session } from '@supabase/supabase-js';
+import { useNavigate } from 'react-router-dom';
 import pizzaImage from '@/assets/food-pizza.jpg';
 import bagelsImage from '@/assets/food-bagels.jpg';
 import sandwichesImage from '@/assets/food-sandwiches.jpg';
@@ -23,6 +24,8 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
   const [user, setUser] = React.useState<User | null>(null);
   const [session, setSession] = React.useState<Session | null>(null);
   const [loading, setLoading] = React.useState(true);
+  const [showExpiredPosts, setShowExpiredPosts] = React.useState(false);
+  const navigate = useNavigate();
   const { profile } = useUserProfile(user);
 
   React.useEffect(() => {
@@ -116,6 +119,13 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
     return null;
   }
 
+  const handleNavClick = (item: any) => {
+    if (item.label === 'New Post') {
+      navigate('/share-food');
+    }
+    // Add other navigation logic here as needed
+  };
+
   const navItems = [
     { icon: TrendingUp, label: 'My Posts', href: '#' },
     { icon: Map, label: 'Find Food', href: '#' },
@@ -194,7 +204,44 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
     }
   ];
 
-  const displayName = profile?.first_name 
+  // Mock expired posts data
+  const expiredPosts = [
+    {
+      id: 101,
+      title: "Yesterday's event pizza",
+      description: "Pizza from yesterday's student government meeting. Unfortunately expired but was delicious!",
+      location: "Student Union, conference room",
+      timeLeft: "Expired 1 day ago",
+      servings: 6,
+      postedBy: "Student Government",
+      status: "Expired",
+      image: pizzaImage
+    },
+    {
+      id: 102,
+      title: "Morning coffee meeting pastries",
+      description: "Assorted pastries from this morning's department meeting. Sadly past their prime now.",
+      location: "Woods Lab, break room",
+      timeLeft: "Expired 8 hours ago",
+      servings: 10,
+      postedBy: "CS Department",
+      status: "Expired",
+      image: bagelsImage
+    },
+    {
+      id: 103,
+      title: "Weekend barbecue leftovers",
+      description: "Grilled vegetables and sides from last weekend's outdoor barbecue event.",
+      location: "Quad pavilion",
+      timeLeft: "Expired 3 days ago",
+      servings: 15,
+      postedBy: "Recreation Committee",
+      status: "Expired",
+      image: saladImage
+    }
+  ];
+
+  const displayName = profile?.first_name
     ? `${profile.first_name}${profile.last_name ? ` ${profile.last_name}` : ''}`
     : user?.email?.split('@')[0] || 'User';
 
@@ -250,6 +297,7 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
             <div 
               key={item.label} 
               className="flex flex-col items-center gap-3 cursor-pointer group"
+              onClick={() => handleNavClick(item)}
             >
               {item.primary ? (
                 <div className="w-16 h-16 bg-black dark:bg-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
@@ -273,12 +321,21 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
 
         {/* Active Posts Section */}
         <section>
-          <h2 className="text-2xl font-playfair font-semibold text-foreground mb-6 tracking-wide">
-            Active Posts
-          </h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-playfair font-semibold text-foreground tracking-wide">
+              {showExpiredPosts ? 'Expired Posts' : 'Active Posts'}
+            </h2>
+            <button
+              onClick={() => setShowExpiredPosts(!showExpiredPosts)}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-inter font-medium text-foreground/80 hover:text-foreground bg-muted/30 hover:bg-muted/50 rounded-lg transition-colors duration-200"
+            >
+              {showExpiredPosts ? 'Show Active Posts' : 'Show Expired Posts'}
+              <ChevronRight className={`h-4 w-4 transition-transform duration-200 ${showExpiredPosts ? 'rotate-180' : ''}`} />
+            </button>
+          </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {activePosts.map((post) => (
+            {(showExpiredPosts ? expiredPosts : activePosts).map((post) => (
               <Card key={post.id} className="bg-card border-border/30 hover:border-border/50 transition-all duration-200 hover:shadow-sm overflow-hidden group">
                 <div className="aspect-[4/3] bg-muted/20 relative overflow-hidden">
                   <img 
@@ -288,7 +345,11 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
                   />
                   <Badge 
                     variant="secondary" 
-                    className="absolute top-2 right-2 bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
+                    className={`absolute top-2 right-2 ${
+                      post.status === 'Expired' 
+                        ? 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'
+                        : 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
+                    }`}
                   >
                     {post.status}
                   </Badge>
