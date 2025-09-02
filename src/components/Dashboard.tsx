@@ -186,14 +186,14 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
     }
   }, [user]);
 
-  // Dummy posts with properly generated images
+  // Dummy posts with properly generated images using Sewanee locations
   const dummyPosts = [
     {
       id: 'dummy-1',
       user_id: 'dummy-user-1',
       title: 'Homemade Margherita Pizza',
       description: 'Fresh basil, mozzarella, and tomato sauce on homemade dough. Made too much for dinner tonight!',
-      location: 'Downtown Apartment',
+      location: 'Tuckaway Cafe',
       servings: '6-8 slices',
       image_url: dummyPizzaImage,
       created_at: new Date().toISOString(),
@@ -207,7 +207,7 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
       user_id: 'dummy-user-2',
       title: 'Fresh Garden Salad',
       description: 'Mixed greens with cherry tomatoes, cucumbers, and house vinaigrette. Perfect for a healthy lunch!',
-      location: 'University Campus',
+      location: 'McClurg Dining Hall',
       servings: '4-6 people',
       image_url: dummySaladImage,
       created_at: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), // 1 hour ago
@@ -221,7 +221,7 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
       user_id: 'dummy-user-3', 
       title: 'Seasonal Fruit Bowl',
       description: 'Fresh strawberries, blueberries, and kiwi from the farmers market. Great for sharing!',
-      location: 'Community Center',
+      location: 'Sewanee Market',
       servings: '8-10 people',
       image_url: dummyFruitImage,
       created_at: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(), // 3 hours ago
@@ -235,7 +235,7 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
       user_id: 'dummy-user-4',
       title: 'Gourmet Sandwiches',
       description: 'Turkey, avocado, and sprouts on artisan sourdough. Made for office lunch but have extras!',
-      location: 'Business District',
+      location: 'Stirling\'s Coffee House',
       servings: '4 sandwiches',
       image_url: dummySandwichesImage,
       created_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), // 5 hours ago
@@ -249,7 +249,7 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
       user_id: 'dummy-user-5',
       title: 'Everything Bagels',
       description: 'Fresh baked everything bagels with cream cheese and lox. Perfect for weekend brunch!',
-      location: 'Local Bakery',
+      location: 'Humphreys Hall',
       servings: '8 bagels',
       image_url: dummyBagelsImage,
       created_at: new Date(Date.now() - 7 * 60 * 60 * 1000).toISOString(), // 7 hours ago
@@ -263,7 +263,7 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
       user_id: 'dummy-user-6',
       title: 'Creamy Italian Pasta',
       description: 'Penne with herbs, vegetables, and parmesan. Comfort food at its finest!',
-      location: 'Little Italy',
+      location: 'Benedict Hall',
       servings: '6-8 people',
       image_url: dummyPastaImage,
       created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
