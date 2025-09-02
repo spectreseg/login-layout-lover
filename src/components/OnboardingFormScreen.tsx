@@ -86,7 +86,7 @@ export default function OnboardingFormScreen({ onBack, onProceed }: OnboardingFo
       <div className="min-h-screen flex flex-col items-center justify-between md:justify-center px-4 py-4 md:py-8">
         
         {/* Content container with tiger and speech bubble */}
-        <div className="relative flex flex-col md:flex-row items-center justify-center flex-1 md:flex-none">
+        <div className="relative flex flex-col md:flex-row items-center justify-center flex-1 md:flex-none mt-8 md:mt-12">
           
           {/* Speech bubble - above tiger on mobile, to the right on desktop */}
           <div className={`relative md:absolute md:-top-10 md:left-80 z-20 mb-2 md:mb-0 order-1 md:order-none transition-opacity duration-700 ${bubbleVisible ? 'opacity-100' : 'opacity-0'}`}>
