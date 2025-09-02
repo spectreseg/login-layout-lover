@@ -9,7 +9,7 @@ export const useNotifications = () => {
     
     // Set up real-time subscription for notification changes
     const channel = supabase
-      .channel('notifications-count-updates')
+      .channel('notifications-badge-updates')
       .on(
         'postgres_changes',
         {
@@ -18,20 +18,13 @@ export const useNotifications = () => {
           table: 'notifications',
         },
         async (payload) => {
-          console.log('Real-time notification update for badge:', payload);
-          const { data: { user } } = await supabase.auth.getUser();
-          if (user) {
-            // Check if this notification affects the current user
-            const affectedUserId = (payload.new as any)?.user_id || (payload.old as any)?.user_id;
-            if (affectedUserId === user.id) {
-              console.log('Updating unread count for current user');
-              fetchUnreadCount();
-            }
-          }
+          console.log('Badge: Real-time notification update:', payload);
+          // Always refetch count when any notification changes
+          await fetchUnreadCount();
         }
       )
       .subscribe((status) => {
-        console.log('Notification count subscription status:', status);
+        console.log('Badge subscription status:', status);
       });
 
     return () => {
@@ -43,6 +36,7 @@ export const useNotifications = () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
+        console.log('Badge: No user, setting count to 0');
         setUnreadCount(0);
         return;
       }
@@ -54,13 +48,17 @@ export const useNotifications = () => {
         .eq('read', false);
 
       if (error) {
-        console.error('Error fetching unread count:', error);
+        console.error('Badge: Error fetching unread count:', error);
+        setUnreadCount(0);
         return;
       }
 
-      setUnreadCount(count || 0);
+      const newCount = count || 0;
+      console.log('Badge: Fetched unread count:', newCount);
+      setUnreadCount(newCount);
     } catch (error) {
-      console.error('Error in fetchUnreadCount:', error);
+      console.error('Badge: Error in fetchUnreadCount:', error);
+      setUnreadCount(0);
     }
   };
 

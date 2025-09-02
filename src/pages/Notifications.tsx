@@ -143,16 +143,7 @@ const Notifications = () => {
 
   const markAsRead = async (notificationId: string) => {
     try {
-      const { error } = await supabase
-        .from('notifications')
-        .update({ read: true })
-        .eq('id', notificationId);
-
-      if (error) {
-        console.error('Error marking notification as read:', error);
-        return;
-      }
-
+      // Optimistically update the UI first
       setNotifications(prev =>
         prev.map(notif =>
           notif.id === notificationId
@@ -160,6 +151,26 @@ const Notifications = () => {
             : notif
         )
       );
+
+      const { error } = await supabase
+        .from('notifications')
+        .update({ read: true })
+        .eq('id', notificationId);
+
+      if (error) {
+        console.error('Error marking notification as read:', error);
+        // Revert the optimistic update on error
+        setNotifications(prev =>
+          prev.map(notif =>
+            notif.id === notificationId
+              ? { ...notif, read: false }
+              : notif
+          )
+        );
+        return;
+      }
+
+      console.log('Notification marked as read:', notificationId);
     } catch (error) {
       console.error('Error in markAsRead:', error);
     }

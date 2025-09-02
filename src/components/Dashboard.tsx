@@ -50,7 +50,20 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
   const [myPosts, setMyPosts] = React.useState<FoodPost[]>([]);
   const navigate = useNavigate();
   const { profile } = useUserProfile(user);
-  const { unreadCount } = useNotifications();
+  const { unreadCount, refetchUnreadCount } = useNotifications();
+
+  // Debug unread count
+  React.useEffect(() => {
+    console.log('Dashboard: Current unread count:', unreadCount);
+  }, [unreadCount]);
+
+  // Force refresh unread count when dashboard loads
+  React.useEffect(() => {
+    if (user) {
+      console.log('Dashboard: User loaded, refreshing unread count');
+      refetchUnreadCount();
+    }
+  }, [user, refetchUnreadCount]);
 
   React.useEffect(() => {
     // Set up auth state listener
@@ -620,6 +633,12 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
                   {item.label === 'Notifications' && unreadCount > 0 && (
                     <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
                       {unreadCount > 9 ? '9+' : unreadCount}
+                    </div>
+                  )}
+                  {/* Debug info - remove this after testing */}
+                  {item.label === 'Notifications' && (
+                    <div className="absolute -bottom-6 left-0 text-xs text-gray-500 bg-white px-1 rounded">
+                      {unreadCount}
                     </div>
                   )}
                 </div>
