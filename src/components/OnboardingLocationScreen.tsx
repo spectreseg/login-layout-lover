@@ -8,6 +8,7 @@ interface OnboardingLocationScreenProps {
 export default function OnboardingLocationScreen({ onBack, onProceed }: OnboardingLocationScreenProps) {
   const [tigerVisible, setTigerVisible] = useState(false);
   const [bubbleVisible, setBubbleVisible] = useState(false);
+  const [formVisible, setFormVisible] = useState(false);
   const [buttonsVisible, setButtonsVisible] = useState(false);
 
   useEffect(() => {
@@ -25,15 +26,22 @@ export default function OnboardingLocationScreen({ onBack, onProceed }: Onboardi
       setBubbleVisible(true);
     }, 800);
 
+    // Form appears after bubble
+    const formTimer = setTimeout(() => {
+      console.log('Form animation triggered');
+      setFormVisible(true);
+    }, 1300);
+
     // Buttons fly up last
     const buttonsTimer = setTimeout(() => {
       console.log('Buttons animation triggered');
       setButtonsVisible(true);
-    }, 1300);
+    }, 1800);
 
     return () => {
       clearTimeout(tigerTimer);
       clearTimeout(bubbleTimer);
+      clearTimeout(formTimer);
       clearTimeout(buttonsTimer);
     };
   }, []);
@@ -97,10 +105,10 @@ export default function OnboardingLocationScreen({ onBack, onProceed }: Onboardi
         </div>
 
         {/* Button container */}
-        <div className={`w-full max-w-4xl mx-auto mb-8 transition-all duration-700 ease-out ${buttonsVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
+        <div className={`w-full max-w-4xl mx-auto mb-8 transition-all duration-700 ease-out ${formVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
           <div className="flex items-center justify-center gap-8">
             {/* Back button - left side */}
-            <div>
+            <div className={`transition-all duration-700 ease-out ${buttonsVisible ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}`}>
               <button
                 onClick={onBack}
                 type="button"
@@ -121,7 +129,7 @@ export default function OnboardingLocationScreen({ onBack, onProceed }: Onboardi
             </div>
             
             {/* Proceed button - right side */}
-            <div>
+            <div className={`transition-all duration-700 ease-out ${buttonsVisible ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}`}>
               <button
                 onClick={onProceed}
                 className="bg-purple-600 text-white px-6 py-2 rounded-xl text-sm font-semibold hover:bg-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-purple-600"
