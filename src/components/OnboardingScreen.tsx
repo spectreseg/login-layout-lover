@@ -10,8 +10,10 @@ export default function OnboardingScreen({ onBack, onProceed }: OnboardingScreen
   const [showAnimations, setShowAnimations] = useState(false);
 
   useEffect(() => {
+    console.log('OnboardingScreen mounted');
     // Trigger animations after component mounts
     const timer = setTimeout(() => {
+      console.log('Triggering animations');
       setShowAnimations(true);
     }, 100);
     return () => clearTimeout(timer);

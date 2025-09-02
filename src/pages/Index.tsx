@@ -13,8 +13,10 @@ const Index = () => {
   };
 
   const handleToggleMode = (mode: 'login' | 'register') => {
+    console.log('handleToggleMode called with:', mode);
     setAuthMode(mode);
     if (mode === 'register') {
+      console.log('Setting showOnboarding to true');
       setShowOnboarding(true);
     }
   };
@@ -30,8 +32,11 @@ const Index = () => {
     console.log('Proceeding to registration form');
   };
 
+  console.log('Current state - authMode:', authMode, 'showOnboarding:', showOnboarding);
+
   // Show full-screen onboarding
   if (showOnboarding) {
+    console.log('Rendering onboarding screen');
     return (
       <div className="min-h-screen flex items-center justify-center p-4 relative">
         <StarryBackground />
