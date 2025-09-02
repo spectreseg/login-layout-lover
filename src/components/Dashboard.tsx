@@ -126,8 +126,8 @@ export default function Dashboard() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b border-border/20 bg-card/50 backdrop-blur-sm">
-        <div className="w-full px-4 py-6">
-          <div className="flex items-center justify-center gap-32">
+        <div className="w-full px-4 py-4">
+          <div className="flex items-center justify-center gap-48">
             <div className="flex flex-col items-center gap-3 cursor-pointer group">
               <div className="w-12 h-12 bg-transparent flex items-center justify-center group-hover:bg-muted/50 rounded-lg transition-colors duration-200">
                 <button onClick={toggleDarkMode}>
@@ -163,9 +163,9 @@ export default function Dashboard() {
       </header>
 
       {/* Main Content */}
-      <main className="w-full px-4 py-6">
+      <main className="w-full px-4 py-3">
         {/* Navigation Grid */}
-        <div className="flex items-center justify-between px-8 py-8 mb-8 bg-muted/50 mx-4 rounded-lg">
+        <div className="flex items-center justify-between px-8 py-6 mb-4 bg-muted/50 mx-4 rounded-lg">
           {navItems.map((item) => (
             <div 
               key={item.label} 
