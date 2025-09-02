@@ -7,6 +7,12 @@ import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { User } from '@supabase/supabase-js';
+import pizzaImage from '@/assets/food-pizza.jpg';
+import bagelsImage from '@/assets/food-bagels.jpg';
+import sandwichesImage from '@/assets/food-sandwiches.jpg';
+import saladImage from '@/assets/food-salad.jpg';
+import fruitImage from '@/assets/food-fruit.jpg';
+import pastaImage from '@/assets/food-pasta.jpg';
 
 export default function Dashboard() {
   const [isDarkMode, setIsDarkMode] = React.useState(false);
@@ -49,7 +55,7 @@ export default function Dashboard() {
       servings: 8,
       postedBy: "Sarah Williams",
       status: "Available",
-      image: "/lovable-uploads/172d518a-3a29-459c-b8b5-c8a8d6c8d862.png"
+      image: pizzaImage
     },
     {
       id: 2,
@@ -60,7 +66,7 @@ export default function Dashboard() {
       servings: 12,
       postedBy: "Dr. Johnson",
       status: "Available",
-      image: "/lovable-uploads/172d518a-3a29-459c-b8b5-c8a8d6c8d862.png"
+      image: bagelsImage
     },
     {
       id: 3,
@@ -71,7 +77,40 @@ export default function Dashboard() {
       servings: 15,
       postedBy: "Dining Services",
       status: "Available",
-      image: "/lovable-uploads/172d518a-3a29-459c-b8b5-c8a8d6c8d862.png"
+      image: sandwichesImage
+    },
+    {
+      id: 4,
+      title: "Fresh salad bowl from catering",
+      description: "Large mixed greens salad with vinaigrette dressing available. Perfect for a light and healthy meal.",
+      location: "Spencer Hall, conference room",
+      timeLeft: "Expires in 3 hours",
+      servings: 6,
+      postedBy: "Event Catering",
+      status: "Available",
+      image: saladImage
+    },
+    {
+      id: 5,
+      title: "Fruit platter from orientation",
+      description: "Beautiful assorted fruit platter from new student orientation. Fresh and colorful!",
+      location: "Convocation Hall, lobby",
+      timeLeft: "Expires in 30 minutes",
+      servings: 20,
+      postedBy: "Admissions Office",
+      status: "Available",
+      image: fruitImage
+    },
+    {
+      id: 6,
+      title: "Pasta dinner leftovers",
+      description: "Homemade pasta with marinara sauce from our dorm floor dinner. Plenty left over!",
+      location: "Benedict Hall, 3rd floor kitchen",
+      timeLeft: "Expires in 4 hours",
+      servings: 10,
+      postedBy: "Floor RA Team",
+      status: "Available",
+      image: pastaImage
     }
   ];
 
@@ -87,15 +126,15 @@ export default function Dashboard() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b border-border/20 bg-card/50 backdrop-blur-sm">
-        <div className="max-w-5xl mx-auto px-4 py-3">
+        <div className="w-full px-4 py-3">
           <div className="flex items-center justify-between">
             <Button 
               variant="ghost" 
               size="icon" 
-              onClick={handleSignOut}
-              className="text-destructive hover:text-destructive hover:bg-destructive/10"
+              onClick={toggleDarkMode} 
+              className="text-muted-foreground hover:text-foreground"
             >
-              <LogOut className="h-5 w-5" />
+              {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </Button>
             
             <div className="flex items-center gap-3">
@@ -116,17 +155,17 @@ export default function Dashboard() {
             <Button 
               variant="ghost" 
               size="icon" 
-              onClick={toggleDarkMode} 
-              className="text-muted-foreground hover:text-foreground"
+              onClick={handleSignOut}
+              className="text-destructive hover:text-destructive hover:bg-destructive/10"
             >
-              {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+              <LogOut className="h-5 w-5" />
             </Button>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-5xl mx-auto px-4 py-6">
+      <main className="w-full px-4 py-6">
         {/* Navigation Grid */}
         <div className="grid grid-cols-5 gap-2 mb-8">
           {navItems.map((item) => (
