@@ -320,11 +320,11 @@ const FindFood = () => {
         return;
       }
 
-      // Create custom marker icon based on post type
+      // Create custom marker icon with food emoji
       const markerIcon = {
         path: google.maps.SymbolPath.CIRCLE,
-        scale: 12,
-        fillColor: '#10b981',
+        scale: 15,
+        fillColor: '#ef4444',
         fillOpacity: 0.9,
         strokeColor: '#ffffff',
         strokeWeight: 3,
@@ -333,7 +333,7 @@ const FindFood = () => {
       const marker = new google.maps.Marker({
         position: coordinates,
         map: mapInstanceRef.current,
-        title: post.title,
+        title: `${post.title} at ${post.location}`,
         icon: markerIcon,
       });
 
@@ -341,7 +341,12 @@ const FindFood = () => {
 
       // Create rich info window with post details and image
       const imageHtml = post.image_url ? 
-        `<img src="${post.image_url}" alt="${post.title}" style="width: 120px; height: 80px; object-fit: cover; border-radius: 6px; margin-bottom: 8px; display: block;" onerror="this.style.display='none'" />` 
+        `<div style="text-align: center; margin-bottom: 12px;">
+          <img src="${post.image_url}" alt="${post.title}" 
+               style="width: 160px; height: 120px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);" 
+               onload="this.style.display='block'" 
+               onerror="this.style.display='none'" />
+        </div>` 
         : '';
 
       const timeAgo = new Date(post.created_at).toLocaleTimeString([], { 
@@ -356,34 +361,36 @@ const FindFood = () => {
 
       const infoWindow = new google.maps.InfoWindow({
         content: `
-          <div style="padding: 12px; max-width: 200px; font-family: Arial, sans-serif;">
+          <div style="padding: 16px; max-width: 220px; font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.4;">
             ${imageHtml}
-            <div style="margin-bottom: 8px;">
-              <h3 style="margin: 0 0 4px 0; font-size: 16px; font-weight: bold; color: #1f2937;">${post.title}</h3>
-              <p style="margin: 0 0 6px 0; font-size: 13px; color: #4b5563; line-height: 1.4;">${post.description}</p>
-              <div style="display: flex; align-items: center; font-size: 12px; color: #6b7280; margin-bottom: 4px;">
-                <span style="margin-right: 4px;">📍</span> 
+            <div style="text-align: center; margin-bottom: 12px;">
+              <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600; color: #1f2937;">${post.title}</h3>
+              <p style="margin: 0 0 8px 0; font-size: 14px; color: #4b5563; line-height: 1.4;">${post.description}</p>
+            </div>
+            <div style="background: #f9fafb; padding: 12px; border-radius: 6px; margin-bottom: 8px;">
+              <div style="display: flex; align-items: center; font-size: 13px; color: #374151; margin-bottom: 6px;">
+                <span style="margin-right: 6px; font-size: 16px;">📍</span> 
                 <span style="font-weight: 500;">${post.location}</span>
               </div>
               ${post.servings ? `
-                <div style="display: flex; align-items: center; font-size: 12px; color: #6b7280; margin-bottom: 4px;">
-                  <span style="margin-right: 4px;">🍽️</span> 
+                <div style="display: flex; align-items: center; font-size: 13px; color: #374151;">
+                  <span style="margin-right: 6px; font-size: 16px;">🍽️</span> 
                   <span>Servings: ${post.servings}</span>
                 </div>
               ` : ''}
-              <div style="display: flex; justify-content: space-between; font-size: 11px; color: #9ca3af; padding-top: 6px; border-top: 1px solid #e5e7eb;">
-                <span>Posted: ${timeAgo}</span>
-                <span>Expires: ${expiresAt}</span>
-              </div>
-              <div style="text-align: center; margin-top: 6px;">
-                <span style="display: inline-block; background-color: #dcfce7; color: #166534; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 500;">
-                  Available Now
-                </span>
-              </div>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 11px; color: #6b7280; margin-bottom: 8px;">
+              <span>Posted: ${timeAgo}</span>
+              <span>Expires: ${expiresAt}</span>
+            </div>
+            <div style="text-align: center;">
+              <span style="display: inline-block; background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);">
+                🔥 Available Now
+              </span>
             </div>
           </div>
         `,
-        maxWidth: 250,
+        maxWidth: 280,
       });
 
       console.log(`Created info window for: ${post.title}`);
@@ -391,12 +398,13 @@ const FindFood = () => {
       // Add click listener to marker
       marker.addListener('click', () => {
         console.log(`Marker clicked for: ${post.title}`);
-        // Close all other info windows
+        // Close all other info windows first
         markersRef.current.forEach(m => {
           if (m !== marker && (m as any).infoWindow) {
             ((m as any).infoWindow as google.maps.InfoWindow).close();
           }
         });
+        // Open this info window
         infoWindow.open(mapInstanceRef.current, marker);
       });
 
