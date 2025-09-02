@@ -8,6 +8,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import type { User } from '@supabase/supabase-js';
+import { findLocationCoordinates, getLocationTypeColor } from '@/utils/sewaneeLocations';
 
 // Google Maps type declarations
 declare global {
@@ -25,10 +26,12 @@ declare namespace google {
       constructor(opts?: MarkerOptions);
       addListener(eventName: string, handler: () => void): void;
       setMap(map: Map | null): void;
+      infoWindow?: InfoWindow; // Add custom property
     }
     class InfoWindow {
       constructor(opts?: InfoWindowOptions);
       open(map: Map, anchor?: Marker): void;
+      close(): void;
     }
     interface MapOptions {
       center?: LatLngLiteral;
@@ -51,6 +54,7 @@ declare namespace google {
     }
     interface InfoWindowOptions {
       content?: string;
+      maxWidth?: number;
     }
     interface MapRestriction {
       latLngBounds: LatLngBoundsLiteral;
@@ -106,7 +110,7 @@ const FindFood = () => {
   
   const [filterMode, setFilterMode] = useState<'nearby' | 'all' | 'my'>('all');
 
-  const { data: foodPosts = [] } = useQuery({
+  const { data: foodPosts = [], refetch } = useQuery({
     queryKey: ['food-posts'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -118,6 +122,41 @@ const FindFood = () => {
       return data as FoodPost[];
     },
   });
+
+  // Set up real-time subscription for new posts
+  useEffect(() => {
+    const channel = supabase
+      .channel('schema-db-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'food_posts'
+        },
+        (payload) => {
+          console.log('New post added:', payload);
+          refetch(); // Refetch data when new post is added
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'food_posts'
+        },
+        (payload) => {
+          console.log('Post updated:', payload);
+          refetch(); // Refetch data when post is updated
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [refetch]);
 
   const filteredPosts = React.useMemo(() => {
     if (!currentUser) return [];
@@ -185,48 +224,102 @@ const FindFood = () => {
   }, []);
 
   useEffect(() => {
-    if (!mapInstanceRef.current || !filteredPosts.length) return;
+    if (!mapInstanceRef.current || !filteredPosts.length) {
+      // Clear markers if no posts
+      if (!filteredPosts.length) {
+        markersRef.current.forEach(marker => marker.setMap(null));
+        markersRef.current = [];
+      }
+      return;
+    }
 
     // Clear existing markers
     markersRef.current.forEach(marker => marker.setMap(null));
     markersRef.current = [];
 
     // Add new markers for filtered posts
-    filteredPosts.forEach((post, index) => {
-      // Generate random coordinates within Sewanee campus area
-      const lat = SEWANEE_CENTER.lat + (Math.random() - 0.5) * 0.008;
-      const lng = SEWANEE_CENTER.lng + (Math.random() - 0.5) * 0.008;
+    filteredPosts.forEach((post) => {
+      // Get coordinates for the post location
+      const coordinates = findLocationCoordinates(post.location);
+      if (!coordinates) return;
+
+      // Create custom marker icon based on post type
+      const markerIcon = {
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 12,
+        fillColor: '#10b981',
+        fillOpacity: 0.9,
+        strokeColor: '#ffffff',
+        strokeWeight: 3,
+      };
 
       const marker = new google.maps.Marker({
-        position: { lat, lng },
+        position: coordinates,
         map: mapInstanceRef.current,
         title: post.title,
-        icon: {
-          path: google.maps.SymbolPath.CIRCLE,
-          scale: 8,
-          fillColor: '#10b981',
-          fillOpacity: 1,
-          strokeColor: '#ffffff',
-          strokeWeight: 2,
-        },
+        icon: markerIcon,
+      });
+
+      // Create rich info window with post details and image
+      const imageHtml = post.image_url ? 
+        `<img src="${post.image_url}" alt="${post.title}" style="width: 120px; height: 80px; object-fit: cover; border-radius: 6px; margin-bottom: 8px;" />` 
+        : '';
+
+      const timeAgo = new Date(post.created_at).toLocaleTimeString([], { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      });
+
+      const expiresAt = new Date(post.expires_at).toLocaleTimeString([], { 
+        hour: '2-digit', 
+        minute: '2-digit' 
       });
 
       const infoWindow = new google.maps.InfoWindow({
         content: `
-          <div class="p-2 max-w-xs">
-            <h3 class="font-semibold text-sm">${post.title}</h3>
-            <p class="text-xs text-gray-600 mt-1">${post.description}</p>
-            <p class="text-xs text-gray-500 mt-1 flex items-center">
-              <span class="mr-1">📍</span> ${post.location}
-            </p>
-            ${post.servings ? `<p class="text-xs text-gray-500">Servings: ${post.servings}</p>` : ''}
+          <div class="p-3 max-w-xs">
+            ${imageHtml}
+            <div class="space-y-2">
+              <h3 class="font-bold text-base text-gray-900">${post.title}</h3>
+              <p class="text-sm text-gray-700">${post.description}</p>
+              <div class="flex items-center text-xs text-gray-600">
+                <span class="mr-1">📍</span> 
+                <span class="font-medium">${post.location}</span>
+              </div>
+              ${post.servings ? `
+                <div class="flex items-center text-xs text-gray-600">
+                  <span class="mr-1">🍽️</span> 
+                  <span>Servings: ${post.servings}</span>
+                </div>
+              ` : ''}
+              <div class="flex items-center justify-between text-xs text-gray-500 pt-1 border-t border-gray-200">
+                <span>Posted: ${timeAgo}</span>
+                <span>Expires: ${expiresAt}</span>
+              </div>
+              <div class="text-xs text-center">
+                <span class="inline-block bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
+                  Available Now
+                </span>
+              </div>
+            </div>
           </div>
         `,
+        maxWidth: 250,
       });
 
+      // Add click listener to marker
       marker.addListener('click', () => {
+        // Close all other info windows
+        markersRef.current.forEach(m => {
+          if (m !== marker && (m as any).infoWindow) {
+            ((m as any).infoWindow as google.maps.InfoWindow).close();
+          }
+        });
         infoWindow.open(mapInstanceRef.current, marker);
       });
+
+      // Store info window reference on marker for later access
+      (marker as any).infoWindow = infoWindow;
 
       markersRef.current.push(marker);
     });
