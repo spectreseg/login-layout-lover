@@ -94,7 +94,7 @@ export default function OnboardingAvatarScreen({ onBack, onProceed }: Onboarding
           {/* Monte mascot with phone */}
           <div className={`flex-shrink-0 order-2 md:order-none transition-transform duration-1000 ease-out ${tigerVisible ? 'translate-y-0' : 'translate-y-full'}`}>
             <img
-              src="/lovable-uploads/monte-tiger-selfie.png"
+              src="/lovable-uploads/4e2f3f60-20d2-4179-a8c3-d01aaedd6fb1.png"
               alt="Monte the Tiger with Phone"
               className="w-[350px] h-[350px] md:w-[550px] md:h-[550px] object-contain drop-shadow-2xl"
               onLoad={() => console.log('Tiger phone image loaded successfully')}
