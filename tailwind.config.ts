@@ -20,6 +20,9 @@ export default {
 		extend: {
       fontFamily: {
         'playfair': ['Playfair Display', 'serif'],
+        'inter': ['Inter', 'sans-serif'],
+        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        serif: ['Playfair Display', 'ui-serif', 'Georgia', 'serif'],
       },
       colors: {
 				border: 'hsl(var(--border))',

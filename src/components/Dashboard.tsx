@@ -146,7 +146,7 @@ export default function Dashboard() {
                   {initials}
                 </AvatarFallback>
               </Avatar>
-              <h1 className="text-3xl font-bold text-foreground">
+              <h1 className="text-4xl font-playfair font-semibold text-foreground tracking-wide">
                 Welcome back, {displayName}!
               </h1>
             </div>
@@ -180,7 +180,7 @@ export default function Dashboard() {
                   <item.icon className="h-6 w-6 text-foreground/80 group-hover:text-foreground" />
                 </div>
               )}
-              <span className={`font-medium text-center ${
+              <span className={`font-inter font-medium text-center tracking-wide ${
                 item.primary 
                   ? 'text-sm text-foreground' 
                   : 'text-sm text-foreground/80 group-hover:text-foreground'
@@ -193,7 +193,7 @@ export default function Dashboard() {
 
         {/* Active Posts Section */}
         <section>
-          <h2 className="text-lg font-semibold text-foreground mb-4">
+          <h2 className="text-2xl font-playfair font-semibold text-foreground mb-6 tracking-wide">
             Active Posts
           </h2>
           
@@ -216,37 +216,37 @@ export default function Dashboard() {
                 <CardContent className="p-4">
                   <div className="space-y-3">
                     <div>
-                      <h3 className="font-medium text-sm text-foreground leading-tight mb-1">
+                      <h3 className="font-inter font-semibold text-base text-foreground leading-tight mb-2 tracking-wide">
                         {post.title}
                       </h3>
-                      <p className="text-xs text-muted-foreground leading-relaxed">
+                      <p className="text-sm text-muted-foreground leading-relaxed font-inter">
                         {post.description}
                       </p>
                     </div>
                     
-                    <div className="space-y-2 text-xs text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <MapPin className="h-3 w-3" />
+                    <div className="space-y-2 text-sm text-muted-foreground font-inter">
+                      <div className="flex items-center gap-2">
+                        <MapPin className="h-4 w-4" />
                         <span>{post.location}</span>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4" />
                         <span>{post.timeLeft}</span>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Users className="h-3 w-3" />
+                      <div className="flex items-center gap-2">
+                        <Users className="h-4 w-4" />
                         <span>{post.servings} servings</span>
                       </div>
-                      <div className="text-xs text-foreground/70">
+                      <div className="text-sm text-foreground/70 font-medium">
                         by {post.postedBy}
                       </div>
                     </div>
 
-                    <div className="flex gap-2 pt-2">
-                      <Button variant="ghost" size="sm" className="flex-1 text-xs h-8 text-primary">
+                    <div className="flex gap-3 pt-3">
+                      <Button variant="ghost" size="sm" className="flex-1 text-sm h-9 text-primary font-inter font-medium">
                         View Details
                       </Button>
-                      <Button size="sm" className="flex-1 text-xs h-8 bg-primary hover:bg-primary/90">
+                      <Button size="sm" className="flex-1 text-sm h-9 bg-primary hover:bg-primary/90 font-inter font-medium">
                         I'm On My Way!
                       </Button>
                     </div>
