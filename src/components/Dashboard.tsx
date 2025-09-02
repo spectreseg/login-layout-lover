@@ -290,13 +290,8 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
   };
 
   // Handle marking post as finished
-  const handleMarkAsFinished = async (postId: string) => {
-    if (!user) {
-      console.log('No user found, cannot mark as finished');
-      return;
-    }
-
-    console.log('Marking post as finished:', postId, 'by user:', user.id);
+  const handleMarkAsFinished = async (postId: string, userId: string) => {
+    console.log('Marking post as finished:', postId, 'by user:', userId);
 
     try {
       // Get current post data
@@ -324,16 +319,17 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
       console.log('Current finished_by array:', currentFinishedBy);
       
       // Check if user already marked as finished
-      if (currentFinishedBy.includes(user.id)) {
+      if (currentFinishedBy.includes(userId)) {
         console.log('User already marked this post as finished');
         alert('You have already marked this post as finished!');
         return;
       }
 
       // Add user to finished_by array
-      const updatedFinishedBy = [...currentFinishedBy, user.id];
+      const updatedFinishedBy = [...currentFinishedBy, userId];
       console.log('Updated finished_by array:', updatedFinishedBy);
 
+      // Update the post in the database
       const { error } = await supabase
         .from('food_posts')
         .update({ finished_by: updatedFinishedBy })
@@ -346,6 +342,15 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
       }
 
       console.log('Successfully updated finished_by array');
+
+      // Immediately update local state for instant UI feedback
+      setActivePosts(prevPosts => 
+        prevPosts.map(post => 
+          post.id === postId 
+            ? { ...post, finished_by: updatedFinishedBy }
+            : post
+        )
+      );
 
       // If 3 users marked as finished, automatically expire the post
       if (updatedFinishedBy.length >= 3) {
@@ -366,7 +371,7 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
         alert('This post has been marked as finished by 3 users and is now automatically expired!');
       }
 
-      // Refresh posts
+      // Refresh posts to ensure consistency
       fetchPosts();
     } catch (error) {
       console.error('Error in handleMarkAsFinished:', error);
@@ -756,7 +761,7 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
                         {isUserInFinishedList(post.finished_by, user?.id) ? (
                           <Button 
                             size="sm" 
-                            className="flex-1 text-sm h-9 bg-green-600 hover:bg-green-600 text-white cursor-not-allowed font-inter font-medium" 
+                            className="flex-1 text-sm h-9 bg-green-600 hover:bg-green-600 text-white font-bold cursor-not-allowed font-inter font-medium border-0" 
                             disabled
                           >
                             <CheckCircle className="h-4 w-4 mr-2" />
@@ -780,7 +785,7 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
                               }
                               
                               console.log('This is a real post, calling handleMarkAsFinished');
-                              handleMarkAsFinished(post.id);
+                              handleMarkAsFinished(post.id, user?.id || 'current-user');
                             }}
                             disabled={showExpiredPosts}
                           >
