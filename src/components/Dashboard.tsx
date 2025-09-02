@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { Link } from 'react-router-dom';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { useNotifications } from '@/hooks/useNotifications';
 import { User, Session } from '@supabase/supabase-js';
 import { useNavigate } from 'react-router-dom';
 import dummyPizzaImage from '@/assets/dummy-pizza.jpg';
@@ -49,6 +50,7 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
   const [myPosts, setMyPosts] = React.useState<FoodPost[]>([]);
   const navigate = useNavigate();
   const { profile } = useUserProfile(user);
+  const { unreadCount } = useNotifications();
 
   React.useEffect(() => {
     // Set up auth state listener
@@ -605,7 +607,7 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
                   <item.icon className="h-7 w-7 text-white dark:text-black" />
                 </div>
               ) : (
-                <div className={`w-12 h-12 flex items-center justify-center rounded-lg transition-colors duration-200 ${
+                <div className={`w-12 h-12 flex items-center justify-center rounded-lg transition-colors duration-200 relative ${
                   item.label === 'My Posts' && showMyPosts 
                     ? 'bg-purple-500 hover:bg-purple-600' 
                     : 'bg-transparent group-hover:bg-muted/50'
@@ -615,6 +617,11 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
                       ? 'text-white' 
                       : 'text-foreground/80 group-hover:text-foreground'
                   }`} />
+                  {item.label === 'Notifications' && unreadCount > 0 && (
+                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </div>
+                  )}
                 </div>
               )}
               <span className={`font-inter font-medium text-center tracking-wide ${
