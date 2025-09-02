@@ -122,9 +122,9 @@ export default function OnboardingLocationScreen({ onBack, onProceed }: Onboardi
             <div className="w-full max-w-md">
               <button
                 onClick={handleLocationRequest}
-                className="w-full px-6 py-3 bg-gray-200 text-gray-700 rounded-xl text-base font-semibold hover:bg-gray-300 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-gray-300"
+                className="w-full px-6 py-3 bg-gray-200 text-gray-700 rounded-xl text-base font-semibold hover:bg-gray-300 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-gray-300 flex items-center justify-center gap-2"
               >
-                Use my location button
+                📍 Use my location
               </button>
             </div>
             
