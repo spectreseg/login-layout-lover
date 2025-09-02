@@ -238,10 +238,8 @@ export default function OnboardingAvatarScreen({ onBack, onProceed }: Onboarding
     setIsProcessing(true);
     console.log('Starting registration process...');
     
-    // Use a small delay to ensure the overlay is fully rendered before proceeding
-    setTimeout(() => {
-      onProceed({avatar: selectedFile});
-    }, 100);
+    // Immediate transition - no delay
+    onProceed({avatar: selectedFile});
   };
 
   // Cleanup preview URL on component unmount

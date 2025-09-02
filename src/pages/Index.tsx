@@ -214,7 +214,7 @@ const Index = () => {
 
       console.log('User registered successfully:', data);
       
-      // Immediately transition to completion screen to prevent flash
+      // INSTANT transition to completion screen - no delays
       setOnboardingStep('completion');
       
       // Upload avatar after successful registration if we have one
