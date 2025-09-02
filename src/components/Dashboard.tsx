@@ -371,8 +371,10 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
         alert('This post has been marked as finished by 3 users and is now automatically expired!');
       }
 
-      // Refresh posts to ensure consistency
-      fetchPosts();
+      // Refresh posts to ensure consistency (but delay it to avoid overriding local state)
+      setTimeout(() => {
+        fetchPosts();
+      }, 100);
     } catch (error) {
       console.error('Error in handleMarkAsFinished:', error);
       alert('Failed to mark as finished. Please try again.');
@@ -756,7 +758,7 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
                         {isUserInFinishedList(post.finished_by, user?.id) ? (
                           <Button 
                             size="sm" 
-                            className="flex-1 text-sm h-9 bg-green-600 hover:bg-green-600 text-white font-bold cursor-not-allowed font-inter font-medium border-0" 
+                            className="flex-1 text-sm h-9 bg-green-500 hover:bg-green-500 text-white font-bold cursor-not-allowed font-inter font-medium border-0 dark:bg-green-600 dark:hover:bg-green-600 dark:text-white" 
                             disabled
                           >
                             <CheckCircle className="h-4 w-4 mr-2" />
@@ -765,7 +767,7 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
                         ) : (
                           <Button 
                             size="sm" 
-                            className="flex-1 text-sm h-9 bg-primary hover:bg-primary/90 text-white font-inter font-medium"
+                            className="flex-1 text-sm h-9 bg-primary hover:bg-primary/90 text-white font-inter font-medium dark:text-white"
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
