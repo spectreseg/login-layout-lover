@@ -63,19 +63,19 @@ export default function OnboardingFormScreen({ onBack, onProceed }: OnboardingFo
       email: value
     }));
     
-    // Reset email if it doesn't end with @sewanee.edu
-    if (value && !value.endsWith('@sewanee.edu')) {
-      setTimeout(() => {
-        setFormData(prev => ({
-          ...prev,
-          email: ''
-        }));
-      }, 500);
-    }
+    // Only validate when user stops typing (not while typing)
+    // No automatic reset - let them type freely
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate email format on submit
+    if (!formData.email.endsWith('@sewanee.edu')) {
+      alert('Please use a valid @sewanee.edu email address');
+      return;
+    }
+    
     console.log('Form submitted:', formData);
     onProceed({
       name: formData.name,
@@ -154,11 +154,7 @@ export default function OnboardingFormScreen({ onBack, onProceed }: OnboardingFo
                   placeholder="your.name@sewanee.edu"
                   value={formData.email}
                   onChange={(e) => handleEmailChange(e.target.value)}
-                  className={`w-full px-4 py-3 bg-gray-100 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all ${
-                    formData.email && !formData.email.endsWith('@sewanee.edu') 
-                      ? 'border-2 border-red-500' 
-                      : 'border border-gray-300'
-                  }`}
+                  className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                   required
                 />
               </div>
@@ -197,11 +193,7 @@ export default function OnboardingFormScreen({ onBack, onProceed }: OnboardingFo
                   placeholder="your.name@sewanee.edu"
                   value={formData.email}
                   onChange={(e) => handleEmailChange(e.target.value)}
-                  className={`w-full px-4 py-3 bg-gray-100 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all ${
-                    formData.email && !formData.email.endsWith('@sewanee.edu') 
-                      ? 'border-2 border-red-500' 
-                      : 'border border-gray-300'
-                  }`}
+                  className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                   required
                 />
               </div>
