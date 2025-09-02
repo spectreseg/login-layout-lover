@@ -219,14 +219,15 @@ const Index = () => {
         try {
           console.log('Uploading avatar for new user:', data.user.id);
           
-          // Create a unique filename
+          // Create a path that follows the expected folder structure: {userId}/filename
           const fileExt = avatarFile.name.split('.').pop();
-          const fileName = `avatar-${data.user.id}-${Date.now()}.${fileExt}`;
+          const fileName = `avatar-${Date.now()}.${fileExt}`;
+          const filePath = `${data.user.id}/${fileName}`;
           
-          // Upload to storage
+          // Upload to storage with proper folder structure
           const { data: uploadData, error: uploadError } = await supabase.storage
             .from('avatars')
-            .upload(fileName, avatarFile, {
+            .upload(filePath, avatarFile, {
               cacheControl: '3600',
               upsert: true
             });
