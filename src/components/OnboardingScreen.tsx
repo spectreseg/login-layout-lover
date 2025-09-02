@@ -21,7 +21,7 @@ export default function OnboardingScreen({ onBack, onProceed }: OnboardingScreen
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6 py-8 relative overflow-hidden bg-black">
+    <div className="min-h-screen flex flex-col items-center justify-center px-6 py-8 relative z-10">
       {/* Speech Bubble - fades in */}
       <div className={`mb-8 transition-all duration-1000 delay-1500 ${
         showAnimations ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
@@ -34,7 +34,7 @@ export default function OnboardingScreen({ onBack, onProceed }: OnboardingScreen
         showAnimations ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
       }`}>
         <img 
-          src="/lovable-uploads/monte-tiger-full.png" 
+          src="/lovable-uploads/66d848c6-3010-4a7c-ae3f-ef4b712ad9f6.png" 
           alt="Monte the Tiger" 
           className="w-64 h-64 sm:w-80 sm:h-80 object-contain"
           onLoad={() => console.log('Tiger image loaded successfully')}
