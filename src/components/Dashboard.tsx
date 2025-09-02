@@ -729,6 +729,7 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
                           size="sm" 
                           className="flex-1 text-sm h-9 bg-primary hover:bg-primary/90 font-inter font-medium"
                           onClick={(e) => {
+                            alert('Button clicked!'); // Simple test
                             e.preventDefault();
                             e.stopPropagation();
                             console.log('=== BUTTON CLICKED ===');

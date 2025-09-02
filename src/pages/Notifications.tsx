@@ -1,10 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Bell, Check, X } from 'lucide-react';
+import { Bell, Check, ArrowLeft, MapPin, Clock, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardContent } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
+import dummyPizzaImage from '@/assets/dummy-pizza.jpg';
+import dummySaladImage from '@/assets/dummy-salad.jpg';
+import dummyFruitImage from '@/assets/dummy-fruit.jpg';
+import dummySandwichesImage from '@/assets/dummy-sandwiches.jpg';
+import dummyBagelsImage from '@/assets/dummy-bagels.jpg';
+import dummyPastaImage from '@/assets/dummy-pasta.jpg';
 
 interface Notification {
   id: string;
@@ -15,64 +22,103 @@ interface Notification {
   food_post_id: string | null;
   read: boolean;
   created_at: string;
+  food_post?: {
+    title: string;
+    image_url: string | null;
+    location: string;
+    expires_at: string;
+    profiles: {
+      first_name: string | null;
+      last_name: string | null;
+    } | null;
+  };
 }
 
 const Notifications = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
-  // Add dummy notifications for the existing dummy posts
+  // Map dummy post IDs to images
+  const dummyPostImages: Record<string, string> = {
+    'dummy-1': dummyPizzaImage,
+    'dummy-2': dummySaladImage,
+    'dummy-3': dummyFruitImage,
+    'dummy-4': dummySandwichesImage,
+    'dummy-5': dummyBagelsImage,
+    'dummy-6': dummyPastaImage,
+  };
+
+  // Enhanced dummy notifications with food post data
   const dummyNotifications: Notification[] = [
     {
       id: 'notif-1',
       user_id: 'current-user',
       type: 'new_listing',
       title: 'New Food Available!',
-      message: 'Someone shared Fresh Garden Salad in Downtown Café',
+      message: 'Marco Rossi shared Homemade Margherita Pizza in Downtown Apartment',
       food_post_id: 'dummy-1',
       read: false,
-      created_at: new Date().toISOString()
+      created_at: new Date(Date.now() - 30 * 60 * 1000).toISOString(), // 30 minutes ago
+      food_post: {
+        title: 'Homemade Margherita Pizza',
+        image_url: dummyPizzaImage,
+        location: 'Downtown Apartment',
+        expires_at: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(),
+        profiles: { first_name: 'Marco', last_name: 'Rossi' }
+      }
     },
     {
       id: 'notif-2',
       user_id: 'current-user',
       type: 'new_listing',
       title: 'New Food Available!',
-      message: 'Someone shared Homemade Pizza Slices in University District',
+      message: 'Sarah Johnson shared Fresh Garden Salad in University Campus',
       food_post_id: 'dummy-2',
       read: false,
-      created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
+      created_at: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), // 1 hour ago
+      food_post: {
+        title: 'Fresh Garden Salad',
+        image_url: dummySaladImage,
+        location: 'University Campus',
+        expires_at: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString(),
+        profiles: { first_name: 'Sarah', last_name: 'Johnson' }
+      }
     },
     {
       id: 'notif-3',
       user_id: 'current-user',
       type: 'new_listing',
       title: 'New Food Available!',
-      message: 'Someone shared Fresh Fruit Bowl in Community Center',
+      message: 'Emma Chen shared Seasonal Fruit Bowl in Community Center',
       food_post_id: 'dummy-3',
       read: true,
-      created_at: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString()
+      created_at: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(), // 3 hours ago
+      food_post: {
+        title: 'Seasonal Fruit Bowl',
+        image_url: dummyFruitImage,
+        location: 'Community Center',
+        expires_at: new Date(Date.now() + 5 * 60 * 60 * 1000).toISOString(),
+        profiles: { first_name: 'Emma', last_name: 'Chen' }
+      }
     },
     {
       id: 'notif-4',
       user_id: 'current-user',
       type: 'new_listing',
       title: 'New Food Available!',
-      message: 'Someone shared Artisan Bagels in Local Bakery',
-      food_post_id: 'dummy-4',
+      message: 'Antonio Gonzalez shared Creamy Italian Pasta in Little Italy',
+      food_post_id: 'dummy-6',
       read: true,
-      created_at: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString()
-    },
-    {
-      id: 'notif-5',
-      user_id: 'current-user',
-      type: 'new_listing',
-      title: 'New Food Available!',
-      message: 'Someone shared Gourmet Sandwiches in Business District',
-      food_post_id: 'dummy-5',
-      read: true,
-      created_at: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString()
+      created_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), // 5 hours ago
+      food_post: {
+        title: 'Creamy Italian Pasta',
+        image_url: dummyPastaImage,
+        location: 'Little Italy',
+        expires_at: new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString(),
+        profiles: { first_name: 'Antonio', last_name: 'Gonzalez' }
+      }
     }
   ];
 
@@ -88,15 +134,17 @@ const Notifications = () => {
           event: 'INSERT',
           schema: 'public',
           table: 'notifications',
-          filter: `user_id=eq.${supabase.auth.getUser().then(u => u.data.user?.id)}`
         },
-        (payload) => {
-          console.log('New notification:', payload);
-          setNotifications(prev => [payload.new as Notification, ...prev]);
-          toast({
-            title: (payload.new as Notification).title,
-            description: (payload.new as Notification).message,
-          });
+        async (payload) => {
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user && (payload.new as any).user_id === user.id) {
+            console.log('New notification:', payload);
+            await fetchNotifications(); // Refetch to get complete data
+            toast({
+              title: (payload.new as Notification).title,
+              description: (payload.new as Notification).message,
+            });
+          }
         }
       )
       .subscribe();
@@ -109,21 +157,48 @@ const Notifications = () => {
   const fetchNotifications = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) {
+        setNotifications(dummyNotifications);
+        setLoading(false);
+        return;
+      }
 
+      // Fetch notifications with food post data and profiles
       const { data, error } = await supabase
         .from('notifications')
-        .select('*')
+        .select(`
+          *,
+          food_post:food_posts!food_post_id (
+            title,
+            image_url,
+            location,
+            expires_at,
+            profiles!user_id (
+              first_name,
+              last_name
+            )
+          )
+        `)
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) {
         console.error('Error fetching notifications:', error);
-        // Use dummy notifications if there's an error or no real notifications
         setNotifications(dummyNotifications);
       } else {
-        // Combine real notifications with dummy ones for now
-        setNotifications([...data, ...dummyNotifications]);
+        // Transform the data to match our interface
+        const transformedData = (data || []).map(notif => ({
+          ...notif,
+          food_post: notif.food_post ? {
+            ...notif.food_post,
+            profiles: Array.isArray(notif.food_post.profiles) 
+              ? notif.food_post.profiles[0] 
+              : notif.food_post.profiles
+          } : null
+        }));
+        
+        // Combine real notifications with dummy ones
+        setNotifications([...transformedData, ...dummyNotifications]);
       }
     } catch (error) {
       console.error('Error in fetchNotifications:', error);
@@ -169,47 +244,17 @@ const Notifications = () => {
     }
   };
 
-  const markAllAsRead = async () => {
-    // Update dummy notifications
-    const dummyIds = notifications.filter(n => n.id.startsWith('notif-')).map(n => n.id);
-    
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      // Update real notifications
-      const { error } = await supabase
-        .from('notifications')
-        .update({ read: true })
-        .eq('user_id', user.id)
-        .eq('read', false);
-
-      if (error) {
-        console.error('Error marking all notifications as read:', error);
-      }
-
-      // Update state for all notifications
-      setNotifications(prev =>
-        prev.map(notif => ({ ...notif, read: true }))
-      );
-
-      toast({
-        title: "All notifications marked as read",
-      });
-    } catch (error) {
-      console.error('Error in markAllAsRead:', error);
-    }
-  };
-
   const formatTimeAgo = (dateString: string) => {
     const now = new Date();
     const notificationDate = new Date(dateString);
     const diffInMs = now.getTime() - notificationDate.getTime();
-    const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
+    const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
+    const diffInHours = Math.floor(diffInMinutes / 60);
     const diffInDays = Math.floor(diffInHours / 24);
 
-    if (diffInHours < 1) {
-      const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
+    if (diffInMinutes < 1) {
+      return 'just now';
+    } else if (diffInMinutes < 60) {
       return `${diffInMinutes}m ago`;
     } else if (diffInHours < 24) {
       return `${diffInHours}h ago`;
@@ -218,11 +263,37 @@ const Notifications = () => {
     }
   };
 
+  const getTimeStatus = (expiresAt: string) => {
+    const now = new Date();
+    const expiry = new Date(expiresAt);
+    const diff = expiry.getTime() - now.getTime();
+    
+    if (diff > 0) {
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      
+      if (hours > 0) {
+        return `Expires in ${hours}h ${minutes}m`;
+      } else {
+        return `Expires in ${minutes}m`;
+      }
+    } else {
+      return 'Expired';
+    }
+  };
+
+  const getPosterName = (profiles: any) => {
+    if (profiles?.first_name) {
+      return `${profiles.first_name}${profiles.last_name ? ` ${profiles.last_name}` : ''}`;
+    }
+    return 'Anonymous User';
+  };
+
   const unreadCount = notifications.filter(n => !n.read).length;
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-purple-950 dark:via-pink-950 dark:to-blue-950 p-4">
+      <div className="min-h-screen bg-white p-4">
         <div className="max-w-4xl mx-auto pt-20">
           <div className="text-center">Loading notifications...</div>
         </div>
@@ -231,41 +302,47 @@ const Notifications = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-purple-950 dark:via-pink-950 dark:to-blue-950 p-4">
-      <div className="max-w-4xl mx-auto pt-20">
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-3">
-            <Bell className="w-8 h-8 text-purple-600" />
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              Notifications
-            </h1>
-            {unreadCount > 0 && (
-              <Badge variant="destructive" className="ml-2">
-                {unreadCount} new
-              </Badge>
-            )}
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <header className="border-b border-border/20 bg-white">
+        <div className="max-w-4xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                onClick={() => navigate('/dashboard')}
+                className="flex items-center gap-3 text-foreground hover:text-foreground transition-all duration-200 px-4 py-2 rounded-lg h-12 text-lg font-inter font-bold hover:scale-105"
+              >
+                <ArrowLeft className="h-5 w-5" />
+                <span className="font-bold">Dashboard</span>
+              </Button>
+              
+              <div className="flex items-center gap-3">
+                <Bell className="w-8 h-8 text-purple-600" />
+                <h1 className="text-3xl font-playfair font-bold text-foreground">
+                  Notifications
+                </h1>
+                {unreadCount > 0 && (
+                  <Badge variant="destructive" className="ml-2">
+                    {unreadCount} new
+                  </Badge>
+                )}
+              </div>
+            </div>
           </div>
-          
-          {unreadCount > 0 && (
-            <Button 
-              onClick={markAllAsRead}
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              <Check className="w-4 h-4" />
-              Mark all read
-            </Button>
-          )}
         </div>
+      </header>
 
+      {/* Main Content */}
+      <main className="max-w-4xl mx-auto p-4 pt-8">
         {notifications.length === 0 ? (
-          <Card className="text-center py-12">
+          <Card className="text-center py-12 bg-white border-border/20">
             <CardContent>
-              <Bell className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              <Bell className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-foreground mb-2">
                 No notifications yet
               </h3>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-muted-foreground">
                 You'll see notifications here when other users share food near you.
               </p>
             </CardContent>
@@ -275,48 +352,90 @@ const Notifications = () => {
             {notifications.map((notification) => (
               <Card 
                 key={notification.id}
-                className={`transition-all duration-200 ${
+                className={`transition-all duration-200 bg-white border hover:shadow-md ${
                   !notification.read 
-                    ? 'border-purple-200 bg-purple-50/50 dark:border-purple-800 dark:bg-purple-950/20' 
-                    : 'border-gray-200 dark:border-gray-800'
+                    ? 'border-purple-200 bg-purple-50/30' 
+                    : 'border-border/20'
                 }`}
               >
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold text-gray-900 dark:text-white">
-                          {notification.title}
-                        </h3>
-                        {!notification.read && (
-                          <div className="w-2 h-2 bg-purple-500 rounded-full" />
-                        )}
+                <CardContent className="p-6">
+                  <div className="flex gap-4">
+                    {/* Food Image */}
+                    <div className="flex-shrink-0">
+                      <div className="w-20 h-20 bg-muted/20 rounded-lg overflow-hidden">
+                        <img
+                          src={notification.food_post?.image_url || dummyPostImages[notification.food_post_id || ''] || dummyPizzaImage}
+                          alt={notification.food_post?.title || 'Food'}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
-                      <p className="text-gray-600 dark:text-gray-400 text-sm">
-                        {notification.message}
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
-                        {formatTimeAgo(notification.created_at)}
-                      </p>
                     </div>
-                    
-                    {!notification.read && (
-                      <Button
-                        onClick={() => markAsRead(notification.id)}
-                        variant="ghost"
-                        size="sm"
-                        className="ml-4 flex-shrink-0"
-                      >
-                        <Check className="w-4 h-4" />
-                      </Button>
-                    )}
+
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <h3 className="font-inter font-bold text-lg text-foreground">
+                              {notification.title}
+                            </h3>
+                            {!notification.read && (
+                              <div className="w-2 h-2 bg-purple-500 rounded-full flex-shrink-0" />
+                            )}
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2 text-foreground font-medium">
+                              <User className="h-4 w-4 text-primary" />
+                              <span>
+                                {notification.food_post?.profiles 
+                                  ? getPosterName(notification.food_post.profiles)
+                                  : 'Someone'
+                                } shared {notification.food_post?.title || 'food'}
+                              </span>
+                            </div>
+                            
+                            <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                              <MapPin className="h-4 w-4" />
+                              <span>{notification.food_post?.location || 'Location not specified'}</span>
+                            </div>
+                            
+                            {notification.food_post?.expires_at && (
+                              <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                                <Clock className="h-4 w-4" />
+                                <span>{getTimeStatus(notification.food_post.expires_at)}</span>
+                              </div>
+                            )}
+                            
+                            <p className="text-xs text-muted-foreground">
+                              {formatTimeAgo(notification.created_at)}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Mark as Read Button */}
+                      {!notification.read && (
+                        <div className="mt-4">
+                          <Button
+                            onClick={() => markAsRead(notification.id)}
+                            variant="outline"
+                            size="sm"
+                            className="flex items-center gap-2 text-sm"
+                          >
+                            <Check className="w-4 h-4" />
+                            Mark as read
+                          </Button>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </CardHeader>
+                </CardContent>
               </Card>
             ))}
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 };
