@@ -9,12 +9,12 @@ import { Link } from 'react-router-dom';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { User, Session } from '@supabase/supabase-js';
 import { useNavigate } from 'react-router-dom';
-import pizzaImage from '@/assets/food-pizza.jpg';
-import bagelsImage from '@/assets/food-bagels.jpg';
-import sandwichesImage from '@/assets/food-sandwiches.jpg';
-import saladImage from '@/assets/food-salad.jpg';
-import fruitImage from '@/assets/food-fruit.jpg';
-import pastaImage from '@/assets/food-pasta.jpg';
+import dummyPizzaImage from '@/assets/dummy-pizza.jpg';
+import dummySaladImage from '@/assets/dummy-salad.jpg';
+import dummyFruitImage from '@/assets/dummy-fruit.jpg';
+import dummySandwichesImage from '@/assets/dummy-sandwiches.jpg';
+import dummyBagelsImage from '@/assets/dummy-bagels.jpg';
+import dummyPastaImage from '@/assets/dummy-pasta.jpg';
 
 interface DashboardProps {
   onSignOut?: () => void;
@@ -170,72 +170,85 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
     }
   }, [user]);
 
-  // Dummy posts for display
+  // Dummy posts with properly generated images
   const dummyPosts = [
     {
       id: 'dummy-1',
       user_id: 'dummy-user-1',
-      title: 'Fresh Garden Salad',
-      description: 'Mixed greens with tomatoes, cucumber, and homemade vinaigrette. Perfect for a healthy lunch!',
-      location: 'Downtown Café',
-      servings: '4-6 people',
-      image_url: '/src/assets/food-salad.jpg',
+      title: 'Homemade Margherita Pizza',
+      description: 'Fresh basil, mozzarella, and tomato sauce on homemade dough. Made too much for dinner tonight!',
+      location: 'Downtown Apartment',
+      servings: '6-8 slices',
+      image_url: dummyPizzaImage,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-      expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // expires in 24 hours
-      profiles: { first_name: 'Sarah', last_name: 'Chen', avatar_url: null }
+      expires_at: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(), // expires in 4 hours
+      profiles: { first_name: 'Marco', last_name: 'Rossi', avatar_url: null }
     },
     {
       id: 'dummy-2', 
       user_id: 'dummy-user-2',
-      title: 'Homemade Pizza Slices',
-      description: 'Margherita pizza with fresh basil and mozzarella. Made this morning!',
-      location: 'University District',
-      servings: '8 slices',
-      image_url: '/src/assets/food-pizza.jpg',
-      created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
-      updated_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-      expires_at: new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString(), // expires in 6 hours
-      profiles: { first_name: 'Marco', last_name: 'Giuseppe', avatar_url: null }
+      title: 'Fresh Garden Salad',
+      description: 'Mixed greens with cherry tomatoes, cucumbers, and house vinaigrette. Perfect for a healthy lunch!',
+      location: 'University Campus',
+      servings: '4-6 people',
+      image_url: dummySaladImage,
+      created_at: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), // 1 hour ago
+      updated_at: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
+      expires_at: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString(), // expires in 8 hours
+      profiles: { first_name: 'Sarah', last_name: 'Johnson', avatar_url: null }
     },
     {
       id: 'dummy-3',
       user_id: 'dummy-user-3', 
-      title: 'Fresh Fruit Bowl',
-      description: 'Seasonal fruits including strawberries, blueberries, and kiwi. Great for sharing!',
+      title: 'Seasonal Fruit Bowl',
+      description: 'Fresh strawberries, blueberries, and kiwi from the farmers market. Great for sharing!',
       location: 'Community Center',
-      servings: '6-8 people',
-      image_url: '/src/assets/food-fruit.jpg',
-      created_at: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(), // 4 hours ago
-      updated_at: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
-      expires_at: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(), // expires in 2 hours
-      profiles: { first_name: 'Emma', last_name: 'Wilson', avatar_url: null }
+      servings: '8-10 people',
+      image_url: dummyFruitImage,
+      created_at: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(), // 3 hours ago
+      updated_at: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
+      expires_at: new Date(Date.now() + 5 * 60 * 60 * 1000).toISOString(), // expires in 5 hours
+      profiles: { first_name: 'Emma', last_name: 'Chen', avatar_url: null }
     },
     {
       id: 'dummy-4',
       user_id: 'dummy-user-4',
-      title: 'Artisan Bagels',
-      description: 'Everything bagels with cream cheese and smoked salmon. Perfect for breakfast or brunch!',
-      location: 'Local Bakery',
-      servings: '12 bagels',
-      image_url: '/src/assets/food-bagels.jpg',
-      created_at: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(), // 6 hours ago
-      updated_at: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
+      title: 'Gourmet Sandwiches',
+      description: 'Turkey, avocado, and sprouts on artisan sourdough. Made for office lunch but have extras!',
+      location: 'Business District',
+      servings: '4 sandwiches',
+      image_url: dummySandwichesImage,
+      created_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), // 5 hours ago
+      updated_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
       expires_at: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), // expired 1 hour ago
-      profiles: { first_name: 'David', last_name: 'Brown', avatar_url: null }
+      profiles: { first_name: 'David', last_name: 'Miller', avatar_url: null }
     },
     {
       id: 'dummy-5',
       user_id: 'dummy-user-5',
-      title: 'Gourmet Sandwiches',
-      description: 'Turkey and avocado sandwiches on sourdough bread. Made for office lunch but have extras!',
-      location: 'Business District',
-      servings: '6 sandwiches',
-      image_url: '/src/assets/food-sandwiches.jpg',
-      created_at: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(), // 8 hours ago
-      updated_at: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
-      expires_at: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(), // expired 3 hours ago
+      title: 'Everything Bagels',
+      description: 'Fresh baked everything bagels with cream cheese and lox. Perfect for weekend brunch!',
+      location: 'Local Bakery',
+      servings: '8 bagels',
+      image_url: dummyBagelsImage,
+      created_at: new Date(Date.now() - 7 * 60 * 60 * 1000).toISOString(), // 7 hours ago
+      updated_at: new Date(Date.now() - 7 * 60 * 60 * 1000).toISOString(),
+      expires_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // expired 2 hours ago
       profiles: { first_name: 'Lisa', last_name: 'Anderson', avatar_url: null }
+    },
+    {
+      id: 'dummy-6',
+      user_id: 'dummy-user-6',
+      title: 'Creamy Italian Pasta',
+      description: 'Penne with herbs, vegetables, and parmesan. Comfort food at its finest!',
+      location: 'Little Italy',
+      servings: '6-8 people',
+      image_url: dummyPastaImage,
+      created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
+      updated_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+      expires_at: new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString(), // expires in 6 hours
+      profiles: { first_name: 'Antonio', last_name: 'Gonzalez', avatar_url: null }
     }
   ];
 
@@ -332,7 +345,7 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
       return post.image_url;
     }
     // Fallback to static images based on index
-    const images = [pizzaImage, bagelsImage, sandwichesImage, saladImage, fruitImage, pastaImage];
+    const images = [dummyPizzaImage, dummySaladImage, dummyFruitImage, dummySandwichesImage, dummyBagelsImage, dummyPastaImage];
     return images[index % images.length];
   };
 
