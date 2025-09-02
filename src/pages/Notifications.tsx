@@ -50,104 +50,38 @@ const Notifications = () => {
     'dummy-6': dummyPastaImage,
   };
 
-  // Enhanced dummy notifications with food post data
-  const dummyNotifications: Notification[] = [
-    {
-      id: 'notif-1',
-      user_id: 'current-user',
-      type: 'new_listing',
-      title: 'New Food Available!',
-      message: 'Marco Rossi shared Homemade Margherita Pizza in Downtown Apartment',
-      food_post_id: 'dummy-1',
-      read: false,
-      created_at: new Date(Date.now() - 30 * 60 * 1000).toISOString(), // 30 minutes ago
-      food_post: {
-        title: 'Homemade Margherita Pizza',
-        image_url: dummyPizzaImage,
-        location: 'Downtown Apartment',
-        expires_at: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(),
-        profiles: { first_name: 'Marco', last_name: 'Rossi' }
-      }
-    },
-    {
-      id: 'notif-2',
-      user_id: 'current-user',
-      type: 'new_listing',
-      title: 'New Food Available!',
-      message: 'Sarah Johnson shared Fresh Garden Salad in University Campus',
-      food_post_id: 'dummy-2',
-      read: false,
-      created_at: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), // 1 hour ago
-      food_post: {
-        title: 'Fresh Garden Salad',
-        image_url: dummySaladImage,
-        location: 'University Campus',
-        expires_at: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString(),
-        profiles: { first_name: 'Sarah', last_name: 'Johnson' }
-      }
-    },
-    {
-      id: 'notif-3',
-      user_id: 'current-user',
-      type: 'new_listing',
-      title: 'New Food Available!',
-      message: 'Emma Chen shared Seasonal Fruit Bowl in Community Center',
-      food_post_id: 'dummy-3',
-      read: true,
-      created_at: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(), // 3 hours ago
-      food_post: {
-        title: 'Seasonal Fruit Bowl',
-        image_url: dummyFruitImage,
-        location: 'Community Center',
-        expires_at: new Date(Date.now() + 5 * 60 * 60 * 1000).toISOString(),
-        profiles: { first_name: 'Emma', last_name: 'Chen' }
-      }
-    },
-    {
-      id: 'notif-4',
-      user_id: 'current-user',
-      type: 'new_listing',
-      title: 'New Food Available!',
-      message: 'Antonio Gonzalez shared Creamy Italian Pasta in Little Italy',
-      food_post_id: 'dummy-6',
-      read: true,
-      created_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), // 5 hours ago
-      food_post: {
-        title: 'Creamy Italian Pasta',
-        image_url: dummyPastaImage,
-        location: 'Little Italy',
-        expires_at: new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString(),
-        profiles: { first_name: 'Antonio', last_name: 'Gonzalez' }
-      }
-    }
-  ];
 
   useEffect(() => {
     fetchNotifications();
     
     // Set up real-time subscription for new notifications
     const channel = supabase
-      .channel('notifications-changes')
+      .channel('notifications-realtime')
       .on(
         'postgres_changes',
         {
-          event: 'INSERT',
+          event: '*', // Listen to all events (INSERT, UPDATE, DELETE)
           schema: 'public',
           table: 'notifications',
         },
         async (payload) => {
+          console.log('Real-time notification event:', payload);
           const { data: { user } } = await supabase.auth.getUser();
-          if (user && (payload.new as any).user_id === user.id) {
-            console.log('New notification:', payload);
+          if (user && (payload.new as any)?.user_id === user.id) {
+            console.log('New notification for current user:', payload);
             await fetchNotifications(); // Refetch to get complete data
-            toast({
-              title: (payload.new as Notification).title,
-              description: (payload.new as Notification).message,
-            });
+            if (payload.eventType === 'INSERT') {
+              toast({
+                title: (payload.new as Notification).title,
+                description: (payload.new as Notification).message,
+              });
+            }
           }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Notification subscription status:', status);
+      });
 
     return () => {
       supabase.removeChannel(channel);
@@ -158,7 +92,7 @@ const Notifications = () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        setNotifications(dummyNotifications);
+        setNotifications([]);
         setLoading(false);
         return;
       }
@@ -184,7 +118,7 @@ const Notifications = () => {
 
       if (error) {
         console.error('Error fetching notifications:', error);
-        setNotifications(dummyNotifications);
+        setNotifications([]);
       } else {
         // Transform the data to match our interface
         const transformedData = (data || []).map(notif => ({
@@ -197,30 +131,17 @@ const Notifications = () => {
           } : null
         }));
         
-        // Combine real notifications with dummy ones
-        setNotifications([...transformedData, ...dummyNotifications]);
+        setNotifications(transformedData);
       }
     } catch (error) {
       console.error('Error in fetchNotifications:', error);
-      setNotifications(dummyNotifications);
+      setNotifications([]);
     } finally {
       setLoading(false);
     }
   };
 
   const markAsRead = async (notificationId: string) => {
-    // Skip API call for dummy notifications
-    if (notificationId.startsWith('notif-')) {
-      setNotifications(prev =>
-        prev.map(notif =>
-          notif.id === notificationId
-            ? { ...notif, read: true }
-            : notif
-        )
-      );
-      return;
-    }
-
     try {
       const { error } = await supabase
         .from('notifications')

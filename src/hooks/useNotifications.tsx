@@ -9,22 +9,30 @@ export const useNotifications = () => {
     
     // Set up real-time subscription for notification changes
     const channel = supabase
-      .channel('notifications-count')
+      .channel('notifications-count-updates')
       .on(
         'postgres_changes',
         {
-          event: '*',
+          event: '*', // Listen to all events (INSERT, UPDATE, DELETE)
           schema: 'public',
           table: 'notifications',
         },
         async (payload) => {
+          console.log('Real-time notification update for badge:', payload);
           const { data: { user } } = await supabase.auth.getUser();
-          if (user && (payload.new as any)?.user_id === user.id) {
-            fetchUnreadCount();
+          if (user) {
+            // Check if this notification affects the current user
+            const affectedUserId = (payload.new as any)?.user_id || (payload.old as any)?.user_id;
+            if (affectedUserId === user.id) {
+              console.log('Updating unread count for current user');
+              fetchUnreadCount();
+            }
           }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Notification count subscription status:', status);
+      });
 
     return () => {
       supabase.removeChannel(channel);
