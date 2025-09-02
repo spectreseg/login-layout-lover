@@ -173,7 +173,12 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
 
   // Handle marking post as finished
   const handleMarkAsFinished = async (postId: string) => {
-    if (!user) return;
+    if (!user) {
+      console.log('No user found, cannot mark as finished');
+      return;
+    }
+
+    console.log('Marking post as finished:', postId, 'by user:', user.id);
 
     try {
       // Get current post data
@@ -181,23 +186,35 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
         .from('food_posts')
         .select('finished_by')
         .eq('id', postId)
-        .single();
+        .maybeSingle();
 
       if (fetchError) {
         console.error('Error fetching post:', fetchError);
+        alert('Failed to fetch post data. Please try again.');
         return;
       }
 
+      if (!currentPost) {
+        console.error('Post not found:', postId);
+        alert('Post not found. Please refresh the page.');
+        return;
+      }
+
+      console.log('Current post data:', currentPost);
+      
       const currentFinishedBy = currentPost.finished_by || [];
+      console.log('Current finished_by array:', currentFinishedBy);
       
       // Check if user already marked as finished
       if (currentFinishedBy.includes(user.id)) {
+        console.log('User already marked this post as finished');
         alert('You have already marked this post as finished!');
         return;
       }
 
       // Add user to finished_by array
       const updatedFinishedBy = [...currentFinishedBy, user.id];
+      console.log('Updated finished_by array:', updatedFinishedBy);
 
       const { error } = await supabase
         .from('food_posts')
@@ -205,15 +222,18 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
         .eq('id', postId);
 
       if (error) {
-        console.error('Error marking as finished:', error);
+        console.error('Error updating finished_by:', error);
         alert('Failed to mark as finished. Please try again.');
         return;
       }
+
+      console.log('Successfully updated finished_by array');
 
       // Refresh posts
       fetchPosts();
       
       if (updatedFinishedBy.length >= 3) {
+        console.log('Post should be expired now - 3 users marked as finished');
         alert('This post has been marked as finished by 3 users and is now expired!');
       }
     } catch (error) {
