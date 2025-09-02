@@ -340,13 +340,27 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
 
       console.log('Successfully updated finished_by array');
 
-      // Refresh posts
-      fetchPosts();
-      
+      // If 3 users marked as finished, automatically expire the post
       if (updatedFinishedBy.length >= 3) {
         console.log('Post should be expired now - 3 users marked as finished');
-        alert('This post has been marked as finished by 3 users and is now expired!');
+        
+        // Update expires_at to current time to expire the post
+        const { error: expireError } = await supabase
+          .from('food_posts')
+          .update({ expires_at: new Date().toISOString() })
+          .eq('id', postId);
+          
+        if (expireError) {
+          console.error('Error expiring post:', expireError);
+        } else {
+          console.log('Post automatically expired due to 3 users marking as finished');
+        }
+        
+        alert('This post has been marked as finished by 3 users and is now automatically expired!');
       }
+
+      // Refresh posts
+      fetchPosts();
     } catch (error) {
       console.error('Error in handleMarkAsFinished:', error);
       alert('Failed to mark as finished. Please try again.');
@@ -507,6 +521,12 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
       return `${post.profiles.first_name}${post.profiles.last_name ? ` ${post.profiles.last_name}` : ''}`;
     }
     return 'Anonymous User';
+  };
+
+  // Helper function to check if user is in finished list
+  const isUserInFinishedList = (finishedBy: string[] | null | undefined, userId: string | undefined) => {
+    if (!finishedBy || !userId) return false;
+    return finishedBy.includes(userId);
   };
 
   const displayName = profile?.first_name
@@ -725,45 +745,41 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
                         <Button variant="ghost" size="sm" className="flex-1 text-sm h-9 text-primary font-inter font-medium">
                           View Details
                         </Button>
-                        <Button 
-                          size="sm" 
-                          className="flex-1 text-sm h-9 bg-primary hover:bg-primary/90 font-inter font-medium"
-                          onClick={(e) => {
-                            alert('Button clicked!'); // Simple test
-                            e.preventDefault();
-                            e.stopPropagation();
-                            console.log('=== BUTTON CLICKED ===');
-                            console.log('Button clicked for post:', post.id);
-                            console.log('Post data:', post);
-                            console.log('User ID:', user?.id);
-                            console.log('User object:', user);
-                            console.log('Button disabled?', post.finished_by?.includes(user?.id || '') || showExpiredPosts);
-                            console.log('showExpiredPosts:', showExpiredPosts);
-                            console.log('finished_by array:', post.finished_by);
-                            
-                            if (post.id.startsWith('dummy-')) {
-                              console.log('This is a dummy post, calling handleMarkDummyAsFinished');
-                              handleMarkDummyAsFinished(post.id);
-                              return;
-                            }
-                            
-                            console.log('This is a real post, calling handleMarkAsFinished');
-                            handleMarkAsFinished(post.id);
-                          }}
-                          disabled={post.finished_by?.includes(user?.id || '') || showExpiredPosts}
-                        >
-                          {post.finished_by?.includes(user?.id || '') ? (
-                            <>
-                              <Check className="h-4 w-4 mr-2" />
-                              Marked as Finished
-                            </>
-                          ) : (
-                            <>
-                              <CheckCircle className="h-4 w-4 mr-2" />
-                              Mark as Finished
-                            </>
-                          )}
-                        </Button>
+                        {isUserInFinishedList(post.finished_by, user?.id) ? (
+                          <Button 
+                            size="sm" 
+                            className="flex-1 text-sm h-9 bg-gray-500 text-white cursor-not-allowed font-inter font-medium" 
+                            disabled
+                          >
+                            <CheckCircle className="h-4 w-4 mr-2" />
+                            Marked as Finished
+                          </Button>
+                        ) : (
+                          <Button 
+                            size="sm" 
+                            className="flex-1 text-sm h-9 bg-green-600 hover:bg-green-700 text-white font-inter font-medium"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              console.log('=== BUTTON CLICKED ===');
+                              console.log('Button clicked for post:', post.id);
+                              console.log('User ID:', user?.id);
+                              
+                              if (post.id.startsWith('dummy-')) {
+                                console.log('This is a dummy post, calling handleMarkDummyAsFinished');
+                                handleMarkDummyAsFinished(post.id);
+                                return;
+                              }
+                              
+                              console.log('This is a real post, calling handleMarkAsFinished');
+                              handleMarkAsFinished(post.id);
+                            }}
+                            disabled={showExpiredPosts}
+                          >
+                            <Check className="h-4 w-4 mr-2" />
+                            Mark as Finished
+                          </Button>
+                        )}
                       </>
                     )}
                   </div>

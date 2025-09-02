@@ -327,8 +327,8 @@ const Notifications = () => {
                 onClick={() => navigate('/dashboard')}
                 className="flex items-center gap-3 text-foreground hover:text-foreground transition-all duration-200 px-4 py-2 rounded-lg h-12 text-lg font-inter font-bold hover:scale-105"
               >
+                <ArrowLeft className="h-5 w-5" />
                 <span className="font-bold">Dashboard</span>
-                <ArrowLeft className="h-5 w-5 rotate-180" />
               </Button>
             </div>
           </div>
