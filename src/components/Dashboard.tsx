@@ -167,32 +167,37 @@ export default function Dashboard() {
       {/* Main Content */}
       <main className="w-full px-4 py-6">
         {/* Navigation Grid */}
-        <div className="grid grid-cols-5 gap-2 mb-8">
-          {navItems.map((item) => (
+        <div className="grid grid-cols-5 gap-4 mb-8 max-w-4xl mx-auto">
+          {navItems.map((item, index) => (
             <Card 
               key={item.label} 
               className={`group cursor-pointer transition-all duration-200 hover:scale-[1.02] border ${
                 item.primary 
-                  ? 'bg-primary text-primary-foreground shadow-md hover:shadow-lg border-primary/20' 
-                  : 'bg-card/60 hover:bg-card border-border/30 hover:border-border/50 hover:shadow-sm'
+                  ? 'bg-primary text-primary-foreground shadow-md hover:shadow-lg border-primary/20 col-span-1' 
+                  : 'bg-card/60 hover:bg-card border-border/30 hover:border-border/50 hover:shadow-sm col-span-1'
               }`}
+              style={item.primary ? { gridColumn: 'span 1' } : {}}
             >
-              <CardContent className="flex flex-col items-center justify-center p-3 min-h-[80px]">
-                <div className={`rounded-full p-2 mb-1.5 transition-colors ${
+              <CardContent className={`flex flex-col items-center justify-center transition-colors ${
+                item.primary 
+                  ? 'p-6 min-h-[100px]' 
+                  : 'p-4 min-h-[100px]'
+              }`}>
+                <div className={`rounded-full mb-2 transition-colors ${
                   item.primary 
-                    ? 'bg-primary-foreground/20' 
-                    : 'bg-muted/40 group-hover:bg-muted/60'
+                    ? 'bg-primary-foreground/20 p-3' 
+                    : 'bg-muted/40 group-hover:bg-muted/60 p-2.5'
                 }`}>
-                  <item.icon className={`h-4 w-4 ${
+                  <item.icon className={`${
                     item.primary 
-                      ? 'text-primary-foreground' 
-                      : 'text-foreground/80'
+                      ? 'h-6 w-6 text-primary-foreground' 
+                      : 'h-5 w-5 text-foreground/80'
                   }`} />
                 </div>
-                <span className={`text-xs font-medium text-center leading-tight ${
+                <span className={`font-medium text-center leading-tight ${
                   item.primary 
-                    ? 'text-primary-foreground' 
-                    : 'text-foreground/80'
+                    ? 'text-sm text-primary-foreground' 
+                    : 'text-xs text-foreground/80'
                 }`}>
                   {item.label}
                 </span>
