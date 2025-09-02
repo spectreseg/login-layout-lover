@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import AuthForm from '@/components/AuthForm';
 import StarryBackground from '@/components/StarryBackground';
 import OnboardingScreen from '@/components/OnboardingScreen';
@@ -105,6 +105,27 @@ const Index = () => {
   };
 
   console.log('Current state - authMode:', authMode, 'onboardingStep:', onboardingStep);
+
+  // Preload all onboarding images for smooth transitions
+  const preloadImages = () => {
+    const imageUrls = [
+      '/lovable-uploads/0ae562c5-5c88-4c2d-97cd-7d89c980721a.png', // Form screen tiger
+      '/lovable-uploads/0665048e-ad40-4530-b849-0390b3667650.png', // Password screen tiger
+      '/lovable-uploads/fc82ea5e-3e13-4240-8f8c-b4469c2153c4.png', // Location screen tiger
+      '/lovable-uploads/4e2f3f60-20d2-4179-a8c3-d01aaedd6fb1.png', // Avatar screen tiger
+      '/lovable-uploads/bb95d81e-f824-4762-aed3-c6fb2af3cfba.png'  // Completion screen tiger
+    ];
+
+    imageUrls.forEach(url => {
+      const img = new Image();
+      img.src = url;
+    });
+  };
+
+  // Preload images when component mounts
+  React.useEffect(() => {
+    preloadImages();
+  }, []);
 
   // Show first onboarding screen
   if (onboardingStep === 'intro') {
