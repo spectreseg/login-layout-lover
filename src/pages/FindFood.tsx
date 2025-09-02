@@ -159,20 +159,27 @@ const FindFood = () => {
   }, [refetch]);
 
   const filteredPosts = React.useMemo(() => {
-    if (!currentUser) return [];
+    console.log('All food posts:', foodPosts);
+    console.log('Current user:', currentUser);
+    console.log('Filter mode:', filterMode);
     
     const activePosts = foodPosts.filter(post => 
-      new Date(post.expires_at) > new Date() && 
-      !post.finished_by.includes(currentUser.id)
+      new Date(post.expires_at) > new Date()
     );
+
+    console.log('Active posts (not expired):', activePosts);
 
     switch (filterMode) {
       case 'my':
-        return activePosts.filter(post => post.user_id === currentUser.id);
+        const myPosts = activePosts.filter(post => currentUser && post.user_id === currentUser.id);
+        console.log('My posts:', myPosts);
+        return myPosts;
       case 'nearby':
         // For demo purposes, showing all posts within Sewanee area (1.5 mile radius)
+        console.log('Nearby posts:', activePosts);
         return activePosts;
       default:
+        console.log('All posts:', activePosts);
         return activePosts;
     }
   }, [foodPosts, filterMode, currentUser]);
@@ -224,24 +231,35 @@ const FindFood = () => {
   }, []);
 
   useEffect(() => {
-    if (!mapInstanceRef.current || !filteredPosts.length) {
-      // Clear markers if no posts
-      if (!filteredPosts.length) {
-        markersRef.current.forEach(marker => marker.setMap(null));
-        markersRef.current = [];
-      }
+    console.log('Map effect triggered. Filtered posts:', filteredPosts);
+    
+    if (!mapInstanceRef.current) {
+      console.log('Map instance not ready');
       return;
     }
 
     // Clear existing markers
     markersRef.current.forEach(marker => marker.setMap(null));
     markersRef.current = [];
+    console.log('Cleared existing markers');
+
+    if (!filteredPosts.length) {
+      console.log('No filtered posts to display');
+      return;
+    }
 
     // Add new markers for filtered posts
-    filteredPosts.forEach((post) => {
+    filteredPosts.forEach((post, index) => {
+      console.log(`Processing post ${index + 1}:`, post);
+      
       // Get coordinates for the post location
       const coordinates = findLocationCoordinates(post.location);
-      if (!coordinates) return;
+      console.log(`Coordinates for "${post.location}":`, coordinates);
+      
+      if (!coordinates) {
+        console.log(`No coordinates found for location: ${post.location}`);
+        return;
+      }
 
       // Create custom marker icon based on post type
       const markerIcon = {
@@ -260,9 +278,11 @@ const FindFood = () => {
         icon: markerIcon,
       });
 
+      console.log(`Created marker for post: ${post.title} at`, coordinates);
+
       // Create rich info window with post details and image
       const imageHtml = post.image_url ? 
-        `<img src="${post.image_url}" alt="${post.title}" style="width: 120px; height: 80px; object-fit: cover; border-radius: 6px; margin-bottom: 8px;" />` 
+        `<img src="${post.image_url}" alt="${post.title}" style="width: 120px; height: 80px; object-fit: cover; border-radius: 6px; margin-bottom: 8px; display: block;" onerror="this.style.display='none'" />` 
         : '';
 
       const timeAgo = new Date(post.created_at).toLocaleTimeString([], { 
@@ -277,27 +297,27 @@ const FindFood = () => {
 
       const infoWindow = new google.maps.InfoWindow({
         content: `
-          <div class="p-3 max-w-xs">
+          <div style="padding: 12px; max-width: 200px; font-family: Arial, sans-serif;">
             ${imageHtml}
-            <div class="space-y-2">
-              <h3 class="font-bold text-base text-gray-900">${post.title}</h3>
-              <p class="text-sm text-gray-700">${post.description}</p>
-              <div class="flex items-center text-xs text-gray-600">
-                <span class="mr-1">📍</span> 
-                <span class="font-medium">${post.location}</span>
+            <div style="margin-bottom: 8px;">
+              <h3 style="margin: 0 0 4px 0; font-size: 16px; font-weight: bold; color: #1f2937;">${post.title}</h3>
+              <p style="margin: 0 0 6px 0; font-size: 13px; color: #4b5563; line-height: 1.4;">${post.description}</p>
+              <div style="display: flex; align-items: center; font-size: 12px; color: #6b7280; margin-bottom: 4px;">
+                <span style="margin-right: 4px;">📍</span> 
+                <span style="font-weight: 500;">${post.location}</span>
               </div>
               ${post.servings ? `
-                <div class="flex items-center text-xs text-gray-600">
-                  <span class="mr-1">🍽️</span> 
+                <div style="display: flex; align-items: center; font-size: 12px; color: #6b7280; margin-bottom: 4px;">
+                  <span style="margin-right: 4px;">🍽️</span> 
                   <span>Servings: ${post.servings}</span>
                 </div>
               ` : ''}
-              <div class="flex items-center justify-between text-xs text-gray-500 pt-1 border-t border-gray-200">
+              <div style="display: flex; justify-content: space-between; font-size: 11px; color: #9ca3af; padding-top: 6px; border-top: 1px solid #e5e7eb;">
                 <span>Posted: ${timeAgo}</span>
                 <span>Expires: ${expiresAt}</span>
               </div>
-              <div class="text-xs text-center">
-                <span class="inline-block bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
+              <div style="text-align: center; margin-top: 6px;">
+                <span style="display: inline-block; background-color: #dcfce7; color: #166534; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 500;">
                   Available Now
                 </span>
               </div>
@@ -307,8 +327,11 @@ const FindFood = () => {
         maxWidth: 250,
       });
 
+      console.log(`Created info window for: ${post.title}`);
+
       // Add click listener to marker
       marker.addListener('click', () => {
+        console.log(`Marker clicked for: ${post.title}`);
         // Close all other info windows
         markersRef.current.forEach(m => {
           if (m !== marker && (m as any).infoWindow) {
@@ -322,7 +345,10 @@ const FindFood = () => {
       (marker as any).infoWindow = infoWindow;
 
       markersRef.current.push(marker);
+      console.log(`Added marker ${index + 1} to markers array. Total markers: ${markersRef.current.length}`);
     });
+    
+    console.log(`Finished processing ${filteredPosts.length} posts. Total markers created: ${markersRef.current.length}`);
   }, [filteredPosts]);
 
   return (
