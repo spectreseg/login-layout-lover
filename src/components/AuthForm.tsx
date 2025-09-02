@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
-import OnboardingScreen from './OnboardingScreen';
 
 interface AuthFormProps {
   mode: 'login' | 'register';
@@ -13,7 +12,6 @@ export default function AuthForm({
   onLogin
 }: AuthFormProps) {
   const [showPassword, setShowPassword] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -28,57 +26,6 @@ export default function AuthForm({
     e.preventDefault();
     onLogin();
   };
-  
-  const handleOnboardingProceed = () => {
-    setShowOnboarding(false);
-  };
-
-  const handleOnboardingBack = () => {
-    setShowOnboarding(false);
-    onToggleMode('login');
-  };
-
-  const handleRegisterClick = () => {
-    onToggleMode('register');
-    setShowOnboarding(true);
-  };
-
-  // Show onboarding screen when in register mode and showOnboarding is true
-  if (mode === 'register' && showOnboarding) {
-    return (
-      <div className="bg-white rounded-2xl shadow-2xl w-full relative overflow-visible mt-16 sm:mt-20 md:mt-24">
-        {/* TigerBites Text */}
-        <div className="absolute -top-20 sm:-top-24 md:-top-28 left-1/2 transform -translate-x-1/2 z-30">
-          <h1 className="font-playfair text-3xl sm:text-4xl md:text-5xl font-bold text-white text-center tracking-wide drop-shadow-lg">
-            TigerBites
-          </h1>
-        </div>
-        
-        {/* Logo Section - positioned to straddle background and form */}
-        <div className="absolute -top-12 sm:-top-16 md:-top-20 left-1/2 transform -translate-x-1/2 z-20">
-          <div className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 relative">
-            <img src="/lovable-uploads/00927cad-9b22-41ba-9858-efcf7069f623.png" alt="Tiger Logo" className="w-full h-full object-contain drop-shadow-lg" />
-          </div>
-        </div>
-        
-        {/* Tab Navigation */}
-        <div className="flex border-b border-gray-200 mt-16 sm:mt-20 md:mt-24 rounded-t-2xl overflow-hidden">
-          <button onClick={() => onToggleMode('login')} className="flex-1 py-3 sm:py-4 md:py-5 px-3 sm:px-5 md:px-7 text-sm sm:text-base md:text-lg text-center font-medium transition-smooth text-gray-500 hover:text-gray-700 hover:bg-gray-50">
-            Login
-          </button>
-          <button className="flex-1 py-3 sm:py-4 md:py-5 px-3 sm:px-5 md:px-7 text-sm sm:text-base md:text-lg text-center font-medium transition-smooth text-purple-700 border-b-2 border-purple-700 bg-purple-50">
-            Register
-          </button>
-        </div>
-
-        <OnboardingScreen 
-          onBack={handleOnboardingBack}
-          onProceed={handleOnboardingProceed}
-        />
-      </div>
-    );
-  }
-
   return <div className="bg-white rounded-2xl shadow-2xl w-full relative overflow-visible mt-16 sm:mt-20 md:mt-24">
       {/* TigerBites Text */}
       <div className="absolute -top-20 sm:-top-24 md:-top-28 left-1/2 transform -translate-x-1/2 z-30">
@@ -98,7 +45,7 @@ export default function AuthForm({
         <button onClick={() => onToggleMode('login')} className={`flex-1 py-3 sm:py-4 md:py-5 px-3 sm:px-5 md:px-7 text-sm sm:text-base md:text-lg text-center font-medium transition-smooth ${mode === 'login' ? 'text-purple-700 border-b-2 border-purple-700 bg-purple-50' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}>
           Login
         </button>
-        <button onClick={handleRegisterClick} className={`flex-1 py-3 sm:py-4 md:py-5 px-3 sm:px-5 md:px-7 text-sm sm:text-base md:text-lg text-center font-medium transition-smooth ${mode === 'register' ? 'text-purple-700 border-b-2 border-purple-700 bg-purple-50' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}>
+        <button onClick={() => onToggleMode('register')} className={`flex-1 py-3 sm:py-4 md:py-5 px-3 sm:px-5 md:px-7 text-sm sm:text-base md:text-lg text-center font-medium transition-smooth ${mode === 'register' ? 'text-purple-700 border-b-2 border-purple-700 bg-purple-50' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}>
           Register
         </button>
       </div>

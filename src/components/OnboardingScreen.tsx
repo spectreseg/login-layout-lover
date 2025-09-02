@@ -18,7 +18,7 @@ export default function OnboardingScreen({ onBack, onProceed }: OnboardingScreen
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[600px] px-6 py-8 relative overflow-hidden">
+    <div className="flex flex-col items-center justify-center min-h-screen px-6 py-8 relative overflow-hidden">
       {/* Speech Bubble */}
       <div className={`mb-8 transition-all duration-1000 delay-700 ${
         showAnimations ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
