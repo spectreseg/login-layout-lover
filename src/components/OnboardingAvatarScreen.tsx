@@ -95,7 +95,7 @@ export default function OnboardingAvatarScreen({ onBack, onProceed }: Onboarding
                   lastModified: Date.now()
                 }
               );
-              console.log('HEIC conversion successful');
+              console.log('HEIC conversion successful:', convertedFile.name, convertedFile.type);
               resolve(convertedFile);
             } else {
               reject(new Error('Failed to convert HEIC to JPEG'));
@@ -184,7 +184,9 @@ export default function OnboardingAvatarScreen({ onBack, onProceed }: Onboarding
     if (previewUrl) {
       URL.revokeObjectURL(previewUrl);
     }
-    return URL.createObjectURL(file);
+    const newUrl = URL.createObjectURL(file);
+    console.log('Created preview URL for file:', file.name, file.type, 'URL:', newUrl);
+    return newUrl;
   };
 
   const isHeicFile = (file: File): boolean => {
@@ -224,16 +226,12 @@ export default function OnboardingAvatarScreen({ onBack, onProceed }: Onboarding
       
       setSelectedFile(processedFile);
       
-      // For HEIC files, create preview from converted file
-      if (isHeicFile(file) && processedFile) {
-        const preview = createPreviewUrl(processedFile);
-        setPreviewUrl(preview);
-      } else {
-        const preview = createPreviewUrl(processedFile);
-        setPreviewUrl(preview);
-      }
+      // Always create preview from the processed file (converted JPEG for HEIC files)
+      console.log('Creating preview for processed file:', processedFile.name, processedFile.type);
+      const preview = createPreviewUrl(processedFile);
+      setPreviewUrl(preview);
+      console.log('Preview URL created:', preview);
       
-      console.log('File processing completed:', processedFile.name);
     } catch (error) {
       console.error('Error processing file:', error);
       alert(`Failed to process the selected image: ${error instanceof Error ? error.message : 'Unknown error'}. Please try a different file.`);
