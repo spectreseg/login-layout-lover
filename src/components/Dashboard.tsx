@@ -264,20 +264,27 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
   
   const handleMarkDummyAsFinished = (postId: string) => {
     console.log('Handling dummy post mark as finished:', postId);
+    console.log('Current user ID:', user?.id);
     
-    setDummyPostsState(prevPosts => 
-      prevPosts.map(post => {
+    setDummyPostsState(prevPosts => {
+      const updatedPosts = prevPosts.map(post => {
         if (post.id === postId) {
           const currentFinishedBy = post.finished_by || [];
-          if (!currentFinishedBy.includes(user?.id || 'current-user')) {
-            const updatedFinishedBy = [...currentFinishedBy, user?.id || 'current-user'];
+          const userId = user?.id || 'current-user';
+          console.log('Current finished_by for post:', currentFinishedBy);
+          console.log('Adding user ID:', userId);
+          
+          if (!currentFinishedBy.includes(userId)) {
+            const updatedFinishedBy = [...currentFinishedBy, userId];
             console.log('Updated dummy post finished_by:', updatedFinishedBy);
             return { ...post, finished_by: updatedFinishedBy };
           }
         }
         return post;
-      })
-    );
+      });
+      console.log('Updated dummy posts state:', updatedPosts);
+      return updatedPosts;
+    });
     
     console.log('Demo: Marked dummy post as finished!');
   };
