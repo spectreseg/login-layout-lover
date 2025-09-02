@@ -1,11 +1,26 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from 'react';
+import AuthForm from '@/components/AuthForm';
 
 const Index = () => {
+  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+
+  const handleLogin = () => {
+    console.log('Login attempted');
+    // Handle login logic here
+  };
+
+  const handleToggleMode = (mode: 'login' | 'register') => {
+    setAuthMode(mode);
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-auth-purple-light via-background to-auth-gray-50 p-4">
+      <div className="w-full max-w-md">
+        <AuthForm 
+          mode={authMode}
+          onToggleMode={handleToggleMode}
+          onLogin={handleLogin}
+        />
       </div>
     </div>
   );
