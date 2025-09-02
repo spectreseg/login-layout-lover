@@ -46,10 +46,10 @@ export default function OnboardingCompletionScreen({ onComplete }: OnboardingCom
           
           {/* Thank you message */}
           <div className={`text-center transition-opacity duration-700 ${textVisible ? 'opacity-100' : 'opacity-0'}`}>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl md:text-3xl font-playfair font-semibold text-white mb-2">
               Thanks for registering!
             </h1>
-            <p className="text-lg md:text-xl text-gray-600">
+            <p className="text-2xl md:text-3xl font-playfair font-semibold text-white">
               Redirecting to dashboard...
             </p>
           </div>
