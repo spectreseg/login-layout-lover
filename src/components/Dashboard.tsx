@@ -732,11 +732,6 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
                       <div className="text-sm text-foreground/70 font-medium">
                         by {getPosterName(post)}
                       </div>
-                      {post.finished_by && post.finished_by.length > 0 && (
-                        <div className="text-xs text-muted-foreground">
-                          {post.finished_by.length} user(s) marked as finished
-                        </div>
-                      )}
                     </div>
                   </div>
 
@@ -765,7 +760,7 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
                             disabled
                           >
                             <CheckCircle className="h-4 w-4 mr-2" />
-                            Marked as Finished
+                            Marked as Finished ({post.finished_by?.length || 0})
                           </Button>
                         ) : (
                           <Button 
