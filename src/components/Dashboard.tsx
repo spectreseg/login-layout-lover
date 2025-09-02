@@ -635,12 +635,6 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
                       {unreadCount > 9 ? '9+' : unreadCount}
                     </div>
                   )}
-                  {/* Debug info - remove this after testing */}
-                  {item.label === 'Notifications' && (
-                    <div className="absolute -bottom-6 left-0 text-xs text-gray-500 bg-white px-1 rounded">
-                      {unreadCount}
-                    </div>
-                  )}
                 </div>
               )}
               <span className={`font-inter font-medium text-center tracking-wide ${
