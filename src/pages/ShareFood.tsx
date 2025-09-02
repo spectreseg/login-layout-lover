@@ -150,12 +150,12 @@ export default function ShareFood() {
           {/* Back Button - Left Side */}
           <div className="flex-shrink-0 pt-16">
             <Button
-              variant="ghost"
+              variant="outline"
               onClick={handleCancel}
-              className="flex items-center gap-2 text-foreground/80 hover:text-foreground hover:bg-muted/50 transition-all duration-200 px-3 py-2 rounded-lg"
+              className="flex items-center gap-3 text-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200 px-6 py-3 rounded-xl border-2 h-12 text-lg font-inter font-bold shadow-md hover:shadow-lg"
             >
-              <ArrowLeft className="h-4 w-4" />
-              <span className="text-sm font-medium">Back to Dashboard</span>
+              <ArrowLeft className="h-5 w-5" />
+              <span className="font-bold">Dashboard</span>
             </Button>
           </div>
 
@@ -312,42 +312,74 @@ export default function ShareFood() {
                         <Button
                           variant="outline"
                           className={cn(
-                            "h-12 text-lg font-inter bg-white border-2 border-purple-300 focus:border-purple-600 rounded-xl shadow-sm focus:shadow-md transition-all duration-200 text-purple-700 justify-start",
+                            "w-full h-12 text-lg font-inter bg-white border-2 border-purple-300 focus:border-purple-600 rounded-xl shadow-sm focus:shadow-md transition-all duration-200 text-purple-700 justify-start text-left",
                             !formData.availableUntil && "text-muted-foreground"
                           )}
                         >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {formData.availableUntil ? (
-                            format(formData.availableUntil, "PPP p")
-                          ) : (
-                            <span className="text-lg">Pick date and time</span>
-                          )}
+                          <CalendarIcon className="mr-2 h-4 w-4 flex-shrink-0" />
+                          <span className="truncate">
+                            {formData.availableUntil ? (
+                              format(formData.availableUntil, "MMM d, yyyy 'at' h:mm a")
+                            ) : (
+                              "Pick date and time"
+                            )}
+                          </span>
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0" align="start">
                         <Calendar
                           mode="single"
                           selected={formData.availableUntil}
-                          onSelect={(date) => handleInputChange('availableUntil', date)}
+                          onSelect={(date) => {
+                            if (date) {
+                              // Set default time to current hour + 1
+                              const now = new Date();
+                              date.setHours(now.getHours() + 1, 0, 0, 0);
+                              handleInputChange('availableUntil', date);
+                            } else {
+                              handleInputChange('availableUntil', null);
+                            }
+                          }}
                           disabled={(date) => date < new Date()}
                           initialFocus
                           className={cn("p-3 pointer-events-auto")}
                         />
                         {formData.availableUntil && (
-                          <div className="p-3 border-t">
-                            <Label className="text-sm font-medium">Time</Label>
-                            <Input
-                              type="time"
-                              onChange={(e) => {
-                                if (formData.availableUntil && e.target.value) {
-                                  const [hours, minutes] = e.target.value.split(':');
-                                  const newDate = new Date(formData.availableUntil);
-                                  newDate.setHours(parseInt(hours), parseInt(minutes));
+                          <div className="p-4 border-t bg-muted/20">
+                            <Label className="text-sm font-medium text-purple-700 mb-2 block">Set Time</Label>
+                            <div className="flex gap-2 items-center">
+                              <select
+                                value={formData.availableUntil.getHours()}
+                                onChange={(e) => {
+                                  const newDate = new Date(formData.availableUntil!);
+                                  newDate.setHours(parseInt(e.target.value));
                                   handleInputChange('availableUntil', newDate);
-                                }
-                              }}
-                              className="mt-1"
-                            />
+                                }}
+                                className="px-3 py-2 border border-purple-300 rounded-lg text-sm font-medium focus:border-purple-600 focus:outline-none"
+                              >
+                                {Array.from({ length: 24 }, (_, i) => (
+                                  <option key={i} value={i}>
+                                    {i.toString().padStart(2, '0')}
+                                  </option>
+                                ))}
+                              </select>
+                              <span className="text-purple-700 font-bold">:</span>
+                              <select
+                                value={formData.availableUntil.getMinutes()}
+                                onChange={(e) => {
+                                  const newDate = new Date(formData.availableUntil!);
+                                  newDate.setMinutes(parseInt(e.target.value));
+                                  handleInputChange('availableUntil', newDate);
+                                }}
+                                className="px-3 py-2 border border-purple-300 rounded-lg text-sm font-medium focus:border-purple-600 focus:outline-none"
+                              >
+                                {[0, 15, 30, 45].map((minute) => (
+                                  <option key={minute} value={minute}>
+                                    {minute.toString().padStart(2, '0')}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
                           </div>
                         )}
                       </PopoverContent>
