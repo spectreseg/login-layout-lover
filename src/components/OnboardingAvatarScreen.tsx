@@ -6,7 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 
 interface OnboardingAvatarScreenProps {
   onBack: () => void;
-  onProceed: () => void;
+  onProceed: (avatarData?: {avatar: File | null}) => void;
 }
 
 export default function OnboardingAvatarScreen({ onBack, onProceed }: OnboardingAvatarScreenProps) {
@@ -262,7 +262,7 @@ export default function OnboardingAvatarScreen({ onBack, onProceed }: Onboarding
     }
     
     // Always proceed to next step
-    onProceed();
+    onProceed({avatar: selectedFile});
   };
 
   // Cleanup preview URL on component unmount

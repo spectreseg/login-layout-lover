@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 interface OnboardingPasswordScreenProps {
   onBack: () => void;
-  onProceed: () => void;
+  onProceed: (passwordData: {password: string}) => void;
 }
 
 export default function OnboardingPasswordScreen({ onBack, onProceed }: OnboardingPasswordScreenProps) {
@@ -64,7 +64,7 @@ export default function OnboardingPasswordScreen({ onBack, onProceed }: Onboardi
       return;
     }
     console.log('Password form submitted:', formData);
-    onProceed();
+    onProceed({password: formData.password});
   };
 
   return (
@@ -150,8 +150,9 @@ export default function OnboardingPasswordScreen({ onBack, onProceed }: Onboardi
             {/* Proceed button - right side */}
             <div className={`transition-all duration-700 ease-out ${buttonsVisible ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}`}>
               <button
-                onClick={handleSubmit}
-                className="bg-purple-600 text-white px-6 py-2 rounded-xl text-sm font-semibold hover:bg-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-purple-600"
+                onClick={() => onProceed({password: formData.password})}
+                disabled={!formData.password || formData.password !== formData.confirmPassword}
+                className="bg-purple-600 text-white px-6 py-2 rounded-xl text-sm font-semibold hover:bg-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-purple-600 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Proceed
               </button>
@@ -195,8 +196,9 @@ export default function OnboardingPasswordScreen({ onBack, onProceed }: Onboardi
           <div className={`flex flex-col gap-3 w-full max-w-md mx-auto transition-all duration-700 ease-out ${buttonsVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
             {/* Proceed button first on mobile */}
             <button
-              onClick={handleSubmit}
-              className="w-full bg-purple-600 text-white px-6 py-3 rounded-xl text-base font-semibold hover:bg-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-purple-600"
+              onClick={() => onProceed({password: formData.password})}
+              disabled={!formData.password || formData.password !== formData.confirmPassword}
+              className="w-full bg-purple-600 text-white px-6 py-3 rounded-xl text-base font-semibold hover:bg-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-purple-600 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Proceed
             </button>

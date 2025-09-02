@@ -17,6 +17,15 @@ const Index = () => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  
+  // Store onboarding data
+  const [onboardingData, setOnboardingData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    location: '',
+    avatar: null as File | null
+  });
 
   
   // Preload all onboarding images for smooth transitions
@@ -116,36 +125,91 @@ const Index = () => {
     setOnboardingStep('intro');
   };
 
-  const handleFormProceed = () => {
+  const handleFormProceed = (formData: {name: string, email: string}) => {
+    setOnboardingData(prev => ({
+      ...prev,
+      name: formData.name,
+      email: formData.email
+    }));
     setOnboardingStep('password');
-    console.log('Moving to password step');
+    console.log('Moving to password step with data:', formData);
   };
 
   const handlePasswordBack = () => {
     setOnboardingStep('form');
   };
 
-  const handlePasswordProceed = () => {
+  const handlePasswordProceed = (passwordData: {password: string}) => {
+    setOnboardingData(prev => ({
+      ...prev,
+      password: passwordData.password
+    }));
     setOnboardingStep('location');
-    console.log('Moving to location step');
+    console.log('Moving to location step with password set');
   };
 
   const handleLocationBack = () => {
     setOnboardingStep('password');
   };
 
-  const handleLocationProceed = () => {
+  const handleLocationProceed = (locationData: {location: string}) => {
+    setOnboardingData(prev => ({
+      ...prev,
+      location: locationData.location
+    }));
     setOnboardingStep('avatar');
-    console.log('Moving to avatar step');
+    console.log('Moving to avatar step with location:', locationData.location);
   };
 
   const handleAvatarBack = () => {
     setOnboardingStep('location');
   };
 
-  const handleAvatarProceed = () => {
-    setOnboardingStep('completion');
-    console.log('Moving to completion step');
+  const handleAvatarProceed = async (avatarData?: {avatar: File | null}) => {
+    if (avatarData?.avatar) {
+      setOnboardingData(prev => ({
+        ...prev,
+        avatar: avatarData.avatar
+      }));
+    }
+    
+    // Now register the user with all collected data
+    try {
+      const [firstName, ...lastNameParts] = onboardingData.name.split(' ');
+      const lastName = lastNameParts.join(' ');
+      
+      console.log('Registering user with data:', {
+        email: onboardingData.email,
+        firstName,
+        lastName,
+        location: onboardingData.location
+      });
+      
+      const { data, error } = await supabase.auth.signUp({
+        email: onboardingData.email,
+        password: onboardingData.password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+          data: {
+            first_name: firstName,
+            last_name: lastName,
+            location: onboardingData.location
+          }
+        }
+      });
+
+      if (error) {
+        console.error('Registration error:', error);
+        alert('Registration failed: ' + error.message);
+        return;
+      }
+
+      console.log('User registered successfully:', data);
+      setOnboardingStep('completion');
+    } catch (error) {
+      console.error('Registration error:', error);
+      alert('Registration failed. Please try again.');
+    }
   };
 
   const handleCompletionFinish = () => {

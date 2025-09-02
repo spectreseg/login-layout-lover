@@ -52,29 +52,8 @@ export default function AuthForm({
           onLogin();
         }
       } else {
-        const { data, error } = await supabase.auth.signUp({
-          email: formData.email,
-          password: formData.password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/`,
-            data: {
-              first_name: formData.firstName,
-              last_name: formData.lastName,
-              account_type: formData.accountType,
-            }
-          }
-        });
-
-        if (error) throw error;
-
-        if (data.user) {
-          toast({
-            title: "Account created!",
-            description: "Please check your email to verify your account.",
-          });
-          // Start onboarding flow
-          onToggleMode('register');
-        }
+        // Redirect to onboarding flow instead of registering directly
+        onToggleMode('register');
       }
     } catch (error: any) {
       toast({

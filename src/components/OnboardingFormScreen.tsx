@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 interface OnboardingFormScreenProps {
   onBack: () => void;
-  onProceed: () => void;
+  onProceed: (formData: {name: string, email: string}) => void;
 }
 
 export default function OnboardingFormScreen({ onBack, onProceed }: OnboardingFormScreenProps) {
@@ -77,7 +77,10 @@ export default function OnboardingFormScreen({ onBack, onProceed }: OnboardingFo
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Form submitted:', formData);
-    onProceed();
+    onProceed({
+      name: formData.name,
+      email: formData.email
+    });
   };
 
   return (
@@ -164,7 +167,7 @@ export default function OnboardingFormScreen({ onBack, onProceed }: OnboardingFo
             {/* Proceed button - right side */}
             <div className={`transition-all duration-700 ease-out ${buttonsVisible ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}`}>
               <button
-                onClick={handleSubmit}
+                onClick={() => onProceed({name: formData.name, email: formData.email})}
                 className="bg-purple-600 text-white px-6 py-2 rounded-xl text-sm font-semibold hover:bg-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-purple-600"
               >
                 Proceed
@@ -209,7 +212,7 @@ export default function OnboardingFormScreen({ onBack, onProceed }: OnboardingFo
           <div className={`flex flex-col gap-3 w-full max-w-md mx-auto transition-all duration-700 ease-out ${buttonsVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
             {/* Proceed button first on mobile */}
             <button
-              onClick={handleSubmit}
+              onClick={() => onProceed({name: formData.name, email: formData.email})}
               className="w-full bg-purple-600 text-white px-6 py-3 rounded-xl text-base font-semibold hover:bg-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-purple-600"
             >
               Proceed

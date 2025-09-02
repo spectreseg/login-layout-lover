@@ -3,7 +3,7 @@ import { MapPin } from 'lucide-react';
 
 interface OnboardingLocationScreenProps {
   onBack: () => void;
-  onProceed: () => void;
+  onProceed: (locationData: {location: string}) => void;
 }
 
 export default function OnboardingLocationScreen({ onBack, onProceed }: OnboardingLocationScreenProps) {
@@ -52,16 +52,16 @@ export default function OnboardingLocationScreen({ onBack, onProceed }: Onboardi
       navigator.geolocation.getCurrentPosition(
         (position) => {
           console.log('Location granted:', position.coords);
-          onProceed();
+          onProceed({location: `${position.coords.latitude},${position.coords.longitude}`});
         },
         (error) => {
           console.log('Location denied:', error);
-          onProceed(); // Continue anyway
+          onProceed({location: 'location_denied'}); // Continue anyway
         }
       );
     } else {
       console.log('Geolocation not supported');
-      onProceed(); // Continue anyway
+      onProceed({location: 'geolocation_not_supported'}); // Continue anyway
     }
   };
 
@@ -133,10 +133,10 @@ export default function OnboardingLocationScreen({ onBack, onProceed }: Onboardi
             {/* Proceed button - right side */}
             <div className={`transition-all duration-700 ease-out ${buttonsVisible ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}`}>
               <button
-                onClick={onProceed}
+                onClick={() => onProceed({location: 'skipped'})}
                 className="bg-purple-600 text-white px-6 py-2 rounded-xl text-sm font-semibold hover:bg-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-purple-600"
               >
-                Proceed
+                Skip
               </button>
             </div>
           </div>
@@ -159,10 +159,10 @@ export default function OnboardingLocationScreen({ onBack, onProceed }: Onboardi
           <div className={`flex flex-col gap-3 w-full max-w-md mx-auto transition-all duration-700 ease-out ${buttonsVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
             {/* Proceed button first on mobile */}
             <button
-              onClick={onProceed}
+              onClick={() => onProceed({location: 'skipped'})}
               className="w-full bg-purple-600 text-white px-6 py-3 rounded-xl text-base font-semibold hover:bg-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-purple-600"
             >
-              Proceed
+              Skip
             </button>
             
             {/* Back button second on mobile */}
