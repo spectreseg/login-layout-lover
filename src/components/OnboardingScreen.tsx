@@ -72,7 +72,7 @@ export default function OnboardingScreen({ onBack, onProceed }: OnboardingScreen
             <img
               src="/lovable-uploads/66d848c6-3010-4a7c-ae3f-ef4b712ad9f6.png"
               alt="Monte the Tiger Mascot"
-              className="w-[300px] h-[300px] md:w-[500px] md:h-[500px] object-contain drop-shadow-2xl"
+              className="w-[350px] h-[350px] md:w-[550px] md:h-[550px] object-contain drop-shadow-2xl"
               onLoad={() => console.log('Tiger image loaded successfully')}
               onError={() => console.log('Tiger image failed to load')}
             />
@@ -81,7 +81,7 @@ export default function OnboardingScreen({ onBack, onProceed }: OnboardingScreen
         </div>
         
         {/* Action buttons - responsive layout */}
-        <div className={`flex flex-col md:flex-row gap-3 md:gap-52 items-center justify-center pb-4 md:pb-0 w-full max-w-sm md:max-w-none transition-all duration-700 ease-out ${buttonsVisible ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}`}>
+        <div className={`flex flex-col md:flex-row gap-4 md:gap-60 items-center justify-center pb-4 md:pb-0 w-full max-w-sm md:max-w-none mt-8 md:mt-12 transition-all duration-700 ease-out ${buttonsVisible ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}`}>
           {/* Proceed button first on mobile, second on desktop */}
           <button
             onClick={onProceed}
