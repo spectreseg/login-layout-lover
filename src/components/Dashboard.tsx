@@ -1,5 +1,5 @@
 import React from 'react';
-import { LogOut, TrendingUp, Map, Plus, Bell, Settings, Moon, Sun, MapPin, Clock, Users, ChevronRight, CheckCircle, Trash2 } from 'lucide-react';
+import { LogOut, TrendingUp, Map, Plus, Bell, Settings, Moon, Sun, MapPin, Clock, Users, ChevronRight, CheckCircle, Trash2, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
@@ -226,9 +226,6 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
   const handleDeletePost = async (postId: string) => {
     if (!user) return;
 
-    const confirmed = window.confirm('Are you sure you want to delete this post?');
-    if (!confirmed) return;
-
     try {
       const { error } = await supabase
         .from('food_posts')
@@ -244,7 +241,6 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
 
       // Refresh posts
       fetchPosts();
-      alert('Post deleted successfully!');
     } catch (error) {
       console.error('Error in handleDeletePost:', error);
       alert('Failed to delete post. Please try again.');
@@ -607,7 +603,7 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
               }
 
               return postsToShow.map((post, index) => (
-              <Card key={post.id} className="bg-card border-border/30 hover:border-border/50 transition-all duration-200 hover:shadow-sm overflow-hidden group">
+              <Card key={post.id} className="bg-card border-border/30 hover:border-border/50 transition-all duration-200 hover:shadow-sm overflow-hidden group flex flex-col">
                 <div className="aspect-[4/3] bg-muted/20 relative overflow-hidden">
                   <img 
                     src={getPostImage(post, index)} 
@@ -625,8 +621,8 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
                     {showExpiredPosts ? 'Expired' : 'Available'}
                   </Badge>
                 </div>
-                <CardContent className="p-4 cursor-default">
-                  <div className="space-y-3">
+                <CardContent className="p-4 cursor-default flex flex-col flex-1">
+                  <div className="space-y-3 flex-1">
                     <div>
                       <h3 className="font-inter font-semibold text-base text-foreground leading-tight mb-2 tracking-wide">
                         {post.title}
@@ -660,37 +656,46 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
                         </div>
                       )}
                     </div>
+                  </div>
 
-                    <div className="flex gap-3 pt-3">
-                      {user && post.user_id === user.id ? (
-                        // Show delete button for own posts
-                        <Button 
-                          variant="destructive" 
-                          size="sm" 
-                          className="flex-1 text-sm h-9 font-inter font-medium"
-                          onClick={() => handleDeletePost(post.id)}
-                        >
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          Delete Post
+                  <div className="flex gap-3 pt-3 mt-auto">
+                    {user && post.user_id === user.id ? (
+                      // Show delete button for own posts
+                      <Button 
+                        variant="destructive" 
+                        size="sm" 
+                        className="flex-1 text-sm h-9 font-inter font-medium"
+                        onClick={() => handleDeletePost(post.id)}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete Post
+                      </Button>
+                    ) : (
+                      // Show action buttons for other users' posts
+                      <>
+                        <Button variant="ghost" size="sm" className="flex-1 text-sm h-9 text-primary font-inter font-medium">
+                          View Details
                         </Button>
-                      ) : (
-                        // Show action buttons for other users' posts
-                        <>
-                          <Button variant="ghost" size="sm" className="flex-1 text-sm h-9 text-primary font-inter font-medium">
-                            View Details
-                          </Button>
-                          <Button 
-                            size="sm" 
-                            className="flex-1 text-sm h-9 bg-primary hover:bg-primary/90 font-inter font-medium"
-                            onClick={() => handleMarkAsFinished(post.id)}
-                            disabled={post.finished_by?.includes(user?.id || '') || showExpiredPosts}
-                          >
-                            <CheckCircle className="h-4 w-4 mr-2" />
-                            {post.finished_by?.includes(user?.id || '') ? 'Marked!' : 'Mark as Finished'}
-                          </Button>
-                        </>
-                      )}
-                    </div>
+                        <Button 
+                          size="sm" 
+                          className="flex-1 text-sm h-9 bg-primary hover:bg-primary/90 font-inter font-medium"
+                          onClick={() => handleMarkAsFinished(post.id)}
+                          disabled={post.finished_by?.includes(user?.id || '') || showExpiredPosts}
+                        >
+                          {post.finished_by?.includes(user?.id || '') ? (
+                            <>
+                              <Check className="h-4 w-4 mr-2" />
+                              Marked as Finished
+                            </>
+                          ) : (
+                            <>
+                              <CheckCircle className="h-4 w-4 mr-2" />
+                              Mark as Finished
+                            </>
+                          )}
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </CardContent>
               </Card>
