@@ -126,7 +126,7 @@ export default function Dashboard() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b border-border/20 bg-card/50 backdrop-blur-sm">
-        <div className="w-full px-4 py-6">
+        <div className="w-full px-4 py-3">
           <div className="flex items-center justify-between">
             <Button 
               variant="ghost" 
@@ -134,20 +134,20 @@ export default function Dashboard() {
               onClick={toggleDarkMode} 
               className="text-muted-foreground hover:text-foreground"
             >
-              {isDarkMode ? <Sun className="h-6 w-6" /> : <Moon className="h-6 w-6" />}
+              {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </Button>
             
-            <div className="flex flex-col items-center gap-3">
-              <Avatar className="h-24 w-24 border-2 border-border/30">
+            <div className="flex items-center gap-3">
+              <Avatar className="h-8 w-8 border border-border/30">
                 <AvatarImage 
                   src={profile?.avatar_url || ""} 
                   className="object-cover"
                 />
-                <AvatarFallback className="bg-primary/10 text-primary font-medium text-2xl">
+                <AvatarFallback className="bg-primary/10 text-primary font-medium text-xs">
                   {initials}
                 </AvatarFallback>
               </Avatar>
-              <h1 className="text-2xl font-semibold text-foreground">
+              <h1 className="text-base font-medium text-foreground">
                 Welcome back, {displayName}!
               </h1>
             </div>
@@ -158,7 +158,7 @@ export default function Dashboard() {
               onClick={handleSignOut}
               className="text-destructive hover:text-destructive hover:bg-destructive/10"
             >
-              <LogOut className="h-6 w-6" />
+              <LogOut className="h-5 w-5" />
             </Button>
           </div>
         </div>
