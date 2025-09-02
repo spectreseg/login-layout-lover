@@ -25,7 +25,7 @@ export default function AuthForm({
     e.preventDefault();
     onLogin();
   };
-  return <div className="bg-card rounded-2xl shadow-auth-form w-full relative overflow-visible backdrop-blur-sm bg-opacity-95 mt-12 sm:mt-16 md:mt-20">
+  return <div className="w-full relative overflow-visible mt-12 sm:mt-16 md:mt-20">
       {/* Logo Section - positioned to straddle background and form */}
       <div className="absolute -top-12 sm:-top-16 md:-top-20 left-1/2 transform -translate-x-1/2 z-20">
         <div className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 relative">
@@ -33,55 +33,55 @@ export default function AuthForm({
         </div>
       </div>
       {/* Tab Navigation */}
-      <div className="flex border-b border-auth-gray-300 mt-16 sm:mt-20 md:mt-24">
-        <button onClick={() => onToggleMode('login')} className={`flex-1 py-2 sm:py-3 md:py-4 px-2 sm:px-4 md:px-6 text-xs sm:text-sm md:text-base text-center font-medium transition-smooth ${mode === 'login' ? 'text-auth-purple border-b-2 border-auth-purple bg-auth-purple-light' : 'text-auth-gray-500 hover:text-auth-gray-700 hover:bg-auth-gray-50'}`}>
+      <div className="flex border-b border-white/20 mt-16 sm:mt-20 md:mt-24">
+        <button onClick={() => onToggleMode('login')} className={`flex-1 py-3 sm:py-4 md:py-5 px-3 sm:px-5 md:px-7 text-sm sm:text-base md:text-lg text-center font-medium transition-smooth ${mode === 'login' ? 'text-white border-b-2 border-white bg-white/10' : 'text-gray-300 hover:text-white hover:bg-white/5'}`}>
           Login
         </button>
-        <button onClick={() => onToggleMode('register')} className={`flex-1 py-2 sm:py-3 md:py-4 px-2 sm:px-4 md:px-6 text-xs sm:text-sm md:text-base text-center font-medium transition-smooth ${mode === 'register' ? 'text-auth-purple border-b-2 border-auth-purple bg-auth-purple-light' : 'text-auth-gray-500 hover:text-auth-gray-700 hover:bg-auth-gray-50'}`}>
+        <button onClick={() => onToggleMode('register')} className={`flex-1 py-3 sm:py-4 md:py-5 px-3 sm:px-5 md:px-7 text-sm sm:text-base md:text-lg text-center font-medium transition-smooth ${mode === 'register' ? 'text-white border-b-2 border-white bg-white/10' : 'text-gray-300 hover:text-white hover:bg-white/5'}`}>
           Register
         </button>
       </div>
 
       {/* Form Content */}
-      <div className="p-4 sm:p-6 md:p-8">
-        <div className="text-center mb-4 sm:mb-6 md:mb-8">
-          <h2 className="text-lg sm:text-xl md:text-2xl font-medium text-auth-gray-900 mb-2">
+      <div className="p-6 sm:p-8 md:p-10">
+        <div className="text-center mb-6 sm:mb-8 md:mb-10">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-medium text-white mb-3">
             Welcome Back
           </h2>
-          <p className="text-xs sm:text-sm md:text-base text-auth-gray-600 font-normal">
+          <p className="text-sm sm:text-base md:text-lg text-gray-300 font-normal">
             Sign in to your account to continue
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Mail className="h-4 w-4 sm:h-5 sm:w-5 text-auth-purple" />
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <Mail className="h-5 w-5 sm:h-6 sm:w-6 text-gray-400" />
             </div>
-            <input type="email" name="email" placeholder="Email Address" value={formData.email} onChange={handleInputChange} className="w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-2.5 md:py-3 text-sm sm:text-base border border-auth-gray-300 rounded-lg focus:ring-2 focus:ring-auth-purple focus:border-transparent transition-smooth bg-auth-gray-50 focus:bg-card font-normal" required />
+            <input type="email" name="email" placeholder="Email Address" value={formData.email} onChange={handleInputChange} className="w-full pl-12 sm:pl-14 pr-4 sm:pr-5 py-3 sm:py-4 md:py-5 text-base sm:text-lg border border-white/20 rounded-xl focus:ring-2 focus:ring-white/30 focus:border-white/30 transition-smooth bg-white/10 backdrop-blur-sm text-white placeholder-gray-300 font-normal" required />
           </div>
 
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Lock className="h-4 w-4 sm:h-5 sm:w-5 text-auth-purple" />
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <Lock className="h-5 w-5 sm:h-6 sm:w-6 text-gray-400" />
             </div>
-            <input type={showPassword ? 'text' : 'password'} name="password" placeholder="Password" value={formData.password} onChange={handleInputChange} className="w-full pl-8 sm:pl-10 pr-10 sm:pr-12 py-2 sm:py-2.5 md:py-3 text-sm sm:text-base border border-auth-gray-300 rounded-lg focus:ring-2 focus:ring-auth-purple focus:border-transparent transition-smooth bg-auth-gray-50 focus:bg-card font-normal" required />
-            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 pr-3 flex items-center text-auth-purple hover:text-auth-purple-dark transition-colors">
-              {showPassword ? <EyeOff className="h-4 w-4 sm:h-5 sm:w-5" /> : <Eye className="h-4 w-4 sm:h-5 sm:w-5" />}
+            <input type={showPassword ? 'text' : 'password'} name="password" placeholder="Password" value={formData.password} onChange={handleInputChange} className="w-full pl-12 sm:pl-14 pr-12 sm:pr-14 py-3 sm:py-4 md:py-5 text-base sm:text-lg border border-white/20 rounded-xl focus:ring-2 focus:ring-white/30 focus:border-white/30 transition-smooth bg-white/10 backdrop-blur-sm text-white placeholder-gray-300 font-normal" required />
+            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-white transition-colors">
+              {showPassword ? <EyeOff className="h-5 w-5 sm:h-6 sm:w-6" /> : <Eye className="h-5 w-5 sm:h-6 sm:w-6" />}
             </button>
           </div>
 
           <div className="flex items-center justify-between">
             <label className="flex items-center">
-              <input type="checkbox" className="h-4 w-4 text-auth-purple focus:ring-auth-purple border-auth-gray-300 rounded" />
-              <span className="ml-2 text-sm text-auth-gray-600 font-normal">Remember me</span>
+              <input type="checkbox" className="h-5 w-5 text-white focus:ring-white/30 border-white/30 rounded bg-white/10" />
+              <span className="ml-3 text-sm sm:text-base text-gray-300 font-normal">Remember me</span>
             </label>
-            <button type="button" className="text-xs sm:text-sm text-auth-purple hover:text-auth-purple-dark transition-colors font-normal">
+            <button type="button" className="text-sm sm:text-base text-white hover:text-gray-300 transition-colors font-normal">
               Forgot password?
             </button>
           </div>
 
-          <button type="submit" className="w-full bg-gradient-purple text-primary-foreground py-2 sm:py-2.5 md:py-3 px-4 text-sm sm:text-base rounded-lg font-medium hover:bg-gradient-purple-hover focus:ring-2 focus:ring-auth-purple focus:ring-offset-2 transition-smooth transform hover:scale-[1.02] active:scale-[0.98] shadow-auth-button">
+          <button type="submit" className="w-full bg-white text-black py-3 sm:py-4 md:py-5 px-6 text-base sm:text-lg rounded-xl font-semibold hover:bg-gray-100 focus:ring-2 focus:ring-white/30 focus:ring-offset-2 focus:ring-offset-black transition-smooth transform hover:scale-[1.02] active:scale-[0.98] shadow-lg">
             Sign In
           </button>
         </form>

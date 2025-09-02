@@ -53,7 +53,9 @@ export default function StarryBackground() {
     let time = 0;
 
     const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // Fill with black background
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
       
       // Draw stars
       stars.forEach(star => {
