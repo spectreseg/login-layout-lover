@@ -127,7 +127,16 @@ export default function Dashboard() {
       {/* Header */}
       <header className="border-b border-border/20 bg-card/50 backdrop-blur-sm">
         <div className="w-full px-4 py-6">
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-between">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={toggleDarkMode} 
+              className="text-muted-foreground hover:text-foreground"
+            >
+              {isDarkMode ? <Sun className="h-6 w-6" /> : <Moon className="h-6 w-6" />}
+            </Button>
+            
             <div className="flex items-center gap-5">
               <Avatar className="h-20 w-20 border-2 border-border/30">
                 <AvatarImage 
@@ -142,36 +151,23 @@ export default function Dashboard() {
                 Welcome back, {displayName}!
               </h1>
             </div>
+            
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={handleSignOut}
+              className="text-destructive hover:text-destructive hover:bg-destructive/10"
+            >
+              <LogOut className="h-6 w-6" />
+            </Button>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
       <main className="w-full px-4 py-6">
-        {/* Controls positioned above navigation */}
-        <div className="flex items-center justify-between px-8 mb-4 max-w-4xl mx-auto">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={toggleDarkMode} 
-            className="text-muted-foreground hover:text-foreground"
-          >
-            {isDarkMode ? <Sun className="h-6 w-6" /> : <Moon className="h-6 w-6" />}
-          </Button>
-          
-          <div className="flex-1"></div>
-          
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={handleSignOut}
-            className="text-destructive hover:text-destructive hover:bg-destructive/10"
-          >
-            <LogOut className="h-6 w-6" />
-          </Button>
-        </div>
         {/* Navigation Grid */}
-        <div className="flex items-center justify-between px-8 py-8 mb-8 bg-muted/50 mx-4 rounded-lg max-w-4xl mx-auto">
+        <div className="flex items-center justify-between px-8 py-8 mb-8 bg-muted/50 mx-4 rounded-lg">
           {navItems.map((item) => (
             <div 
               key={item.label} 
