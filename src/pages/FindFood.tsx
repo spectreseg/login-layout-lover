@@ -391,6 +391,9 @@ const FindFood = () => {
             <div style="text-align: center; margin-bottom: 8px;">
               <h3 style="margin: 0 0 4px 0; font-size: 16px; font-weight: 600; color: #1f2937;">${post.title}</h3>
             </div>
+            <div style="text-align: center; font-size: 12px; color: #6b7280; margin-bottom: 4px;">
+              <span>${post.location}</span>
+            </div>
             <div style="text-align: center; font-size: 12px; color: #6b7280; margin-bottom: 6px;">
               <span>Expires: ${expiresAt}</span>
             </div>
