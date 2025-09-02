@@ -36,17 +36,6 @@ export default {
 					light: 'hsl(var(--primary-light))',
 					hover: 'hsl(var(--primary-hover))'
 				},
-				// Vibrant accent colors
-				accent: {
-					DEFAULT: 'hsl(var(--accent))',
-					foreground: 'hsl(var(--accent-foreground))',
-					blue: 'hsl(var(--accent-blue))',
-					green: 'hsl(var(--accent-green))',
-					orange: 'hsl(var(--accent-orange))',
-					pink: 'hsl(var(--accent-pink))',
-					yellow: 'hsl(var(--accent-yellow))',
-					teal: 'hsl(var(--accent-teal))'
-				},
 				auth: {
 					purple: 'hsl(var(--auth-purple))',
 					'purple-dark': 'hsl(var(--auth-purple-dark))',
@@ -69,6 +58,10 @@ export default {
 				muted: {
 					DEFAULT: 'hsl(var(--muted))',
 					foreground: 'hsl(var(--muted-foreground))'
+				},
+				accent: {
+					DEFAULT: 'hsl(var(--accent))',
+					foreground: 'hsl(var(--accent-foreground))'
 				},
 				popover: {
 					DEFAULT: 'hsl(var(--popover))',
@@ -96,18 +89,11 @@ export default {
 			},
 			backgroundImage: {
 				'gradient-purple': 'var(--gradient-purple)',
-				'gradient-purple-hover': 'var(--gradient-purple-hover)',
-				'gradient-blue': 'var(--gradient-blue)',
-				'gradient-green': 'var(--gradient-green)',
-				'gradient-card': 'var(--gradient-card)',
-				'gradient-hero': 'var(--gradient-hero)',
-				'gradient-nav': 'var(--gradient-nav)'
+				'gradient-purple-hover': 'var(--gradient-purple-hover)'
 			},
 			boxShadow: {
 				'auth-form': 'var(--shadow-auth-form)',
-				'auth-button': 'var(--shadow-auth-button)',
-				'card': 'var(--shadow-card)',
-				'nav': 'var(--shadow-nav)'
+				'auth-button': 'var(--shadow-auth-button)'
 			},
 			transitionProperty: {
 				'smooth': 'var(--transition-smooth)'

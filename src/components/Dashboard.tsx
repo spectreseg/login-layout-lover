@@ -123,9 +123,9 @@ export default function Dashboard() {
     : user?.email?.[0]?.toUpperCase() || 'U';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-accent-blue/5 to-primary/5">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b border-border/20 bg-gradient-hero backdrop-blur-sm shadow-nav">
+      <header className="border-b border-border/20 bg-card/50 backdrop-blur-sm">
         <div className="w-full px-4 py-4">
           <div className="flex items-center justify-center gap-48">
             <div className="flex flex-col items-center gap-3 cursor-pointer group">
@@ -165,25 +165,25 @@ export default function Dashboard() {
       {/* Main Content */}
       <main className="w-full px-4 py-3">
         {/* Navigation Grid */}
-        <div className="flex items-center justify-between px-8 py-6 mb-4 bg-gradient-nav backdrop-blur-sm mx-4 rounded-xl shadow-nav border border-accent-blue/10">
+        <div className="flex items-center justify-between px-8 py-6 mb-4 bg-muted/50 mx-4 rounded-lg">
           {navItems.map((item) => (
             <div 
               key={item.label} 
               className="flex flex-col items-center gap-3 cursor-pointer group"
             >
               {item.primary ? (
-                <div className="w-16 h-16 bg-gradient-purple rounded-full flex items-center justify-center shadow-auth-button hover:shadow-xl transition-all duration-300 hover:scale-110 hover:bg-gradient-purple-hover">
+                <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
                   <item.icon className="h-7 w-7 text-primary-foreground" />
                 </div>
               ) : (
-                <div className="w-12 h-12 bg-transparent flex items-center justify-center group-hover:bg-accent-blue/10 rounded-xl transition-all duration-300 hover:shadow-md border border-transparent group-hover:border-accent-blue/20">
-                  <item.icon className="h-6 w-6 text-foreground/80 group-hover:text-accent-blue transition-colors duration-300" />
+                <div className="w-12 h-12 bg-transparent flex items-center justify-center group-hover:bg-muted/50 rounded-lg transition-colors duration-200">
+                  <item.icon className="h-6 w-6 text-foreground/80 group-hover:text-foreground" />
                 </div>
               )}
-              <span className={`font-inter font-medium text-center tracking-wide transition-colors duration-300 ${
+              <span className={`font-inter font-medium text-center tracking-wide ${
                 item.primary 
                   ? 'text-sm text-foreground' 
-                  : 'text-sm text-foreground/80 group-hover:text-accent-blue'
+                  : 'text-sm text-foreground/80 group-hover:text-foreground'
               }`}>
                 {item.label}
               </span>
@@ -198,80 +198,62 @@ export default function Dashboard() {
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {activePosts.map((post, index) => {
-              const cardColors = [
-                'bg-gradient-to-br from-accent-blue/10 to-accent-blue/5 border-accent-blue/20',
-                'bg-gradient-to-br from-accent-green/10 to-accent-green/5 border-accent-green/20',
-                'bg-gradient-to-br from-accent-orange/10 to-accent-orange/5 border-accent-orange/20',
-                'bg-gradient-to-br from-accent-pink/10 to-accent-pink/5 border-accent-pink/20',
-                'bg-gradient-to-br from-accent-teal/10 to-accent-teal/5 border-accent-teal/20',
-                'bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20'
-              ];
-              const badgeColors = [
-                'bg-accent-blue/10 text-accent-blue border border-accent-blue/20',
-                'bg-accent-green/10 text-accent-green border border-accent-green/20',
-                'bg-accent-orange/10 text-accent-orange border border-accent-orange/20',
-                'bg-accent-pink/10 text-accent-pink border border-accent-pink/20',
-                'bg-accent-teal/10 text-accent-teal border border-accent-teal/20',
-                'bg-primary/10 text-primary border border-primary/20'
-              ];
-              
-              return (
-                <Card key={post.id} className={`${cardColors[index % cardColors.length]} hover:shadow-card transition-all duration-300 hover:scale-[1.02] overflow-hidden border-2`}>
-                  <div className="aspect-[4/3] bg-muted/20 relative overflow-hidden">
-                    <img 
-                      src={post.image} 
-                      alt={post.title}
-                      className="w-full h-full object-cover"
-                    />
-                    <Badge 
-                      className={`absolute top-3 right-3 font-medium ${badgeColors[index % badgeColors.length]}`}
-                    >
-                      {post.status}
-                    </Badge>
-                  </div>
-                  <CardContent className="p-4">
-                    <div className="space-y-3">
-                      <div>
-                        <h3 className="font-inter font-semibold text-base text-foreground leading-tight mb-2 tracking-wide">
-                          {post.title}
-                        </h3>
-                        <p className="text-sm text-muted-foreground leading-relaxed font-inter">
-                          {post.description}
-                        </p>
+            {activePosts.map((post) => (
+              <Card key={post.id} className="bg-card border-border/30 hover:border-border/50 transition-all duration-200 hover:shadow-sm overflow-hidden">
+                <div className="aspect-[4/3] bg-muted/20 relative overflow-hidden">
+                  <img 
+                    src={post.image} 
+                    alt={post.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <Badge 
+                    variant="secondary" 
+                    className="absolute top-2 right-2 bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
+                  >
+                    {post.status}
+                  </Badge>
+                </div>
+                <CardContent className="p-4">
+                  <div className="space-y-3">
+                    <div>
+                      <h3 className="font-inter font-semibold text-base text-foreground leading-tight mb-2 tracking-wide">
+                        {post.title}
+                      </h3>
+                      <p className="text-sm text-muted-foreground leading-relaxed font-inter">
+                        {post.description}
+                      </p>
+                    </div>
+                    
+                    <div className="space-y-2 text-sm text-muted-foreground font-inter">
+                      <div className="flex items-center gap-2">
+                        <MapPin className="h-4 w-4" />
+                        <span>{post.location}</span>
                       </div>
-                      
-                      <div className="space-y-2 text-sm text-muted-foreground font-inter">
-                        <div className="flex items-center gap-2">
-                          <MapPin className="h-4 w-4" />
-                          <span>{post.location}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Clock className="h-4 w-4" />
-                          <span>{post.timeLeft}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Users className="h-4 w-4" />
-                          <span>{post.servings} servings</span>
-                        </div>
-                        <div className="text-sm text-foreground/70 font-medium">
-                          by {post.postedBy}
-                        </div>
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4" />
+                        <span>{post.timeLeft}</span>
                       </div>
-
-                      <div className="flex gap-3 pt-3">
-                        <Button variant="outline" size="sm" className="flex-1 text-sm h-9 font-inter font-medium border-accent-blue/30 text-accent-blue hover:bg-accent-blue/10 hover:border-accent-blue/50">
-                          View Details
-                        </Button>
-                        <Button size="sm" className="flex-1 text-sm h-9 bg-gradient-purple hover:bg-gradient-purple-hover font-inter font-medium shadow-auth-button hover:shadow-xl transition-all duration-300">
-                          I'm On My Way!
-                        </Button>
+                      <div className="flex items-center gap-2">
+                        <Users className="h-4 w-4" />
+                        <span>{post.servings} servings</span>
+                      </div>
+                      <div className="text-sm text-foreground/70 font-medium">
+                        by {post.postedBy}
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
+
+                    <div className="flex gap-3 pt-3">
+                      <Button variant="ghost" size="sm" className="flex-1 text-sm h-9 text-primary font-inter font-medium">
+                        View Details
+                      </Button>
+                      <Button size="sm" className="flex-1 text-sm h-9 bg-primary hover:bg-primary/90 font-inter font-medium">
+                        I'm On My Way!
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </section>
       </main>
