@@ -156,12 +156,7 @@ export default function OnboardingLocationScreen({ onBack, onProceed }: Onboardi
             <div className={`transition-all duration-700 ease-out ${buttonsVisible ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}`}>
               <button
                 onClick={handleProceed}
-                className={`px-6 py-2 rounded-xl text-sm font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 ${
-                  locationGranted
-                    ? 'bg-purple-600 text-white border-purple-600 hover:bg-purple-700'
-                    : 'bg-gray-300 text-gray-500 border-gray-300 cursor-not-allowed'
-                }`}
-                disabled={!locationGranted}
+                className="bg-purple-600 text-white px-6 py-2 rounded-xl text-sm font-semibold hover:bg-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-purple-600"
               >
                 Proceed
               </button>
@@ -192,12 +187,7 @@ export default function OnboardingLocationScreen({ onBack, onProceed }: Onboardi
             {/* Proceed button */}
             <button
               onClick={handleProceed}
-              className={`w-full px-6 py-3 rounded-xl text-base font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 ${
-                locationGranted
-                  ? 'bg-purple-600 text-white border-purple-600 hover:bg-purple-700'
-                  : 'bg-gray-300 text-gray-500 border-gray-300 cursor-not-allowed'
-              }`}
-              disabled={!locationGranted}
+              className="w-full bg-purple-600 text-white px-6 py-3 rounded-xl text-base font-semibold hover:bg-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-purple-600"
             >
               Proceed
             </button>
