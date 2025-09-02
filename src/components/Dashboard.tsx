@@ -293,7 +293,7 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
                     {post.status}
                   </Badge>
                 </div>
-                <CardContent className="p-4">
+                <CardContent className="p-4 cursor-default">
                   <div className="space-y-3">
                     <div>
                       <h3 className="font-inter font-semibold text-base text-foreground leading-tight mb-2 tracking-wide">
