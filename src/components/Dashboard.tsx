@@ -252,8 +252,8 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
               className="flex flex-col items-center gap-3 cursor-pointer group"
             >
               {item.primary ? (
-                <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
-                  <item.icon className="h-7 w-7 text-white" />
+                <div className="w-16 h-16 bg-black dark:bg-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
+                  <item.icon className="h-7 w-7 text-white dark:text-black" />
                 </div>
               ) : (
                 <div className="w-12 h-12 bg-transparent flex items-center justify-center group-hover:bg-muted/50 rounded-lg transition-colors duration-200">
@@ -280,11 +280,11 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {activePosts.map((post) => (
               <Card key={post.id} className="bg-card border-border/30 hover:border-border/50 transition-all duration-200 hover:shadow-sm overflow-hidden">
-                <div className="aspect-[4/3] bg-muted/20 relative overflow-hidden">
+                <div className="aspect-[4/3] bg-muted/20 relative overflow-hidden group">
                   <img 
                     src={post.image} 
                     alt={post.title}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
                   />
                   <Badge 
                     variant="secondary" 
