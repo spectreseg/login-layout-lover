@@ -306,7 +306,8 @@ const Notifications = () => {
       {/* Header */}
       <header className="border-b border-border/20 bg-white">
         <div className="max-w-4xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between w-full">
+            {/* Left side - Notifications title */}
             <div className="flex items-center gap-3">
               <Bell className="w-8 h-8 text-purple-600" />
               <h1 className="text-3xl font-playfair font-bold text-foreground">
@@ -319,14 +320,17 @@ const Notifications = () => {
               )}
             </div>
             
-            <Button
-              variant="ghost"
-              onClick={() => navigate('/dashboard')}
-              className="flex items-center gap-3 text-foreground hover:text-foreground transition-all duration-200 px-4 py-2 rounded-lg h-12 text-lg font-inter font-bold hover:scale-105"
-            >
-              <span className="font-bold">Dashboard</span>
-              <ArrowLeft className="h-5 w-5 rotate-180" />
-            </Button>
+            {/* Right side - Dashboard button */}
+            <div className="ml-auto">
+              <Button
+                variant="ghost"
+                onClick={() => navigate('/dashboard')}
+                className="flex items-center gap-3 text-foreground hover:text-foreground transition-all duration-200 px-4 py-2 rounded-lg h-12 text-lg font-inter font-bold hover:scale-105"
+              >
+                <span className="font-bold">Dashboard</span>
+                <ArrowLeft className="h-5 w-5 rotate-180" />
+              </Button>
+            </div>
           </div>
         </div>
       </header>
