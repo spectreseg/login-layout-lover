@@ -33,25 +33,50 @@ export default function ShareFood() {
     try {
       console.log('Converting HEIC file:', file.name, file.type);
       
-      const convertedBlob = await heic2any({
-        blob: file,
-        toType: "image/jpeg",
-        quality: 0.8
+      // Create a canvas to convert the image
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) throw new Error('Canvas not supported');
+
+      // Create image element
+      const img = new Image();
+      
+      return new Promise((resolve, reject) => {
+        img.onload = () => {
+          try {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            
+            canvas.toBlob((blob) => {
+              if (blob) {
+                const newFileName = file.name.replace(/\.(heic|HEIC)$/i, '.jpg');
+                const convertedFile = new File([blob], newFileName, {
+                  type: 'image/jpeg',
+                });
+                console.log('HEIC conversion successful:', convertedFile.name);
+                resolve(convertedFile);
+              } else {
+                reject(new Error('Canvas conversion failed'));
+              }
+            }, 'image/jpeg', 0.8);
+          } catch (error) {
+            reject(error);
+          }
+        };
+        
+        img.onerror = () => {
+          reject(new Error('Failed to load HEIC image'));
+        };
+        
+        // Convert file to blob URL for the image
+        img.src = URL.createObjectURL(file);
       });
-      
-      // Handle both Blob and Blob[] return types
-      const blob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
-      
-      const newFileName = file.name.replace(/\.(heic|HEIC)$/i, '.jpg');
-      const convertedFile = new File([blob], newFileName, {
-        type: 'image/jpeg',
-      });
-      
-      console.log('HEIC conversion successful:', convertedFile.name);
-      return convertedFile;
     } catch (error) {
       console.error('HEIC conversion failed:', error);
-      throw new Error('Failed to convert HEIC image. Please try a different format.');
+      // Return original file if conversion fails
+      console.log('Falling back to original file');
+      return file;
     }
   };
 
@@ -73,7 +98,13 @@ export default function ShareFood() {
       
       if (isHeic) {
         console.log('Detected HEIC file, converting...');
-        processedFile = await convertHeicToJpeg(file);
+        try {
+          processedFile = await convertHeicToJpeg(file);
+        } catch (conversionError) {
+          console.warn('HEIC conversion failed, using original file:', conversionError);
+          // Use original file if conversion fails
+          processedFile = file;
+        }
       }
       
       setImageFile(processedFile);
@@ -103,49 +134,34 @@ export default function ShareFood() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30 relative">
-      <StarryBackground />
-      
-      {/* Header */}
-      <header className="relative z-10 bg-white dark:bg-card/95 border-b border-border/20 backdrop-blur-sm shadow-sm">
-        <div className="w-full px-6 py-6">
-          <div className="flex items-center justify-between max-w-4xl mx-auto">
-            <Button
-              variant="ghost"
-              onClick={handleCancel}
-              className="flex items-center gap-2 text-foreground/80 hover:text-foreground hover:bg-muted/50 transition-all duration-200"
-            >
-              <ArrowLeft className="h-5 w-5" />
-              Back to Dashboard
-            </Button>
-            <div className="absolute left-1/2 transform -translate-x-1/2">
-              <div className="text-center">
-                <h1 className="text-3xl font-playfair font-bold text-foreground tracking-wide">
-                  Share Food
-                </h1>
-              </div>
-            </div>
-            <div className="w-32" /> {/* Spacer for center alignment */}
-          </div>
-        </div>
-      </header>
-
+    <div className="min-h-screen bg-white">
       {/* Main Content */}
-      <main className="relative z-10 w-full px-6 py-8">
+      <main className="w-full px-6 py-8">
         <div className="max-w-2xl mx-auto">
-          <Card className="bg-white/95 dark:bg-card/95 backdrop-blur border-border/30 shadow-xl rounded-2xl overflow-hidden">
+          <Card className="bg-white border-border/30 shadow-xl rounded-2xl overflow-hidden">
             <CardContent className="p-8">
               <div className="text-center mb-8">
-                {/* Tiger Avatar */}
-                <div className="flex justify-center mb-6">
-                  <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-primary/20 shadow-lg animate-fade-in">
+                {/* Header with Back Button and Tiger */}
+                <div className="flex items-center justify-center mb-6 relative">
+                  <Button
+                    variant="ghost"
+                    onClick={handleCancel}
+                    className="absolute left-0 flex items-center gap-2 text-foreground/80 hover:text-foreground hover:bg-muted/50 transition-all duration-200"
+                  >
+                    <ArrowLeft className="h-5 w-5" />
+                    Back to Dashboard
+                  </Button>
+                  
+                  {/* Tiger Image */}
+                  <div className="w-24 h-24 animate-fade-in">
                     <img 
-                      src="/lovable-uploads/monte-tiger-selfie.png" 
+                      src="/lovable-uploads/3a3c3b4a-16c4-4156-b27c-44f006547e86.png" 
                       alt="Monte Tiger" 
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                     />
                   </div>
                 </div>
+                
                 <h2 className="text-4xl font-playfair font-bold text-foreground mb-3 tracking-wide animate-fade-in">
                   Share Food
                 </h2>
@@ -173,18 +189,15 @@ export default function ShareFood() {
                         />
                         <div className="w-40 h-40 border-2 border-dashed border-primary/30 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-primary/50 transition-all duration-200 bg-gradient-to-br from-muted/20 to-muted/40 hover:from-muted/30 hover:to-muted/50 group">
                           {isUploading ? (
-                            <div className="text-center">
+                            <div className="flex flex-col items-center justify-center">
                               <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mb-2"></div>
                               <div className="text-muted-foreground text-sm font-medium">Processing...</div>
                             </div>
                           ) : (
-                            <div className="text-center">
+                            <div className="flex flex-col items-center justify-center">
                               <Camera className="h-10 w-10 text-muted-foreground group-hover:text-primary transition-colors mb-2" />
                               <div className="text-muted-foreground text-sm font-medium">
                                 Click to upload
-                              </div>
-                              <div className="text-muted-foreground/70 text-xs mt-1">
-                                Supports HEIC
                               </div>
                             </div>
                           )}
@@ -220,7 +233,7 @@ export default function ShareFood() {
                     onChange={(e) => handleInputChange('title', e.target.value)}
                     placeholder="e.g., Pizza from event, Leftover sandwiches"
                     required
-                    className="h-14 text-lg font-inter bg-white/80 dark:bg-background/80 border-border/40 focus:border-primary rounded-xl shadow-sm"
+                    className="h-14 text-lg font-inter bg-white border-border/40 focus:border-primary rounded-xl shadow-sm"
                   />
                 </div>
 
@@ -236,7 +249,7 @@ export default function ShareFood() {
                     placeholder="Describe the food, any allergens, pickup instructions..."
                     required
                     rows={4}
-                    className="text-lg font-inter bg-white/80 dark:bg-background/80 border-border/40 focus:border-primary resize-none rounded-xl shadow-sm"
+                    className="text-lg font-inter bg-white border-border/40 focus:border-primary resize-none rounded-xl shadow-sm"
                   />
                 </div>
 
@@ -252,7 +265,7 @@ export default function ShareFood() {
                     onChange={(e) => handleInputChange('location', e.target.value)}
                     placeholder="e.g., Gailor Hall lobby, McClurg dining hall"
                     required
-                    className="h-14 text-lg font-inter bg-white/80 dark:bg-background/80 border-border/40 focus:border-primary rounded-xl shadow-sm"
+                    className="h-14 text-lg font-inter bg-white border-border/40 focus:border-primary rounded-xl shadow-sm"
                   />
                 </div>
 
@@ -265,7 +278,7 @@ export default function ShareFood() {
                       Number of Servings
                     </Label>
                     <Select value={formData.servings} onValueChange={(value) => handleInputChange('servings', value)}>
-                      <SelectTrigger className="h-14 text-lg font-inter bg-white/80 dark:bg-background/80 border-border/40 rounded-xl shadow-sm">
+                      <SelectTrigger className="h-14 text-lg font-inter bg-white border-border/40 rounded-xl shadow-sm">
                         <SelectValue placeholder="Optional" />
                       </SelectTrigger>
                       <SelectContent>
@@ -290,7 +303,7 @@ export default function ShareFood() {
                       value={formData.availableUntil}
                       onChange={(e) => handleInputChange('availableUntil', e.target.value)}
                       required
-                      className="h-14 text-lg font-inter bg-white/80 dark:bg-background/80 border-border/40 focus:border-primary rounded-xl shadow-sm"
+                      className="h-14 text-lg font-inter bg-white border-border/40 focus:border-primary rounded-xl shadow-sm"
                     />
                   </div>
                 </div>
