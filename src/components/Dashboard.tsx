@@ -278,7 +278,7 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
   const [dummyPostsState, setDummyPostsState] = React.useState(dummyPosts);
   
   const handleMarkDummyAsFinished = (postId: string) => {
-    console.log('Handling dummy post mark as finished:', postId);
+    console.log('Toggling dummy post mark as finished:', postId);
     console.log('Current user ID:', user?.id);
     
     setDummyPostsState(prevPosts => {
@@ -287,13 +287,20 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
           const currentFinishedBy = post.finished_by || [];
           const userId = user?.id || 'current-user';
           console.log('Current finished_by for post:', currentFinishedBy);
-          console.log('Adding user ID:', userId);
           
-          if (!currentFinishedBy.includes(userId)) {
-            const updatedFinishedBy = [...currentFinishedBy, userId];
-            console.log('Updated dummy post finished_by:', updatedFinishedBy);
-            return { ...post, finished_by: updatedFinishedBy };
+          let updatedFinishedBy;
+          
+          // Check if user already marked as finished - if so, remove them (toggle off)
+          if (currentFinishedBy.includes(userId)) {
+            console.log('User already marked this dummy post as finished, toggling off');
+            updatedFinishedBy = currentFinishedBy.filter(id => id !== userId);
+          } else {
+            console.log('User marking dummy post as finished for first time');
+            updatedFinishedBy = [...currentFinishedBy, userId];
           }
+          
+          console.log('Updated dummy post finished_by:', updatedFinishedBy);
+          return { ...post, finished_by: updatedFinishedBy };
         }
         return post;
       });
@@ -301,12 +308,12 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
       return updatedPosts;
     });
     
-    console.log('Demo: Marked dummy post as finished!');
+    console.log('Demo: Toggled dummy post as finished!');
   };
 
-  // Handle marking post as finished
+  // Handle marking post as finished (toggle functionality)
   const handleMarkAsFinished = async (postId: string, userId: string) => {
-    console.log('Marking post as finished:', postId, 'by user:', userId);
+    console.log('Toggling mark as finished:', postId, 'by user:', userId);
 
     try {
       // Get current post data
@@ -333,15 +340,17 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
       const currentFinishedBy = currentPost.finished_by || [];
       console.log('Current finished_by array:', currentFinishedBy);
       
-      // Check if user already marked as finished
+      let updatedFinishedBy;
+      
+      // Check if user already marked as finished - if so, remove them (toggle off)
       if (currentFinishedBy.includes(userId)) {
-        console.log('User already marked this post as finished');
-        alert('You have already marked this post as finished!');
-        return;
+        console.log('User already marked this post as finished, toggling off');
+        updatedFinishedBy = currentFinishedBy.filter(id => id !== userId);
+      } else {
+        console.log('User marking post as finished for first time');
+        updatedFinishedBy = [...currentFinishedBy, userId];
       }
-
-      // Add user to finished_by array
-      const updatedFinishedBy = [...currentFinishedBy, userId];
+      
       console.log('Updated finished_by array:', updatedFinishedBy);
 
       // Update the post in the database
@@ -773,41 +782,43 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
                         <Button variant="ghost" size="sm" className="flex-1 text-sm h-9 text-primary font-inter font-medium">
                           View Details
                         </Button>
-                        {isUserInFinishedList(post.finished_by, user?.id) ? (
-                          <Button 
-                            size="sm" 
-                            className="flex-1 text-sm h-9 bg-green-700 hover:bg-green-700 text-white font-bold cursor-not-allowed font-inter font-medium border-0 dark:bg-green-800 dark:hover:bg-green-800 dark:text-white" 
-                            disabled
-                          >
-                            <CheckCircle className="h-4 w-4 mr-2" />
-                            Marked as Finished ({post.finished_by?.length || 0})
-                          </Button>
-                        ) : (
-                          <Button 
-                            size="sm" 
-                            className="flex-1 text-sm h-9 bg-primary hover:bg-primary/90 text-white font-inter font-medium dark:text-black"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              console.log('=== BUTTON CLICKED ===');
-                              console.log('Button clicked for post:', post.id);
-                              console.log('User ID:', user?.id);
-                              
-                              if (post.id.startsWith('dummy-')) {
-                                console.log('This is a dummy post, calling handleMarkDummyAsFinished');
-                                handleMarkDummyAsFinished(post.id);
-                                return;
-                              }
-                              
-                              console.log('This is a real post, calling handleMarkAsFinished');
-                              handleMarkAsFinished(post.id, user?.id || 'current-user');
-                            }}
-                            disabled={showExpiredPosts}
-                          >
-                            <Check className="h-4 w-4 mr-2" />
-                            Mark as Finished
-                          </Button>
-                        )}
+                        <Button 
+                          size="sm" 
+                          className={`flex-1 text-sm h-9 font-inter font-medium ${
+                            isUserInFinishedList(post.finished_by, user?.id)
+                              ? 'bg-green-700 hover:bg-green-600 text-white border-0 dark:bg-green-800 dark:hover:bg-green-700 dark:text-white'
+                              : 'bg-primary hover:bg-primary/90 text-white dark:text-black'
+                          }`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            console.log('=== BUTTON CLICKED ===');
+                            console.log('Button clicked for post:', post.id);
+                            console.log('User ID:', user?.id);
+                            
+                            if (post.id.startsWith('dummy-')) {
+                              console.log('This is a dummy post, calling handleMarkDummyAsFinished');
+                              handleMarkDummyAsFinished(post.id);
+                              return;
+                            }
+                            
+                            console.log('This is a real post, calling handleMarkAsFinished');
+                            handleMarkAsFinished(post.id, user?.id || 'current-user');
+                          }}
+                          disabled={showExpiredPosts}
+                        >
+                          {isUserInFinishedList(post.finished_by, user?.id) ? (
+                            <>
+                              <CheckCircle className="h-4 w-4 mr-2" />
+                              Marked as Finished ({post.finished_by?.length || 0})
+                            </>
+                          ) : (
+                            <>
+                              <Check className="h-4 w-4 mr-2" />
+                              Mark as Finished
+                            </>
+                          )}
+                        </Button>
                       </>
                     )}
                   </div>
