@@ -128,14 +128,13 @@ export default function Dashboard() {
       <header className="border-b border-border/20 bg-card/50 backdrop-blur-sm">
         <div className="w-full px-4 py-6">
           <div className="flex items-center justify-between">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={toggleDarkMode} 
-              className="text-muted-foreground hover:text-foreground"
-            >
-              {isDarkMode ? <Sun className="h-6 w-6" /> : <Moon className="h-6 w-6" />}
-            </Button>
+            <div className="flex flex-col items-center gap-3 cursor-pointer group">
+              <div className="w-12 h-12 bg-transparent flex items-center justify-center group-hover:bg-muted/50 rounded-lg transition-colors duration-200">
+                <button onClick={toggleDarkMode}>
+                  {isDarkMode ? <Sun className="h-6 w-6 text-foreground/80 group-hover:text-foreground" /> : <Moon className="h-6 w-6 text-foreground/80 group-hover:text-foreground" />}
+                </button>
+              </div>
+            </div>
             
             <div className="flex items-center gap-5">
               <Avatar className="h-20 w-20 border-2 border-border/30">
@@ -152,14 +151,13 @@ export default function Dashboard() {
               </h1>
             </div>
             
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={handleSignOut}
-              className="text-destructive hover:text-destructive hover:bg-destructive/10"
-            >
-              <LogOut className="h-6 w-6" />
-            </Button>
+            <div className="flex flex-col items-center gap-3 cursor-pointer group">
+              <div className="w-12 h-12 bg-transparent flex items-center justify-center group-hover:bg-muted/50 rounded-lg transition-colors duration-200">
+                <button onClick={handleSignOut}>
+                  <LogOut className="h-6 w-6 text-destructive group-hover:text-destructive" />
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </header>
