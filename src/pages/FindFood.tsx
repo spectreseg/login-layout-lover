@@ -24,7 +24,7 @@ declare namespace google {
     }
     class Marker {
       constructor(opts?: MarkerOptions);
-      addListener(eventName: string, handler: () => void): void;
+      addListener(eventName: string, handler: (event?: any) => void): void;
       setMap(map: Map | null): void;
       infoWindow?: InfoWindow; // Add custom property
     }
@@ -51,6 +51,7 @@ declare namespace google {
       map?: Map;
       title?: string;
       icon?: any;
+      draggable?: boolean;
     }
     interface InfoWindowOptions {
       content?: string;
@@ -335,6 +336,17 @@ const FindFood = () => {
         map: mapInstanceRef.current,
         title: `${post.title} at ${post.location}`,
         icon: markerIcon,
+        draggable: true,
+      });
+
+      // Add drag end listener to log new position
+      marker.addListener('dragend', (event: any) => {
+        const newPosition = {
+          lat: event.latLng.lat(),
+          lng: event.latLng.lng()
+        };
+        console.log(`${post.location} dragged to:`, newPosition);
+        console.log(`Update coordinates for ${post.location}: { lat: ${newPosition.lat}, lng: ${newPosition.lng} }`);
       });
 
       console.log(`Created marker for post: ${post.title} at`, coordinates);
