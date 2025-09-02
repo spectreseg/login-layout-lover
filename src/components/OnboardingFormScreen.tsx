@@ -72,7 +72,7 @@ export default function OnboardingFormScreen({ onBack, onProceed }: OnboardingFo
         <div className="relative flex flex-col md:flex-row items-center justify-center flex-1 md:flex-none">
           
           {/* Speech bubble - above tiger on mobile, to the right on desktop */}
-          <div className={`relative md:absolute md:-top-14 md:left-80 z-20 mb-2 md:mb-0 order-1 md:order-none transition-opacity duration-700 ${bubbleVisible ? 'opacity-100' : 'opacity-0'}`}>
+          <div className={`relative md:absolute md:-top-8 md:left-80 z-20 mb-2 md:mb-0 order-1 md:order-none transition-opacity duration-700 ${bubbleVisible ? 'opacity-100' : 'opacity-0'}`}>
             <div className="bg-white rounded-2xl p-2 md:p-3 shadow-2xl relative w-56 md:w-64 h-20 md:h-24 flex items-center justify-center">
               {/* Speech bubble tail - pointing down on mobile, down-left on desktop */}
               <div className="absolute md:bottom-0 md:left-12 bottom-0 left-1/2 md:left-12 transform md:translate-y-2 translate-y-2 -translate-x-1/2 md:translate-x-0">
