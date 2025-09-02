@@ -214,6 +214,9 @@ const Index = () => {
 
       console.log('User registered successfully:', data);
       
+      // Immediately transition to completion screen to prevent flash
+      setOnboardingStep('completion');
+      
       // Upload avatar after successful registration if we have one
       if (avatarFile && data.user) {
         try {
@@ -260,7 +263,7 @@ const Index = () => {
         }
       }
       
-      setOnboardingStep('completion');
+      // Don't set completion here since we already did it after registration
     } catch (error) {
       console.error('Registration error:', error);
       let errorMessage = 'Registration failed. Please try again.';

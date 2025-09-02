@@ -237,8 +237,11 @@ export default function OnboardingAvatarScreen({ onBack, onProceed }: Onboarding
   const handleUpload = async () => {
     setIsProcessing(true);
     console.log('Starting registration process...');
-    // Just proceed with the selected file - actual upload happens after registration
-    onProceed({avatar: selectedFile});
+    
+    // Use a small delay to ensure the overlay is fully rendered before proceeding
+    setTimeout(() => {
+      onProceed({avatar: selectedFile});
+    }, 100);
   };
 
   // Cleanup preview URL on component unmount
