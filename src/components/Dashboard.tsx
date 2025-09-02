@@ -137,17 +137,17 @@ export default function Dashboard() {
               {isDarkMode ? <Sun className="h-6 w-6" /> : <Moon className="h-6 w-6" />}
             </Button>
             
-            <div className="flex items-center gap-4">
-              <Avatar className="h-16 w-16 border-2 border-border/30">
+            <div className="flex items-center gap-5">
+              <Avatar className="h-20 w-20 border-2 border-border/30">
                 <AvatarImage 
                   src={profile?.avatar_url || ""} 
                   className="object-cover"
                 />
-                <AvatarFallback className="bg-primary/10 text-primary font-medium text-lg">
+                <AvatarFallback className="bg-primary/10 text-primary font-bold text-2xl">
                   {initials}
                 </AvatarFallback>
               </Avatar>
-              <h1 className="text-xl font-semibold text-foreground">
+              <h1 className="text-3xl font-bold text-foreground">
                 Welcome back, {displayName}!
               </h1>
             </div>
