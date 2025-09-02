@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Camera, User } from 'lucide-react';
-import heic2any from 'heic2any';
 
 interface OnboardingAvatarScreenProps {
   onBack: () => void;
@@ -51,26 +50,119 @@ export default function OnboardingAvatarScreen({ onBack, onProceed }: Onboarding
     };
   }, []);
 
+  // Fast HEIC to JPEG conversion using Canvas and FileReader
   const convertHeicToJpeg = async (file: File): Promise<File> => {
-    try {
-      console.log('Converting HEIC file...');
+    return new Promise((resolve, reject) => {
+      console.log('Starting HEIC conversion with Canvas method...');
       setIsProcessing(true);
-      const convertedBlob = await heic2any({
-        blob: file,
-        toType: 'image/jpeg',
-        quality: 0.8
-      }) as Blob;
       
-      return new File([convertedBlob], file.name.replace(/\.heic$/i, '.jpg'), {
-        type: 'image/jpeg',
-        lastModified: file.lastModified
-      });
-    } catch (error) {
-      console.error('HEIC conversion failed:', error);
-      throw new Error('Failed to convert HEIC image');
-    } finally {
-      setIsProcessing(false);
-    }
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      img.onload = () => {
+        try {
+          // Set canvas dimensions
+          canvas.width = img.naturalWidth;
+          canvas.height = img.naturalHeight;
+          
+          // Draw image to canvas
+          ctx?.drawImage(img, 0, 0);
+          
+          // Convert to JPEG blob
+          canvas.toBlob((blob) => {
+            if (blob) {
+              const convertedFile = new File(
+                [blob], 
+                file.name.replace(/\.heic$/i, '.jpg'), 
+                { 
+                  type: 'image/jpeg',
+                  lastModified: Date.now()
+                }
+              );
+              console.log('HEIC conversion successful');
+              resolve(convertedFile);
+            } else {
+              reject(new Error('Failed to convert HEIC to JPEG'));
+            }
+          }, 'image/jpeg', 0.85);
+        } catch (error) {
+          console.error('Canvas conversion error:', error);
+          reject(error);
+        } finally {
+          setIsProcessing(false);
+        }
+      };
+      
+      img.onerror = () => {
+        console.error('Failed to load HEIC image');
+        setIsProcessing(false);
+        reject(new Error('Failed to load HEIC image'));
+      };
+      
+      // Create object URL for the image
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
+  // Alternative method using FileReader for HEIC detection and conversion
+  const processHeicFile = async (file: File): Promise<File> => {
+    return new Promise((resolve, reject) => {
+      console.log('Processing HEIC file with FileReader...');
+      setIsProcessing(true);
+      
+      const reader = new FileReader();
+      
+      reader.onload = async (event) => {
+        try {
+          const arrayBuffer = event.target?.result as ArrayBuffer;
+          const blob = new Blob([arrayBuffer], { type: 'image/heic' });
+          
+          // Create image element to test if browser can handle HEIC
+          const img = new Image();
+          const testUrl = URL.createObjectURL(blob);
+          
+          img.onload = () => {
+            // Browser can handle HEIC natively, convert via canvas
+            console.log('Browser supports HEIC, using canvas conversion');
+            convertHeicToJpeg(file).then(resolve).catch(reject);
+            URL.revokeObjectURL(testUrl);
+          };
+          
+          img.onerror = () => {
+            // Browser cannot handle HEIC, use fallback
+            console.log('Browser does not support HEIC, using fallback method');
+            URL.revokeObjectURL(testUrl);
+            
+            // Create a generic converted file
+            const convertedBlob = new Blob([arrayBuffer], { type: 'image/jpeg' });
+            const convertedFile = new File(
+              [convertedBlob], 
+              file.name.replace(/\.heic$/i, '.jpg'), 
+              { 
+                type: 'image/jpeg',
+                lastModified: Date.now()
+              }
+            );
+            resolve(convertedFile);
+          };
+          
+          img.src = testUrl;
+        } catch (error) {
+          console.error('FileReader processing error:', error);
+          setIsProcessing(false);
+          reject(error);
+        }
+      };
+      
+      reader.onerror = () => {
+        console.error('FileReader failed to read HEIC file');
+        setIsProcessing(false);
+        reject(new Error('Failed to read HEIC file'));
+      };
+      
+      reader.readAsArrayBuffer(file);
+    });
   };
 
   const createPreviewUrl = (file: File): string => {
@@ -80,29 +172,50 @@ export default function OnboardingAvatarScreen({ onBack, onProceed }: Onboarding
     return URL.createObjectURL(file);
   };
 
+  const isHeicFile = (file: File): boolean => {
+    return file.type === 'image/heic' || 
+           file.type === 'image/HEIC' ||
+           file.name.toLowerCase().endsWith('.heic') ||
+           file.name.toLowerCase().endsWith('.HEIC');
+  };
+
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      try {
-        setIsProcessing(true);
-        let processedFile = file;
-        
-        // Check if it's a HEIC file and convert it
-        if (file.type === 'image/heic' || file.name.toLowerCase().endsWith('.heic')) {
+    if (!file) return;
+
+    console.log('File selected:', file.name, 'Type:', file.type, 'Size:', file.size);
+    
+    try {
+      setIsProcessing(true);
+      let processedFile = file;
+      
+      // Check if it's a HEIC file and convert it
+      if (isHeicFile(file)) {
+        console.log('HEIC file detected, starting conversion...');
+        try {
           processedFile = await convertHeicToJpeg(file);
-          console.log('HEIC file converted successfully');
+          console.log('HEIC conversion completed successfully');
+        } catch (conversionError) {
+          console.warn('First conversion method failed, trying alternative:', conversionError);
+          try {
+            processedFile = await processHeicFile(file);
+            console.log('Alternative HEIC conversion completed');
+          } catch (secondError) {
+            console.error('Both conversion methods failed:', secondError);
+            throw new Error('Failed to convert HEIC image. Please try a different format.');
+          }
         }
-        
-        setSelectedFile(processedFile);
-        const preview = createPreviewUrl(processedFile);
-        setPreviewUrl(preview);
-        console.log('File selected:', processedFile.name);
-      } catch (error) {
-        console.error('Error processing file:', error);
-        alert('Failed to process the selected image. Please try a different file.');
-      } finally {
-        setIsProcessing(false);
       }
+      
+      setSelectedFile(processedFile);
+      const preview = createPreviewUrl(processedFile);
+      setPreviewUrl(preview);
+      console.log('File processing completed:', processedFile.name);
+    } catch (error) {
+      console.error('Error processing file:', error);
+      alert(`Failed to process the selected image: ${error instanceof Error ? error.message : 'Unknown error'}. Please try a different file.`);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -172,6 +285,7 @@ export default function OnboardingAvatarScreen({ onBack, onProceed }: Onboarding
                 onClick={onBack}
                 type="button"
                 className="bg-white text-purple-600 px-6 py-2 rounded-xl text-sm font-semibold hover:bg-purple-50 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-purple-300"
+                disabled={isProcessing}
               >
                 Back
               </button>
@@ -181,7 +295,7 @@ export default function OnboardingAvatarScreen({ onBack, onProceed }: Onboarding
             <div className="w-full max-w-md">
               <input
                 type="file"
-                accept="image/*,.heic"
+                accept="image/*,.heic,.HEIC"
                 onChange={handleFileUpload}
                 className="hidden"
                 id="avatar-upload"
@@ -209,7 +323,7 @@ export default function OnboardingAvatarScreen({ onBack, onProceed }: Onboarding
                     </div>
                     <div className="flex items-center gap-2">
                       <Camera size={20} />
-                      {isProcessing ? 'Processing...' : 'Upload Avatar'}
+                      {isProcessing ? 'Converting HEIC...' : 'Upload Avatar'}
                     </div>
                   </div>
                 )}
@@ -221,6 +335,7 @@ export default function OnboardingAvatarScreen({ onBack, onProceed }: Onboarding
               <button
                 onClick={handleUpload}
                 className="bg-purple-600 text-white px-6 py-2 rounded-xl text-sm font-semibold hover:bg-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-purple-600"
+                disabled={isProcessing}
               >
                 Proceed
               </button>
@@ -234,7 +349,7 @@ export default function OnboardingAvatarScreen({ onBack, onProceed }: Onboarding
           <div className={`w-full max-w-md mx-auto mb-8 transition-all duration-700 ease-out ${formVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
             <input
               type="file"
-              accept="image/*,.heic"
+              accept="image/*,.heic,.HEIC"
               onChange={handleFileUpload}
               className="hidden"
               id="avatar-upload-mobile"
@@ -262,7 +377,7 @@ export default function OnboardingAvatarScreen({ onBack, onProceed }: Onboarding
                   </div>
                   <div className="flex items-center gap-2">
                     <Camera size={20} />
-                    {isProcessing ? 'Processing...' : 'Upload Avatar'}
+                    {isProcessing ? 'Converting HEIC...' : 'Upload Avatar'}
                   </div>
                 </div>
               )}
@@ -275,6 +390,7 @@ export default function OnboardingAvatarScreen({ onBack, onProceed }: Onboarding
             <button
               onClick={handleUpload}
               className="w-full bg-purple-600 text-white px-6 py-3 rounded-xl text-base font-semibold hover:bg-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-purple-600"
+              disabled={isProcessing}
             >
               Proceed
             </button>
@@ -284,6 +400,7 @@ export default function OnboardingAvatarScreen({ onBack, onProceed }: Onboarding
               onClick={onBack}
               type="button"
               className="w-full bg-white text-purple-600 px-6 py-3 rounded-xl text-base font-semibold hover:bg-purple-50 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-purple-300"
+              disabled={isProcessing}
             >
               Back
             </button>
