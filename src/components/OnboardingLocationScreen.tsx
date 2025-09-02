@@ -86,7 +86,7 @@ export default function OnboardingLocationScreen({ onBack, onProceed }: Onboardi
           {/* Monte mascot with map */}
           <div className={`flex-shrink-0 order-2 md:order-none transition-transform duration-1000 ease-out ${tigerVisible ? 'translate-y-0' : 'translate-y-full'}`}>
             <img
-              src="/lovable-uploads/monte-tiger-map.png"
+              src="/lovable-uploads/fc82ea5e-3e13-4240-8f8c-b4469c2153c4.png"
               alt="Monte the Tiger with Map"
               className="w-[350px] h-[350px] md:w-[550px] md:h-[550px] object-contain drop-shadow-2xl"
               onLoad={() => console.log('Tiger map image loaded successfully')}
