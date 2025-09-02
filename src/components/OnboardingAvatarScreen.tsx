@@ -235,6 +235,8 @@ export default function OnboardingAvatarScreen({ onBack, onProceed }: Onboarding
   };
 
   const handleUpload = async () => {
+    setIsProcessing(true);
+    console.log('Starting registration process...');
     // Just proceed with the selected file - actual upload happens after registration
     onProceed({avatar: selectedFile});
   };
@@ -347,7 +349,7 @@ export default function OnboardingAvatarScreen({ onBack, onProceed }: Onboarding
                 className="bg-purple-600 text-white px-6 py-2 rounded-xl text-sm font-semibold hover:bg-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-purple-600"
                 disabled={isProcessing}
               >
-                Proceed
+                {isProcessing ? 'Creating Account...' : 'Proceed'}
               </button>
             </div>
           </div>
@@ -402,7 +404,7 @@ export default function OnboardingAvatarScreen({ onBack, onProceed }: Onboarding
               className="w-full bg-purple-600 text-white px-6 py-3 rounded-xl text-base font-semibold hover:bg-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-purple-600"
               disabled={isProcessing}
             >
-              Proceed
+              {isProcessing ? 'Creating Account...' : 'Proceed'}
             </button>
             
             {/* Back button second on mobile */}
