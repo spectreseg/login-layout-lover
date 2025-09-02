@@ -5,23 +5,18 @@ interface OnboardingCompletionScreenProps {
 }
 
 export default function OnboardingCompletionScreen({ onComplete }: OnboardingCompletionScreenProps) {
-  const [tigerVisible, setTigerVisible] = useState(false);
+  const [tigerVisible, setTigerVisible] = useState(true); // Start visible immediately
   const [textVisible, setTextVisible] = useState(false);
 
   useEffect(() => {
     console.log('OnboardingCompletionScreen mounted');
     
-    // Tiger flies up first
-    const tigerTimer = setTimeout(() => {
-      console.log('Tiger animation triggered');
-      setTigerVisible(true);
-    }, 300);
-
-    // Text fades in after tiger
+    // Tiger is already visible - no delay needed
+    // Text fades in quickly after mount
     const textTimer = setTimeout(() => {
       console.log('Text animation triggered');
       setTextVisible(true);
-    }, 800);
+    }, 200); // Reduced from 800ms to 200ms
 
     // Auto redirect after 3 seconds
     const redirectTimer = setTimeout(() => {
@@ -30,7 +25,6 @@ export default function OnboardingCompletionScreen({ onComplete }: OnboardingCom
     }, 4000);
 
     return () => {
-      clearTimeout(tigerTimer);
       clearTimeout(textTimer);
       clearTimeout(redirectTimer);
     };
