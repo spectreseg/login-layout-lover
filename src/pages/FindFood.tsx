@@ -33,6 +33,12 @@ declare namespace google {
       open(map: Map, anchor?: Marker): void;
       close(): void;
     }
+    class Size {
+      constructor(width: number, height: number, widthUnit?: string, heightUnit?: string);
+    }
+    class Point {
+      constructor(x: number, y: number);
+    }
     interface MapOptions {
       center?: LatLngLiteral;
       zoom?: number;
@@ -327,14 +333,12 @@ const FindFood = () => {
         return;
       }
 
-      // Create custom marker icon with food emoji
+      // Create custom marker icon using the food image
       const markerIcon = {
-        path: google.maps.SymbolPath.CIRCLE,
-        scale: 15,
-        fillColor: '#ef4444',
-        fillOpacity: 0.9,
-        strokeColor: '#ffffff',
-        strokeWeight: 3,
+        url: post.image_url || '/src/assets/food-pizza.jpg', // fallback to pizza image
+        scaledSize: new google.maps.Size(50, 50), // Size of the image
+        origin: new google.maps.Point(0, 0), // Origin point
+        anchor: new google.maps.Point(25, 25), // Anchor point (center of image)
       };
 
       const marker = new google.maps.Marker({
@@ -402,33 +406,24 @@ const FindFood = () => {
 
       console.log(`Created info window for: ${post.title}`);
 
-      // Show info window by default (no click needed)
-      infoWindow.open(mapInstanceRef.current, marker);
-
-      // Add click listener to marker to toggle info window
+      // Add click listener to marker to show popup
       marker.addListener('click', () => {
         console.log(`Marker clicked for: ${post.title}`);
-        // Toggle this info window
-        if ((marker as any).isInfoWindowOpen) {
-          infoWindow.close();
-          (marker as any).isInfoWindowOpen = false;
-        } else {
-          // Close all other info windows first
-          markersRef.current.forEach(m => {
-            if (m !== marker && (m as any).infoWindow) {
-              ((m as any).infoWindow as google.maps.InfoWindow).close();
-              (m as any).isInfoWindowOpen = false;
-            }
-          });
-          // Open this info window
-          infoWindow.open(mapInstanceRef.current, marker);
-          (marker as any).isInfoWindowOpen = true;
-        }
+        // Close all other info windows first
+        markersRef.current.forEach(m => {
+          if (m !== marker && (m as any).infoWindow) {
+            ((m as any).infoWindow as google.maps.InfoWindow).close();
+            (m as any).isInfoWindowOpen = false;
+          }
+        });
+        // Open this info window
+        infoWindow.open(mapInstanceRef.current, marker);
+        (marker as any).isInfoWindowOpen = true;
       });
 
       // Store info window reference on marker for later access
       (marker as any).infoWindow = infoWindow;
-      (marker as any).isInfoWindowOpen = true; // Track if info window is open
+      (marker as any).isInfoWindowOpen = false; // Initially closed
 
       markersRef.current.push(marker);
       console.log(`Added marker ${index + 1} to markers array. Total markers: ${markersRef.current.length}`);
