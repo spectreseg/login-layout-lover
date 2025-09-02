@@ -146,7 +146,52 @@ export default function ShareFood() {
         return;
       }
 
-      // Create the food post
+      console.log('Starting food post submission for user:', user.id);
+      let finalImageUrl = null;
+
+      // Upload image to Supabase Storage if an image was selected
+      if (imageFile) {
+        console.log('Uploading image to storage...');
+        
+        // Create a unique filename
+        const fileExt = imageFile.name.split('.').pop();
+        const fileName = `food-${Date.now()}.${fileExt}`;
+        const filePath = `${user.id}/${fileName}`;
+
+        // Upload to food-images bucket
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('food-images')
+          .upload(filePath, imageFile, {
+            cacheControl: '3600',
+            upsert: false
+          });
+
+        if (uploadError) {
+          console.error('Image upload error:', uploadError);
+          alert('Failed to upload image. Please try again.');
+          return;
+        }
+
+        // Get the public URL
+        const { data: { publicUrl } } = supabase.storage
+          .from('food-images')
+          .getPublicUrl(uploadData.path);
+
+        finalImageUrl = publicUrl;
+        console.log('Image uploaded successfully:', finalImageUrl);
+      }
+
+      // Create the food post with proper user_id and image URL
+      console.log('Creating food post with data:', {
+        user_id: user.id,
+        title: formData.title,
+        description: formData.description,
+        location: formData.location,
+        servings: formData.servings,
+        image_url: finalImageUrl,
+        expires_at: formData.availableUntil.toISOString()
+      });
+
       const { error } = await supabase
         .from('food_posts')
         .insert([
@@ -156,7 +201,7 @@ export default function ShareFood() {
             description: formData.description,
             location: formData.location,
             servings: formData.servings,
-            image_url: imagePreview || null,
+            image_url: finalImageUrl,
             expires_at: formData.availableUntil.toISOString()
           }
         ]);
@@ -167,6 +212,7 @@ export default function ShareFood() {
         return;
       }
 
+      console.log('Food post created successfully');
       // Redirect to dashboard immediately
       navigate('/dashboard');
     } catch (error) {
