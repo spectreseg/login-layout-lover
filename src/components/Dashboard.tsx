@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
+import { Link } from 'react-router-dom';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { User, Session } from '@supabase/supabase-js';
 import { useNavigate } from 'react-router-dom';
@@ -164,6 +165,75 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
     }
   }, [user]);
 
+  // Dummy posts for display
+  const dummyPosts = [
+    {
+      id: 'dummy-1',
+      user_id: 'dummy-user-1',
+      title: 'Fresh Garden Salad',
+      description: 'Mixed greens with tomatoes, cucumber, and homemade vinaigrette. Perfect for a healthy lunch!',
+      location: 'Downtown Café',
+      servings: '4-6 people',
+      image_url: '/src/assets/food-salad.jpg',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // expires in 24 hours
+      profiles: { first_name: 'Sarah', last_name: 'Chen', avatar_url: null }
+    },
+    {
+      id: 'dummy-2', 
+      user_id: 'dummy-user-2',
+      title: 'Homemade Pizza Slices',
+      description: 'Margherita pizza with fresh basil and mozzarella. Made this morning!',
+      location: 'University District',
+      servings: '8 slices',
+      image_url: '/src/assets/food-pizza.jpg',
+      created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
+      updated_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+      expires_at: new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString(), // expires in 6 hours
+      profiles: { first_name: 'Marco', last_name: 'Giuseppe', avatar_url: null }
+    },
+    {
+      id: 'dummy-3',
+      user_id: 'dummy-user-3', 
+      title: 'Fresh Fruit Bowl',
+      description: 'Seasonal fruits including strawberries, blueberries, and kiwi. Great for sharing!',
+      location: 'Community Center',
+      servings: '6-8 people',
+      image_url: '/src/assets/food-fruit.jpg',
+      created_at: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(), // 4 hours ago
+      updated_at: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
+      expires_at: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(), // expires in 2 hours
+      profiles: { first_name: 'Emma', last_name: 'Wilson', avatar_url: null }
+    },
+    {
+      id: 'dummy-4',
+      user_id: 'dummy-user-4',
+      title: 'Artisan Bagels',
+      description: 'Everything bagels with cream cheese and smoked salmon. Perfect for breakfast or brunch!',
+      location: 'Local Bakery',
+      servings: '12 bagels',
+      image_url: '/src/assets/food-bagels.jpg',
+      created_at: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(), // 6 hours ago
+      updated_at: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
+      expires_at: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), // expired 1 hour ago
+      profiles: { first_name: 'David', last_name: 'Brown', avatar_url: null }
+    },
+    {
+      id: 'dummy-5',
+      user_id: 'dummy-user-5',
+      title: 'Gourmet Sandwiches',
+      description: 'Turkey and avocado sandwiches on sourdough bread. Made for office lunch but have extras!',
+      location: 'Business District',
+      servings: '6 sandwiches',
+      image_url: '/src/assets/food-sandwiches.jpg',
+      created_at: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(), // 8 hours ago
+      updated_at: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
+      expires_at: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(), // expired 3 hours ago
+      profiles: { first_name: 'Lisa', last_name: 'Anderson', avatar_url: null }
+    }
+  ];
+
   React.useEffect(() => {
     if (user) {
       fetchPosts();
@@ -237,6 +307,8 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
     } else if (item.label === 'My Posts') {
       setShowMyPosts(!showMyPosts);
       setShowExpiredPosts(false);
+    } else if (item.label === 'Notifications') {
+      navigate('/notifications');
     }
     // Add other navigation logic here as needed
   };
@@ -396,9 +468,9 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
               if (showMyPosts) {
                 postsToShow = myPosts;
               } else if (showExpiredPosts) {
-                postsToShow = expiredPosts;
+                postsToShow = [...expiredPosts, ...dummyPosts.filter(post => new Date(post.expires_at) < new Date())];
               } else {
-                postsToShow = activePosts;
+                postsToShow = [...activePosts, ...dummyPosts.filter(post => new Date(post.expires_at) > new Date())];
               }
 
               if (postsToShow.length === 0) {
