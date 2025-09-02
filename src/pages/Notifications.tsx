@@ -56,7 +56,7 @@ const Notifications = () => {
     
     // Set up real-time subscription for new notifications
     const channel = supabase
-      .channel('notifications-realtime')
+      .channel('notifications-page-realtime')
       .on(
         'postgres_changes',
         {
@@ -65,25 +65,51 @@ const Notifications = () => {
           table: 'notifications',
         },
         async (payload) => {
-          console.log('Real-time notification event:', payload);
+          console.log('Notifications page: Real-time event:', payload);
           const { data: { user } } = await supabase.auth.getUser();
-          if (user && (payload.new as any)?.user_id === user.id) {
-            console.log('New notification for current user:', payload);
-            await fetchNotifications(); // Refetch to get complete data
-            if (payload.eventType === 'INSERT') {
+          
+          if (!user) return;
+
+          // Handle INSERT events (new notifications)
+          if (payload.eventType === 'INSERT') {
+            const newNotification = payload.new as any;
+            if (newNotification.user_id === user.id) {
+              console.log('New notification for current user, refetching...');
+              await fetchNotifications(); // Refetch to get complete data with joins
               toast({
-                title: (payload.new as Notification).title,
-                description: (payload.new as Notification).message,
+                title: newNotification.title,
+                description: newNotification.message,
               });
+            }
+          }
+          
+          // Handle UPDATE events (marking as read)
+          if (payload.eventType === 'UPDATE') {
+            const updatedNotification = payload.new as any;
+            if (updatedNotification.user_id === user.id) {
+              console.log('Notification updated, refreshing list...');
+              await fetchNotifications();
             }
           }
         }
       )
       .subscribe((status) => {
-        console.log('Notification subscription status:', status);
+        console.log('Notifications page subscription status:', status);
+        if (status === 'SUBSCRIBED') {
+          console.log('✅ Successfully subscribed to notifications changes');
+        } else if (status === 'CHANNEL_ERROR') {
+          console.error('❌ Error subscribing to notifications channel');
+        } else if (status === 'TIMED_OUT') {
+          console.warn('⚠️ Subscription timed out, attempting to reconnect...');
+          // Attempt to resubscribe after a delay
+          setTimeout(() => {
+            fetchNotifications();
+          }, 2000);
+        }
       });
 
     return () => {
+      console.log('Cleaning up notifications subscription');
       supabase.removeChannel(channel);
     };
   }, []);
