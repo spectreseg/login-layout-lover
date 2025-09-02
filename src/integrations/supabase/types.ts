@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      food_posts: {
+        Row: {
+          created_at: string
+          description: string
+          expires_at: string
+          id: string
+          image_url: string | null
+          location: string
+          servings: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          expires_at: string
+          id?: string
+          image_url?: string | null
+          location: string
+          servings?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          expires_at?: string
+          id?: string
+          image_url?: string | null
+          location?: string
+          servings?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

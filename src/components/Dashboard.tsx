@@ -19,12 +19,32 @@ interface DashboardProps {
   onSignOut?: () => void;
 }
 
+interface FoodPost {
+  id: string;
+  title: string;
+  description: string;
+  location: string;
+  servings: string;
+  image_url: string | null;
+  expires_at: string;
+  created_at: string;
+  user_id: string;
+  profiles?: {
+    first_name: string | null;
+    last_name: string | null;
+  };
+}
+
 export default function Dashboard({ onSignOut }: DashboardProps = {}) {
   const [isDarkMode, setIsDarkMode] = React.useState(false);
   const [user, setUser] = React.useState<User | null>(null);
   const [session, setSession] = React.useState<Session | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [showExpiredPosts, setShowExpiredPosts] = React.useState(false);
+  const [showMyPosts, setShowMyPosts] = React.useState(false);
+  const [activePosts, setActivePosts] = React.useState<FoodPost[]>([]);
+  const [expiredPosts, setExpiredPosts] = React.useState<FoodPost[]>([]);
+  const [myPosts, setMyPosts] = React.useState<FoodPost[]>([]);
   const navigate = useNavigate();
   const { profile } = useUserProfile(user);
 
@@ -57,6 +77,98 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // Fetch food posts
+  const fetchPosts = React.useCallback(async () => {
+    try {
+      const now = new Date().toISOString();
+      
+      // Fetch active posts
+      const { data: activeData, error: activeError } = await supabase
+        .from('food_posts')
+        .select('*')
+        .gt('expires_at', now)
+        .order('created_at', { ascending: false });
+
+      if (activeError) {
+        console.error('Error fetching active posts:', activeError);
+      } else {
+        // Get profile data for each post
+        const postsWithProfiles = await Promise.all(
+          (activeData || []).map(async (post) => {
+            const { data: profileData } = await supabase
+              .from('profiles')
+              .select('first_name, last_name')
+              .eq('user_id', post.user_id)
+              .single();
+            
+            return { ...post, profiles: profileData };
+          })
+        );
+        setActivePosts(postsWithProfiles);
+      }
+
+      // Fetch expired posts
+      const { data: expiredData, error: expiredError } = await supabase
+        .from('food_posts')
+        .select('*')
+        .lte('expires_at', now)
+        .order('created_at', { ascending: false });
+
+      if (expiredError) {
+        console.error('Error fetching expired posts:', expiredError);
+      } else {
+        // Get profile data for each post
+        const postsWithProfiles = await Promise.all(
+          (expiredData || []).map(async (post) => {
+            const { data: profileData } = await supabase
+              .from('profiles')
+              .select('first_name, last_name')
+              .eq('user_id', post.user_id)
+              .single();
+            
+            return { ...post, profiles: profileData };
+          })
+        );
+        setExpiredPosts(postsWithProfiles);
+      }
+
+      // Fetch user's posts if logged in
+      if (user) {
+        const { data: myData, error: myError } = await supabase
+          .from('food_posts')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
+
+        if (myError) {
+          console.error('Error fetching my posts:', myError);
+        } else {
+          // Get profile data for each post
+          const postsWithProfiles = await Promise.all(
+            (myData || []).map(async (post) => {
+              const { data: profileData } = await supabase
+                .from('profiles')
+                .select('first_name, last_name')
+                .eq('user_id', post.user_id)
+                .single();
+              
+              return { ...post, profiles: profileData };
+            })
+          );
+          setMyPosts(postsWithProfiles);
+        }
+      }
+    } catch (error) {
+      console.error('Error in fetchPosts:', error);
+    }
+  }, [user]);
+
+  React.useEffect(() => {
+    if (user) {
+      fetchPosts();
+    }
+  }, [user, fetchPosts]);
 
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
@@ -122,6 +234,9 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
   const handleNavClick = (item: any) => {
     if (item.label === 'New Post') {
       navigate('/share-food');
+    } else if (item.label === 'My Posts') {
+      setShowMyPosts(!showMyPosts);
+      setShowExpiredPosts(false);
     }
     // Add other navigation logic here as needed
   };
@@ -134,112 +249,49 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
     { icon: Settings, label: 'Settings', href: '#' },
   ];
 
-  // Mock data for posts with Sewanee TN campus locations
-  const activePosts = [
-    {
-      id: 1,
-      title: "Leftover pizza from study group",
-      description: "We ordered too much pizza during our late-night study session. Still warm and delicious!",
-      location: "Gailor Hall, outside main entrance",
-      timeLeft: "Expires in 45 minutes",
-      servings: 8,
-      postedBy: "Sarah Williams",
-      status: "Available",
-      image: pizzaImage
-    },
-    {
-      id: 2,
-      title: "Faculty meeting bagels & cream cheese",
-      description: "Fresh bagels and assorted cream cheese from this morning's faculty meeting.",
-      location: "Carnegie Hall, faculty lounge",
-      timeLeft: "Expires in 2 hours",
-      servings: 12,
-      postedBy: "Dr. Johnson",
-      status: "Available",
-      image: bagelsImage
-    },
-    {
-      id: 3,
-      title: "Dining hall surplus sandwiches",
-      description: "McClurg has extra sandwiches from today's lunch service. Various options available.",
-      location: "McClurg Dining Hall, outside",
-      timeLeft: "Expires in 1 hour",
-      servings: 15,
-      postedBy: "Dining Services",
-      status: "Available",
-      image: sandwichesImage
-    },
-    {
-      id: 4,
-      title: "Fresh salad bowl from catering",
-      description: "Large mixed greens salad with vinaigrette dressing available. Perfect for a light and healthy meal.",
-      location: "Spencer Hall, conference room",
-      timeLeft: "Expires in 3 hours",
-      servings: 6,
-      postedBy: "Event Catering",
-      status: "Available",
-      image: saladImage
-    },
-    {
-      id: 5,
-      title: "Fruit platter from orientation",
-      description: "Beautiful assorted fruit platter from new student orientation. Fresh and colorful!",
-      location: "Convocation Hall, lobby",
-      timeLeft: "Expires in 30 minutes",
-      servings: 20,
-      postedBy: "Admissions Office",
-      status: "Available",
-      image: fruitImage
-    },
-    {
-      id: 6,
-      title: "Pasta dinner leftovers",
-      description: "Homemade pasta with marinara sauce from our dorm floor dinner. Plenty left over!",
-      location: "Benedict Hall, 3rd floor kitchen",
-      timeLeft: "Expires in 4 hours",
-      servings: 10,
-      postedBy: "Floor RA Team",
-      status: "Available",
-      image: pastaImage
+  // Helper function to get display image
+  const getPostImage = (post: FoodPost, index: number) => {
+    if (post.image_url) {
+      return post.image_url;
     }
-  ];
+    // Fallback to static images based on index
+    const images = [pizzaImage, bagelsImage, sandwichesImage, saladImage, fruitImage, pastaImage];
+    return images[index % images.length];
+  };
 
-  // Mock expired posts data
-  const expiredPosts = [
-    {
-      id: 101,
-      title: "Yesterday's event pizza",
-      description: "Pizza from yesterday's student government meeting. Unfortunately expired but was delicious!",
-      location: "Student Union, conference room",
-      timeLeft: "Expired 1 day ago",
-      servings: 6,
-      postedBy: "Student Government",
-      status: "Expired",
-      image: pizzaImage
-    },
-    {
-      id: 102,
-      title: "Morning coffee meeting pastries",
-      description: "Assorted pastries from this morning's department meeting. Sadly past their prime now.",
-      location: "Woods Lab, break room",
-      timeLeft: "Expired 8 hours ago",
-      servings: 10,
-      postedBy: "CS Department",
-      status: "Expired",
-      image: bagelsImage
-    },
-    {
-      id: 103,
-      title: "Weekend barbecue leftovers",
-      description: "Grilled vegetables and sides from last weekend's outdoor barbecue event.",
-      location: "Quad pavilion",
-      timeLeft: "Expired 3 days ago",
-      servings: 15,
-      postedBy: "Recreation Committee",
-      status: "Expired",
-      image: saladImage
+  // Helper function to format time remaining or expired
+  const getTimeStatus = (expiresAt: string) => {
+    const now = new Date();
+    const expiry = new Date(expiresAt);
+    const diff = expiry.getTime() - now.getTime();
+    
+    if (diff > 0) {
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      
+      if (hours > 0) {
+        return `Expires in ${hours}h ${minutes}m`;
+      } else {
+        return `Expires in ${minutes}m`;
+      }
+    } else {
+      const pastHours = Math.floor(Math.abs(diff) / (1000 * 60 * 60));
+      if (pastHours < 24) {
+        return `Expired ${pastHours}h ago`;
+      } else {
+        const pastDays = Math.floor(pastHours / 24);
+        return `Expired ${pastDays}d ago`;
+      }
     }
-  ];
+  };
+
+  // Helper function to get poster name
+  const getPosterName = (post: FoodPost) => {
+    if (post.profiles?.first_name) {
+      return `${post.profiles.first_name}${post.profiles.last_name ? ` ${post.profiles.last_name}` : ''}`;
+    }
+    return 'Anonymous User';
+  };
 
   const displayName = profile?.first_name
     ? `${profile.first_name}${profile.last_name ? ` ${profile.last_name}` : ''}`
@@ -319,39 +371,64 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
           ))}
         </div>
 
-        {/* Active Posts Section */}
+        {/* Posts Section */}
         <section>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-playfair font-semibold text-foreground tracking-wide">
-              {showExpiredPosts ? 'Expired Posts' : 'Active Posts'}
+              {showMyPosts ? 'My Posts' : (showExpiredPosts ? 'Expired Posts' : 'Active Posts')}
             </h2>
-            <button
-              onClick={() => setShowExpiredPosts(!showExpiredPosts)}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-inter font-medium text-foreground/80 hover:text-foreground bg-muted/30 hover:bg-muted/50 rounded-lg transition-colors duration-200"
-            >
-              {showExpiredPosts ? 'Show Active Posts' : 'Show Expired Posts'}
-              <ChevronRight className={`h-4 w-4 transition-transform duration-200 ${showExpiredPosts ? 'rotate-180' : ''}`} />
-            </button>
+            <div className="flex gap-4">
+              {!showMyPosts && (
+                <button
+                  onClick={() => setShowExpiredPosts(!showExpiredPosts)}
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-inter font-medium text-foreground/80 hover:text-foreground bg-muted/30 hover:bg-muted/50 rounded-lg transition-colors duration-200"
+                >
+                  {showExpiredPosts ? 'Show Active Posts' : 'Show Expired Posts'}
+                  <ChevronRight className={`h-4 w-4 transition-transform duration-200 ${showExpiredPosts ? 'rotate-180' : ''}`} />
+                </button>
+              )}
+            </div>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {(showExpiredPosts ? expiredPosts : activePosts).map((post) => (
+            {(() => {
+              let postsToShow: FoodPost[] = [];
+              if (showMyPosts) {
+                postsToShow = myPosts;
+              } else if (showExpiredPosts) {
+                postsToShow = expiredPosts;
+              } else {
+                postsToShow = activePosts;
+              }
+
+              if (postsToShow.length === 0) {
+                return (
+                  <div className="col-span-full text-center py-12">
+                    <p className="text-muted-foreground text-lg">
+                      {showMyPosts ? 'You haven\'t posted any food yet' : 
+                       showExpiredPosts ? 'No expired posts' : 'No active posts available'}
+                    </p>
+                  </div>
+                );
+              }
+
+              return postsToShow.map((post, index) => (
               <Card key={post.id} className="bg-card border-border/30 hover:border-border/50 transition-all duration-200 hover:shadow-sm overflow-hidden group">
                 <div className="aspect-[4/3] bg-muted/20 relative overflow-hidden">
                   <img 
-                    src={post.image} 
+                    src={getPostImage(post, index)} 
                     alt={post.title}
                     className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
                   />
                   <Badge 
                     variant="secondary" 
                     className={`absolute top-2 right-2 ${
-                      post.status === 'Expired' 
+                      showExpiredPosts 
                         ? 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'
                         : 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
                     }`}
                   >
-                    {post.status}
+                    {showExpiredPosts ? 'Expired' : 'Available'}
                   </Badge>
                 </div>
                 <CardContent className="p-4 cursor-default">
@@ -372,14 +449,16 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
                       </div>
                       <div className="flex items-center gap-2">
                         <Clock className="h-4 w-4" />
-                        <span>{post.timeLeft}</span>
+                        <span>{getTimeStatus(post.expires_at)}</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Users className="h-4 w-4" />
-                        <span>{post.servings} servings</span>
-                      </div>
+                      {post.servings && (
+                        <div className="flex items-center gap-2">
+                          <Users className="h-4 w-4" />
+                          <span>{post.servings} servings</span>
+                        </div>
+                      )}
                       <div className="text-sm text-foreground/70 font-medium">
-                        by {post.postedBy}
+                        by {getPosterName(post)}
                       </div>
                     </div>
 
@@ -394,7 +473,8 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
                   </div>
                 </CardContent>
               </Card>
-            ))}
+            ))
+            })()}
           </div>
         </section>
       </main>

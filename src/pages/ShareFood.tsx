@@ -10,6 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
 
 // @ts-ignore - HEIC convert library  
 import heic2any from 'heic2any';
@@ -132,10 +133,46 @@ export default function ShareFood() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement actual submission logic
-    console.log('Form submitted:', { formData, imageFile });
-    alert('Food post created successfully!');
-    navigate('/dashboard');
+    if (!formData.availableUntil) {
+      alert('Please select an available until date and time');
+      return;
+    }
+
+    try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        alert('You must be logged in to share food');
+        return;
+      }
+
+      // Create the food post
+      const { error } = await supabase
+        .from('food_posts')
+        .insert([
+          {
+            user_id: user.id,
+            title: formData.title,
+            description: formData.description,
+            location: formData.location,
+            servings: formData.servings,
+            image_url: imagePreview || null,
+            expires_at: formData.availableUntil.toISOString()
+          }
+        ]);
+
+      if (error) {
+        console.error('Error creating post:', error);
+        alert('Failed to create post. Please try again.');
+        return;
+      }
+
+      // Redirect to dashboard immediately
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('Failed to create post. Please try again.');
+    }
   };
 
   const handleCancel = () => {
