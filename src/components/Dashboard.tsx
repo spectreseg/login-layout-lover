@@ -446,13 +446,23 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
                   <item.icon className="h-7 w-7 text-white dark:text-black" />
                 </div>
               ) : (
-                <div className="w-12 h-12 bg-transparent flex items-center justify-center group-hover:bg-muted/50 rounded-lg transition-colors duration-200">
-                  <item.icon className="h-6 w-6 text-foreground/80 group-hover:text-foreground" />
+                <div className={`w-12 h-12 flex items-center justify-center rounded-lg transition-colors duration-200 ${
+                  item.label === 'My Posts' && showMyPosts 
+                    ? 'bg-purple-500 hover:bg-purple-600' 
+                    : 'bg-transparent group-hover:bg-muted/50'
+                }`}>
+                  <item.icon className={`h-6 w-6 transition-colors ${
+                    item.label === 'My Posts' && showMyPosts 
+                      ? 'text-white' 
+                      : 'text-foreground/80 group-hover:text-foreground'
+                  }`} />
                 </div>
               )}
               <span className={`font-inter font-medium text-center tracking-wide ${
                 item.primary 
-                  ? 'text-sm text-foreground' 
+                  ? 'text-sm text-foreground'
+                  : item.label === 'My Posts' && showMyPosts
+                  ? 'text-sm text-purple-600 font-semibold'
                   : 'text-sm text-foreground/80 group-hover:text-foreground'
               }`}>
                 {item.label}
@@ -468,7 +478,18 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
               {showMyPosts ? 'My Posts' : (showExpiredPosts ? 'Expired Posts' : 'Active Posts')}
             </h2>
             <div className="flex gap-4">
-              {!showMyPosts && (
+              {showMyPosts ? (
+                <button
+                  onClick={() => {
+                    setShowMyPosts(false);
+                    setShowExpiredPosts(false);
+                  }}
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-inter font-medium text-white bg-purple-500 hover:bg-purple-600 rounded-lg transition-colors duration-200"
+                >
+                  Active Posts
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              ) : (
                 <button
                   onClick={() => setShowExpiredPosts(!showExpiredPosts)}
                   className="flex items-center gap-2 px-4 py-2 text-sm font-inter font-medium text-foreground/80 hover:text-foreground bg-muted/30 hover:bg-muted/50 rounded-lg transition-colors duration-200"

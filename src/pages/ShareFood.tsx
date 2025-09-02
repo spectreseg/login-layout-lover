@@ -423,7 +423,11 @@ export default function ShareFood() {
                               handleInputChange('availableUntil', null);
                             }
                           }}
-                          disabled={(date) => date < new Date()}
+                          disabled={(date) => {
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0); // Start of today
+                            return date < today;
+                          }}
                           initialFocus
                           className={cn("p-3 pointer-events-auto")}
                         />
