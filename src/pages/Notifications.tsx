@@ -128,15 +128,12 @@ const Notifications = () => {
         .from('notifications')
         .select(`
           *,
-          food_post:food_posts!food_post_id (
+          food_posts!food_post_id (
             title,
             image_url,
             location,
             expires_at,
-            profiles!user_id (
-              first_name,
-              last_name
-            )
+            user_id
           )
         `)
         .eq('user_id', user.id)
@@ -145,20 +142,39 @@ const Notifications = () => {
       if (error) {
         console.error('Error fetching notifications:', error);
         setNotifications([]);
-      } else {
-        // Transform the data to match our interface
-        const transformedData = (data || []).map(notif => ({
-          ...notif,
-          food_post: notif.food_post ? {
-            ...notif.food_post,
-            profiles: Array.isArray(notif.food_post.profiles) 
-              ? notif.food_post.profiles[0] 
-              : notif.food_post.profiles
-          } : null
-        }));
-        
-        setNotifications(transformedData);
+        return;
       }
+
+      // Get profile information for post authors
+      const postUserIds = (data || [])
+        .map(notif => notif.food_posts?.user_id)
+        .filter(Boolean);
+
+      let profiles = {};
+      if (postUserIds.length > 0) {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('user_id, first_name, last_name')
+          .in('user_id', postUserIds);
+        
+        profiles = (profileData || []).reduce((acc, profile) => {
+          acc[profile.user_id] = profile;
+          return acc;
+        }, {});
+      }
+      // Transform the data to match our interface
+      const transformedData = (data || []).map(notif => ({
+        ...notif,
+        food_post: notif.food_posts ? {
+          title: notif.food_posts.title,
+          image_url: notif.food_posts.image_url,
+          location: notif.food_posts.location,
+          expires_at: notif.food_posts.expires_at,
+          profiles: profiles[notif.food_posts.user_id] || null
+        } : null
+      }));
+      
+      setNotifications(transformedData);
     } catch (error) {
       console.error('Error in fetchNotifications:', error);
       setNotifications([]);
