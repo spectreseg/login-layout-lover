@@ -223,8 +223,16 @@ export default function OnboardingAvatarScreen({ onBack, onProceed }: Onboarding
       }
       
       setSelectedFile(processedFile);
-      const preview = createPreviewUrl(processedFile);
-      setPreviewUrl(preview);
+      
+      // For HEIC files, create preview from converted file
+      if (isHeicFile(file) && processedFile) {
+        const preview = createPreviewUrl(processedFile);
+        setPreviewUrl(preview);
+      } else {
+        const preview = createPreviewUrl(processedFile);
+        setPreviewUrl(preview);
+      }
+      
       console.log('File processing completed:', processedFile.name);
     } catch (error) {
       console.error('Error processing file:', error);
@@ -238,7 +246,7 @@ export default function OnboardingAvatarScreen({ onBack, onProceed }: Onboarding
     setIsProcessing(true);
     console.log('Starting registration process...');
     
-    // Immediate transition - no delay
+    // Immediate transition with no delays at all
     onProceed({avatar: selectedFile});
   };
 
@@ -253,10 +261,10 @@ export default function OnboardingAvatarScreen({ onBack, onProceed }: Onboarding
 
   return (
     <div className="min-h-screen relative z-10 overflow-hidden">
-      {/* Full screen loading overlay */}
+      {/* Full screen loading overlay that completely hides everything */}
       {isProcessing && (
-        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div className="bg-white rounded-2xl p-8 text-center shadow-2xl">
+        <div className="fixed inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 z-[9999] flex items-center justify-center">
+          <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 text-center shadow-2xl animate-scale-in">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>
             <p className="text-lg font-semibold text-gray-800">Creating your account...</p>
             <p className="text-sm text-gray-600 mt-2">This may take a moment</p>
