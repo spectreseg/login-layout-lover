@@ -94,18 +94,21 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
       if (activeError) {
         console.error('Error fetching active posts:', activeError);
       } else {
+        console.log('Raw active posts from database:', activeData);
         // Get profile data for each post
         const postsWithProfiles = await Promise.all(
           (activeData || []).map(async (post) => {
-            const { data: profileData } = await supabase
-              .from('profiles')
-              .select('first_name, last_name')
-              .eq('user_id', post.user_id)
-              .single();
-            
-            return { ...post, profiles: profileData };
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('first_name, last_name')
+            .eq('user_id', post.user_id)
+            .single();
+          
+          console.log(`Profile data for user ${post.user_id}:`, profileData);
+          return { ...post, profiles: profileData };
           })
         );
+        console.log('Active posts with profiles:', postsWithProfiles);
         setActivePosts(postsWithProfiles);
       }
 
@@ -145,6 +148,7 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
         if (myError) {
           console.error('Error fetching my posts:', myError);
         } else {
+          console.log('Raw my posts from database:', myData);
           // Get profile data for each post
           const postsWithProfiles = await Promise.all(
             (myData || []).map(async (post) => {
@@ -157,6 +161,7 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
               return { ...post, profiles: profileData };
             })
           );
+          console.log('My posts with profiles:', postsWithProfiles);
           setMyPosts(postsWithProfiles);
         }
       }
@@ -472,6 +477,8 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
               } else {
                 postsToShow = [...activePosts, ...dummyPosts.filter(post => new Date(post.expires_at) > new Date())];
               }
+              
+              console.log('Final posts to show:', postsToShow);
 
               if (postsToShow.length === 0) {
                 return (
