@@ -161,7 +161,7 @@ export default function ShareFood() {
 
           {/* Form Container */}
           <div className="flex-1 max-w-2xl">
-            <Card className="bg-white border-border/20 shadow-2xl rounded-3xl overflow-hidden ring-2 ring-purple-300/30 shadow-purple-500/20">
+            <Card className="bg-white border-border/20 shadow-2xl rounded-3xl overflow-hidden ring-4 ring-purple-400/40 shadow-purple-500/30">
               <CardContent className="p-8">
                 <div className="text-center mb-4">
                   {/* Tiger Image - Bigger with minimal gap */}
@@ -261,8 +261,8 @@ export default function ShareFood() {
                     onChange={handleDescriptionChange}
                     placeholder="Describe the food, any allergens, pickup instructions..."
                     required
-                    rows={2}
-                    className="text-lg font-inter bg-white border-2 border-border/30 focus:border-primary resize-none rounded-xl shadow-sm focus:shadow-md transition-all duration-200 p-4 min-h-[60px] placeholder:text-lg"
+                    rows={1}
+                    className="text-lg font-inter bg-white border-2 border-border/30 focus:border-primary resize-none rounded-xl shadow-sm focus:shadow-md transition-all duration-200 p-4 min-h-[48px] placeholder:text-base"
                     style={{ overflow: 'hidden' }}
                   />
                 </div>
@@ -349,17 +349,20 @@ export default function ShareFood() {
                             <Label className="text-sm font-medium text-purple-700 mb-2 block">Set Time</Label>
                             <div className="flex gap-2 items-center">
                               <select
-                                value={formData.availableUntil.getHours()}
+                                value={formData.availableUntil.getHours() % 12 || 12}
                                 onChange={(e) => {
                                   const newDate = new Date(formData.availableUntil!);
-                                  newDate.setHours(parseInt(e.target.value));
+                                  const hour12 = parseInt(e.target.value);
+                                  const isPM = formData.availableUntil!.getHours() >= 12;
+                                  const hour24 = isPM ? (hour12 === 12 ? 12 : hour12 + 12) : (hour12 === 12 ? 0 : hour12);
+                                  newDate.setHours(hour24);
                                   handleInputChange('availableUntil', newDate);
                                 }}
                                 className="px-3 py-2 border border-purple-300 rounded-lg text-sm font-medium focus:border-purple-600 focus:outline-none"
                               >
-                                {Array.from({ length: 24 }, (_, i) => (
-                                  <option key={i} value={i}>
-                                    {i.toString().padStart(2, '0')}
+                                {Array.from({ length: 12 }, (_, i) => (
+                                  <option key={i + 1} value={i + 1}>
+                                    {i + 1}
                                   </option>
                                 ))}
                               </select>
@@ -378,6 +381,22 @@ export default function ShareFood() {
                                     {minute.toString().padStart(2, '0')}
                                   </option>
                                 ))}
+                              </select>
+                              <select
+                                value={formData.availableUntil.getHours() >= 12 ? 'PM' : 'AM'}
+                                onChange={(e) => {
+                                  const newDate = new Date(formData.availableUntil!);
+                                  const currentHour = newDate.getHours();
+                                  const isPM = e.target.value === 'PM';
+                                  const hour12 = currentHour % 12 || 12;
+                                  const hour24 = isPM ? (hour12 === 12 ? 12 : hour12 + 12) : (hour12 === 12 ? 0 : hour12);
+                                  newDate.setHours(hour24);
+                                  handleInputChange('availableUntil', newDate);
+                                }}
+                                className="px-3 py-2 border border-purple-300 rounded-lg text-sm font-medium focus:border-purple-600 focus:outline-none"
+                              >
+                                <option value="AM">AM</option>
+                                <option value="PM">PM</option>
                               </select>
                             </div>
                           </div>
