@@ -137,17 +137,17 @@ export default function Dashboard() {
               {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </Button>
             
-            <div className="flex items-center gap-3">
-              <Avatar className="h-8 w-8 border border-border/30">
+            <div className="flex flex-col items-center gap-2">
+              <Avatar className="h-16 w-16 border-2 border-border/30">
                 <AvatarImage 
                   src={profile?.avatar_url || ""} 
                   className="object-cover"
                 />
-                <AvatarFallback className="bg-primary/10 text-primary font-medium text-xs">
+                <AvatarFallback className="bg-primary/10 text-primary font-medium text-lg">
                   {initials}
                 </AvatarFallback>
               </Avatar>
-              <h1 className="text-base font-medium text-foreground">
+              <h1 className="text-lg font-medium text-foreground">
                 Welcome back, {displayName}!
               </h1>
             </div>
@@ -167,11 +167,11 @@ export default function Dashboard() {
       {/* Main Content */}
       <main className="w-full px-4 py-6">
         {/* Navigation Grid */}
-        <div className="flex items-center justify-between px-8 py-6 mb-8 bg-muted/20">
+        <div className="flex items-center justify-between px-8 py-8 mb-8 bg-muted/50 mx-4 rounded-lg">
           {navItems.map((item) => (
             <div 
               key={item.label} 
-              className="flex flex-col items-center gap-2 cursor-pointer group"
+              className="flex flex-col items-center gap-3 cursor-pointer group"
             >
               {item.primary ? (
                 <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
