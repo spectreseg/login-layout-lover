@@ -95,6 +95,13 @@ export type Database = {
             referencedRelation: "food_posts"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "notifications_food_post_id_fkey"
+            columns: ["food_post_id"]
+            isOneToOne: false
+            referencedRelation: "public_food_posts"
+            referencedColumns: ["id"]
+          },
         ]
       }
       profiles: {
@@ -129,7 +136,45 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_food_posts: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          expires_at: string | null
+          finished_by: string[] | null
+          id: string | null
+          image_url: string | null
+          location: string | null
+          servings: string | null
+          title: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          expires_at?: string | null
+          finished_by?: string[] | null
+          id?: string | null
+          image_url?: string | null
+          location?: string | null
+          servings?: string | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          expires_at?: string | null
+          finished_by?: string[] | null
+          id?: string | null
+          image_url?: string | null
+          location?: string | null
+          servings?: string | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
