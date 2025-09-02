@@ -150,9 +150,9 @@ export default function ShareFood() {
           {/* Back Button - Left Side */}
           <div className="flex-shrink-0 pt-16">
             <Button
-              variant="outline"
+              variant="ghost"
               onClick={handleCancel}
-              className="flex items-center gap-3 text-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200 px-6 py-3 rounded-xl border-2 h-12 text-lg font-inter font-bold shadow-md hover:shadow-lg"
+              className="flex items-center gap-3 text-foreground hover:text-foreground transition-all duration-200 px-6 py-3 rounded-lg h-12 text-lg font-inter font-bold hover:scale-105"
             >
               <ArrowLeft className="h-5 w-5" />
               <span className="font-bold">Dashboard</span>
@@ -161,11 +161,11 @@ export default function ShareFood() {
 
           {/* Form Container */}
           <div className="flex-1 max-w-2xl">
-            <Card className="bg-white border-border/20 shadow-2xl rounded-3xl overflow-hidden">
+            <Card className="bg-white border-border/20 shadow-2xl rounded-3xl overflow-hidden ring-2 ring-purple-300/30 shadow-purple-500/20">
               <CardContent className="p-8">
                 <div className="text-center mb-4">
                   {/* Tiger Image - Bigger with minimal gap */}
-                  <div className="flex justify-center mb-1">
+                  <div className="flex justify-center">
                     <div className="w-40 h-40 animate-fade-in">
                       <img 
                         src="/lovable-uploads/3a3c3b4a-16c4-4156-b27c-44f006547e86.png" 
@@ -261,8 +261,8 @@ export default function ShareFood() {
                     onChange={handleDescriptionChange}
                     placeholder="Describe the food, any allergens, pickup instructions..."
                     required
-                    rows={4}
-                    className="text-lg font-inter bg-white border-2 border-border/30 focus:border-primary resize-none rounded-xl shadow-sm focus:shadow-md transition-all duration-200 p-4 min-h-[100px] placeholder:text-lg"
+                    rows={2}
+                    className="text-lg font-inter bg-white border-2 border-border/30 focus:border-primary resize-none rounded-xl shadow-sm focus:shadow-md transition-all duration-200 p-4 min-h-[60px] placeholder:text-lg"
                     style={{ overflow: 'hidden' }}
                   />
                 </div>
