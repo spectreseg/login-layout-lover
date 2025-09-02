@@ -307,28 +307,26 @@ const Notifications = () => {
       <header className="border-b border-border/20 bg-white">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                onClick={() => navigate('/dashboard')}
-                className="flex items-center gap-3 text-foreground hover:text-foreground transition-all duration-200 px-4 py-2 rounded-lg h-12 text-lg font-inter font-bold hover:scale-105"
-              >
-                <ArrowLeft className="h-5 w-5" />
-                <span className="font-bold">Dashboard</span>
-              </Button>
-              
-              <div className="flex items-center gap-3">
-                <Bell className="w-8 h-8 text-purple-600" />
-                <h1 className="text-3xl font-playfair font-bold text-foreground">
-                  Notifications
-                </h1>
-                {unreadCount > 0 && (
-                  <Badge variant="destructive" className="ml-2">
-                    {unreadCount} new
-                  </Badge>
-                )}
-              </div>
+            <div className="flex items-center gap-3">
+              <Bell className="w-8 h-8 text-purple-600" />
+              <h1 className="text-3xl font-playfair font-bold text-foreground">
+                Notifications
+              </h1>
+              {unreadCount > 0 && (
+                <Badge variant="destructive" className="ml-2">
+                  {unreadCount} new
+                </Badge>
+              )}
             </div>
+            
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/dashboard')}
+              className="flex items-center gap-3 text-foreground hover:text-foreground transition-all duration-200 px-4 py-2 rounded-lg h-12 text-lg font-inter font-bold hover:scale-105"
+            >
+              <span className="font-bold">Dashboard</span>
+              <ArrowLeft className="h-5 w-5 rotate-180" />
+            </Button>
           </div>
         </div>
       </header>
@@ -374,7 +372,7 @@ const Notifications = () => {
                     {/* Content */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between">
-                        <div className="flex-1">
+                        <div className="flex-1 pr-4">
                           <div className="flex items-center gap-2 mb-2">
                             <h3 className="font-inter font-bold text-lg text-foreground">
                               {notification.title}
@@ -412,22 +410,22 @@ const Notifications = () => {
                             </p>
                           </div>
                         </div>
+                        
+                        {/* Mark as Read Button - Right Side */}
+                        {!notification.read && (
+                          <div className="flex-shrink-0">
+                            <Button
+                              onClick={() => markAsRead(notification.id)}
+                              variant="outline"
+                              size="sm"
+                              className="flex items-center gap-2 text-sm"
+                            >
+                              <Check className="w-4 h-4" />
+                              Mark as read
+                            </Button>
+                          </div>
+                        )}
                       </div>
-                      
-                      {/* Mark as Read Button */}
-                      {!notification.read && (
-                        <div className="mt-4">
-                          <Button
-                            onClick={() => markAsRead(notification.id)}
-                            variant="outline"
-                            size="sm"
-                            className="flex items-center gap-2 text-sm"
-                          >
-                            <Check className="w-4 h-4" />
-                            Mark as read
-                          </Button>
-                        </div>
-                      )}
                     </div>
                   </div>
                 </CardContent>
