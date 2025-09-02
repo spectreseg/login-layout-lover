@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { MapPin } from 'lucide-react';
 
 interface OnboardingLocationScreenProps {
   onBack: () => void;
@@ -73,7 +74,7 @@ export default function OnboardingLocationScreen({ onBack, onProceed }: Onboardi
         <div className="relative flex flex-col md:flex-row items-center justify-center flex-1 md:flex-none mt-8 md:mt-12">
           
           {/* Speech bubble - above tiger on mobile, to the right on desktop */}
-          <div className={`relative md:absolute md:-top-8 md:left-80 z-20 mb-2 md:mb-0 order-1 md:order-none transition-opacity duration-700 ${bubbleVisible ? 'opacity-100' : 'opacity-0'}`}>
+          <div className={`relative md:absolute md:-top-12 md:left-80 z-20 mb-2 md:mb-0 order-1 md:order-none transition-opacity duration-700 ${bubbleVisible ? 'opacity-100' : 'opacity-0'}`}>
             <div className="bg-white rounded-2xl p-2 md:p-3 shadow-2xl relative w-64 md:w-72 h-20 md:h-24 flex items-center justify-center">
               {/* Speech bubble tail - pointing down on mobile, down-left on desktop */}
               <div className="absolute md:bottom-0 md:left-12 bottom-0 left-1/2 md:left-12 transform md:translate-y-2 translate-y-2 -translate-x-1/2 md:translate-x-0">
@@ -124,7 +125,8 @@ export default function OnboardingLocationScreen({ onBack, onProceed }: Onboardi
                 onClick={handleLocationRequest}
                 className="w-full px-6 py-3 bg-gray-200 text-gray-700 rounded-xl text-base font-semibold hover:bg-gray-300 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-gray-300 flex items-center justify-center gap-2"
               >
-                📍 Use my location
+                <MapPin size={20} />
+                Use my location
               </button>
             </div>
             
