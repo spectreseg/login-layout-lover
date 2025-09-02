@@ -54,8 +54,11 @@ export default function OnboardingLocationScreen({ onBack, onProceed }: Onboardi
       navigator.geolocation.getCurrentPosition(
         (position) => {
           console.log('Location granted:', position.coords);
+          const coords = `${position.coords.latitude},${position.coords.longitude}`;
+          console.log('Setting location data:', coords);
+          setLocationData(coords);
           setLocationGranted(true);
-          setLocationData(`${position.coords.latitude},${position.coords.longitude}`);
+          console.log('Location state updated - granted: true');
         },
         (error) => {
           console.log('Location denied:', error);
@@ -69,9 +72,12 @@ export default function OnboardingLocationScreen({ onBack, onProceed }: Onboardi
   };
 
   const handleProceed = () => {
+    console.log('Proceed clicked - locationGranted:', locationGranted, 'locationData:', locationData);
     if (locationGranted && locationData) {
+      console.log('Proceeding with location:', locationData);
       onProceed({location: locationData});
     } else {
+      console.log('Cannot proceed - location not granted or data missing');
       alert('Please enable location services first.');
     }
   };
