@@ -127,7 +127,7 @@ export default function Dashboard() {
       {/* Header */}
       <header className="border-b border-border/20 bg-card/50 backdrop-blur-sm">
         <div className="w-full px-4 py-6">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-center gap-32">
             <div className="flex flex-col items-center gap-3 cursor-pointer group">
               <div className="w-12 h-12 bg-transparent flex items-center justify-center group-hover:bg-muted/50 rounded-lg transition-colors duration-200">
                 <button onClick={toggleDarkMode}>
