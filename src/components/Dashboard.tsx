@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from '@/hooks/useUserProfile';
-import { User } from '@supabase/supabase-js';
+import { User, Session } from '@supabase/supabase-js';
 import pizzaImage from '@/assets/food-pizza.jpg';
 import bagelsImage from '@/assets/food-bagels.jpg';
 import sandwichesImage from '@/assets/food-sandwiches.jpg';
@@ -14,16 +14,45 @@ import saladImage from '@/assets/food-salad.jpg';
 import fruitImage from '@/assets/food-fruit.jpg';
 import pastaImage from '@/assets/food-pasta.jpg';
 
-export default function Dashboard() {
+interface DashboardProps {
+  onSignOut?: () => void;
+}
+
+export default function Dashboard({ onSignOut }: DashboardProps = {}) {
   const [isDarkMode, setIsDarkMode] = React.useState(false);
   const [user, setUser] = React.useState<User | null>(null);
+  const [session, setSession] = React.useState<Session | null>(null);
+  const [loading, setLoading] = React.useState(true);
   const { profile } = useUserProfile(user);
 
   React.useEffect(() => {
-    // Get current user
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user);
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
+        
+        // Redirect unauthenticated users
+        if (!session) {
+          window.location.href = '/';
+        }
+      }
+    );
+
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+      
+      // Redirect unauthenticated users
+      if (!session) {
+        window.location.href = '/';
+      }
     });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const toggleDarkMode = () => {
@@ -31,10 +60,61 @@ export default function Dashboard() {
     document.documentElement.classList.toggle('dark');
   };
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    window.location.reload();
+  const cleanupAuthState = () => {
+    // Remove all Supabase auth keys from localStorage
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+        localStorage.removeItem(key);
+      }
+    });
+    // Remove from sessionStorage if in use
+    Object.keys(sessionStorage || {}).forEach((key) => {
+      if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+        sessionStorage.removeItem(key);
+      }
+    });
   };
+
+  const handleSignOut = async () => {
+    try {
+      // Clean up auth state first
+      cleanupAuthState();
+      
+      // Attempt global sign out
+      try {
+        await supabase.auth.signOut({ scope: 'global' });
+      } catch (err) {
+        // Continue even if this fails
+      }
+      
+      // Call parent onSignOut if provided
+      if (onSignOut) {
+        onSignOut();
+      }
+      
+      // Force redirect to auth page
+      window.location.href = '/';
+    } catch (error) {
+      console.error('Sign out error:', error);
+      // Force redirect even if signout fails
+      window.location.href = '/';
+    }
+  };
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-foreground text-xl">Loading...</div>
+      </div>
+    );
+  }
+
+  // Redirect if not authenticated
+  if (!user || !session) {
+    window.location.href = '/';
+    return null;
+  }
 
   const navItems = [
     { icon: TrendingUp, label: 'My Posts', href: '#' },
@@ -199,7 +279,7 @@ export default function Dashboard() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {activePosts.map((post) => (
-              <Card key={post.id} className="bg-card border-border/30 hover:border-border/50 transition-all duration-200 hover:shadow-sm overflow-hidden">
+              <Card key={post.id} className="bg-black border-border/30 hover:border-border/50 transition-all duration-200 hover:shadow-sm overflow-hidden">
                 <div className="aspect-[4/3] bg-muted/20 relative overflow-hidden">
                   <img 
                     src={post.image} 
@@ -213,7 +293,7 @@ export default function Dashboard() {
                     {post.status}
                   </Badge>
                 </div>
-                <CardContent className="p-4">
+                <CardContent className="p-4 bg-black">
                   <div className="space-y-3">
                     <div>
                       <h3 className="font-inter font-semibold text-base text-foreground leading-tight mb-2 tracking-wide">

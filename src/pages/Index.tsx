@@ -311,7 +311,12 @@ const Index = () => {
   // Show dashboard if user is authenticated and not in onboarding
   if (user && onboardingStep === 'none') {
     console.log('Rendering dashboard');
-    return <Dashboard />;
+    return <Dashboard onSignOut={() => {
+      setUser(null);
+      setSession(null);
+      setOnboardingStep('none');
+      setAuthMode('login');
+    }} />;
   }
 
   // Show first onboarding screen
