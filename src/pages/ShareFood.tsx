@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { Camera, ArrowLeft, MapPin, Users, Clock } from 'lucide-react';
+import { Camera, ArrowLeft, MapPin, Users, Clock, CalendarIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useNavigate } from 'react-router-dom';
-import StarryBackground from '@/components/StarryBackground';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 // @ts-ignore - HEIC convert library  
 import heic2any from 'heic2any';
@@ -19,14 +21,21 @@ export default function ShareFood() {
     description: '',
     location: '',
     servings: '',
-    availableUntil: ''
+    availableUntil: null as Date | null
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>('');
   const [isUploading, setIsUploading] = useState(false);
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: string | Date | null) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const textarea = e.target;
+    textarea.style.height = 'auto';
+    textarea.style.height = textarea.scrollHeight + 'px';
+    handleInputChange('description', textarea.value);
   };
 
   const convertHeicToJpeg = async (file: File): Promise<File> => {
@@ -134,41 +143,45 @@ export default function ShareFood() {
   };
 
   return (
-    <div className="min-h-screen bg-white relative">
-      {/* Main Content */}
-      <main className="w-full px-6 py-8">
-        <div className="max-w-2xl mx-auto relative">
-          {/* Back Button - Outside form, left side at tiger level */}
-          <Button
-            variant="ghost"
-            onClick={handleCancel}
-            className="absolute left-[-120px] top-[80px] flex items-center gap-2 text-foreground/80 hover:text-foreground hover:bg-muted/50 transition-all duration-200 px-3 py-2 rounded-lg z-10"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            <span className="text-sm font-medium">Back to Dashboard</span>
-          </Button>
+    <div className="min-h-screen bg-white">
+      {/* Main Content with Back Button */}
+      <main className="w-full px-6 py-6">
+        <div className="flex gap-8 max-w-6xl mx-auto">
+          {/* Back Button - Left Side */}
+          <div className="flex-shrink-0 pt-16">
+            <Button
+              variant="ghost"
+              onClick={handleCancel}
+              className="flex items-center gap-2 text-foreground/80 hover:text-foreground hover:bg-muted/50 transition-all duration-200 px-3 py-2 rounded-lg"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span className="text-sm font-medium">Back to Dashboard</span>
+            </Button>
+          </div>
 
-          <Card className="bg-white border-border/20 shadow-2xl rounded-3xl overflow-hidden">
-            <CardContent className="p-8">
-              <div className="text-center mb-6">
-                {/* Tiger Image - Bigger with minimal gap */}
-                <div className="flex justify-center mb-2">
-                  <div className="w-40 h-40 animate-fade-in">
-                    <img 
-                      src="/lovable-uploads/3a3c3b4a-16c4-4156-b27c-44f006547e86.png" 
-                      alt="Monte Tiger" 
-                      className="w-full h-full object-contain"
-                    />
+          {/* Form Container */}
+          <div className="flex-1 max-w-2xl">
+            <Card className="bg-white border-border/20 shadow-2xl rounded-3xl overflow-hidden">
+              <CardContent className="p-8">
+                <div className="text-center mb-4">
+                  {/* Tiger Image - Bigger with minimal gap */}
+                  <div className="flex justify-center mb-1">
+                    <div className="w-40 h-40 animate-fade-in">
+                      <img 
+                        src="/lovable-uploads/3a3c3b4a-16c4-4156-b27c-44f006547e86.png" 
+                        alt="Monte Tiger" 
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
                   </div>
+                  
+                  <h2 className="text-4xl font-playfair font-bold text-foreground mb-3 tracking-wide animate-fade-in">
+                    Share Food
+                  </h2>
+                  <p className="text-muted-foreground font-inter text-lg leading-relaxed animate-fade-in max-w-md mx-auto">
+                    You&apos;re making Sewanee better
+                  </p>
                 </div>
-                
-                <h2 className="text-4xl font-playfair font-bold text-foreground mb-3 tracking-wide animate-fade-in">
-                  Share Food
-                </h2>
-                <p className="text-muted-foreground font-inter text-lg leading-relaxed animate-fade-in max-w-md mx-auto">
-                  You&apos;re making Sewanee better
-                </p>
-              </div>
 
               <form onSubmit={handleSubmit} className="space-y-6 animate-fade-in"
                     style={{ animationDelay: '0.2s', animationFillMode: 'both' }}>
@@ -245,11 +258,12 @@ export default function ShareFood() {
                   <Textarea
                     id="description"
                     value={formData.description}
-                    onChange={(e) => handleInputChange('description', e.target.value)}
+                    onChange={handleDescriptionChange}
                     placeholder="Describe the food, any allergens, pickup instructions..."
                     required
                     rows={4}
-                    className="text-lg font-inter bg-white border-2 border-border/30 focus:border-primary resize-none rounded-xl shadow-sm focus:shadow-md transition-all duration-200 p-4"
+                    className="text-lg font-inter bg-white border-2 border-border/30 focus:border-primary resize-none rounded-xl shadow-sm focus:shadow-md transition-all duration-200 p-4 min-h-[100px] placeholder:text-lg"
+                    style={{ overflow: 'hidden' }}
                   />
                 </div>
 
@@ -289,19 +303,55 @@ export default function ShareFood() {
 
                   {/* Available Until */}
                   <div className="space-y-3">
-                    <Label htmlFor="availableUntil" className="text-lg font-inter font-bold text-foreground flex items-center gap-2">
+                    <Label className="text-lg font-inter font-bold text-foreground flex items-center gap-2">
                       <Clock className="h-5 w-5 text-purple-600" />
                       Available Until <span className="text-destructive">*</span>
                     </Label>
-                    <Input
-                      id="availableUntil"
-                      type="datetime-local"
-                      value={formData.availableUntil}
-                      onChange={(e) => handleInputChange('availableUntil', e.target.value)}
-                      required
-                      className="h-12 text-lg font-inter bg-white border-2 border-purple-300 focus:border-purple-600 rounded-xl shadow-sm focus:shadow-md transition-all duration-200 text-purple-700"
-                      style={{ colorScheme: 'dark' }}
-                    />
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "h-12 text-lg font-inter bg-white border-2 border-purple-300 focus:border-purple-600 rounded-xl shadow-sm focus:shadow-md transition-all duration-200 text-purple-700 justify-start",
+                            !formData.availableUntil && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {formData.availableUntil ? (
+                            format(formData.availableUntil, "PPP p")
+                          ) : (
+                            <span className="text-lg">Pick date and time</span>
+                          )}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={formData.availableUntil}
+                          onSelect={(date) => handleInputChange('availableUntil', date)}
+                          disabled={(date) => date < new Date()}
+                          initialFocus
+                          className={cn("p-3 pointer-events-auto")}
+                        />
+                        {formData.availableUntil && (
+                          <div className="p-3 border-t">
+                            <Label className="text-sm font-medium">Time</Label>
+                            <Input
+                              type="time"
+                              onChange={(e) => {
+                                if (formData.availableUntil && e.target.value) {
+                                  const [hours, minutes] = e.target.value.split(':');
+                                  const newDate = new Date(formData.availableUntil);
+                                  newDate.setHours(parseInt(hours), parseInt(minutes));
+                                  handleInputChange('availableUntil', newDate);
+                                }
+                              }}
+                              className="mt-1"
+                            />
+                          </div>
+                        )}
+                      </PopoverContent>
+                    </Popover>
                   </div>
                 </div>
 
@@ -326,7 +376,8 @@ export default function ShareFood() {
             </CardContent>
           </Card>
         </div>
-      </main>
-    </div>
+      </div>
+    </main>
+  </div>
   );
 }
