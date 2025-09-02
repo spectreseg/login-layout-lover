@@ -167,42 +167,29 @@ export default function Dashboard() {
       {/* Main Content */}
       <main className="w-full px-4 py-6">
         {/* Navigation Grid */}
-        <div className="grid grid-cols-5 gap-4 mb-8 max-w-4xl mx-auto">
-          {navItems.map((item, index) => (
-            <Card 
+        <div className="flex items-center justify-between px-8 py-6 mb-8 bg-muted/20">
+          {navItems.map((item) => (
+            <div 
               key={item.label} 
-              className={`group cursor-pointer transition-all duration-200 hover:scale-[1.02] border ${
-                item.primary 
-                  ? 'bg-primary text-primary-foreground shadow-md hover:shadow-lg border-primary/20 col-span-1' 
-                  : 'bg-card/60 hover:bg-card border-border/30 hover:border-border/50 hover:shadow-sm col-span-1'
-              }`}
-              style={item.primary ? { gridColumn: 'span 1' } : {}}
+              className="flex flex-col items-center gap-2 cursor-pointer group"
             >
-              <CardContent className={`flex flex-col items-center justify-center transition-colors ${
-                item.primary 
-                  ? 'p-6 min-h-[100px]' 
-                  : 'p-4 min-h-[100px]'
-              }`}>
-                <div className={`rounded-full mb-2 transition-colors ${
-                  item.primary 
-                    ? 'bg-primary-foreground/20 p-3' 
-                    : 'bg-muted/40 group-hover:bg-muted/60 p-2.5'
-                }`}>
-                  <item.icon className={`${
-                    item.primary 
-                      ? 'h-6 w-6 text-primary-foreground' 
-                      : 'h-5 w-5 text-foreground/80'
-                  }`} />
+              {item.primary ? (
+                <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
+                  <item.icon className="h-7 w-7 text-primary-foreground" />
                 </div>
-                <span className={`font-medium text-center leading-tight ${
-                  item.primary 
-                    ? 'text-sm text-primary-foreground' 
-                    : 'text-xs text-foreground/80'
-                }`}>
-                  {item.label}
-                </span>
-              </CardContent>
-            </Card>
+              ) : (
+                <div className="w-12 h-12 bg-transparent flex items-center justify-center group-hover:bg-muted/50 rounded-lg transition-colors duration-200">
+                  <item.icon className="h-6 w-6 text-foreground/80 group-hover:text-foreground" />
+                </div>
+              )}
+              <span className={`font-medium text-center ${
+                item.primary 
+                  ? 'text-sm text-foreground' 
+                  : 'text-sm text-foreground/80 group-hover:text-foreground'
+              }`}>
+                {item.label}
+              </span>
+            </div>
           ))}
         </div>
 
