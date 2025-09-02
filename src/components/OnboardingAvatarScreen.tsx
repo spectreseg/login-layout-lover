@@ -252,6 +252,17 @@ export default function OnboardingAvatarScreen({ onBack, onProceed }: Onboarding
 
   return (
     <div className="min-h-screen relative z-10 overflow-hidden">
+      {/* Full screen loading overlay */}
+      {isProcessing && (
+        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-white rounded-2xl p-8 text-center shadow-2xl">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>
+            <p className="text-lg font-semibold text-gray-800">Creating your account...</p>
+            <p className="text-sm text-gray-600 mt-2">This may take a moment</p>
+          </div>
+        </div>
+      )}
+      
       {/* Main content */}
       <div className="min-h-screen flex flex-col items-center justify-between md:justify-center px-4 py-4 md:py-8">
         
