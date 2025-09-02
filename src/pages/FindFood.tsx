@@ -99,6 +99,10 @@ const FindFood = () => {
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
   const markersRef = useRef<google.maps.Marker[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [customPositions, setCustomPositions] = useState<Record<string, {lat: number, lng: number}>>(() => {
+    const saved = localStorage.getItem('food-marker-positions');
+    return saved ? JSON.parse(saved) : {};
+  });
   const { profile } = useUserProfile(currentUser);
 
   useEffect(() => {
@@ -120,7 +124,7 @@ const FindFood = () => {
       description: 'Fresh basil, mozzarella, and tomato sauce on homemade dough. Made too much for dinner tonight!',
       location: 'Stirling Coffee House',
       servings: '6-8 slices',
-      image_url: '/assets/dummy-pizza-DzZu7eHL.jpg',
+      image_url: '/src/assets/food-pizza.jpg',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       expires_at: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(),
@@ -133,7 +137,7 @@ const FindFood = () => {
       description: 'Mixed greens with cherry tomatoes, cucumbers, and house vinaigrette. Perfect for a healthy lunch!',
       location: 'McClurg Dining Hall',
       servings: '4-6 people',
-      image_url: '/assets/dummy-salad-DLDokZKN.jpg',
+      image_url: '/src/assets/food-salad.jpg',
       created_at: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
       updated_at: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
       expires_at: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString(),
@@ -146,7 +150,7 @@ const FindFood = () => {
       description: 'Fresh strawberries, blueberries, and kiwi from the farmers market. Great for sharing!',
       location: 'Blue Chair Tavern',
       servings: '8-10 people',
-      image_url: '/assets/dummy-fruit-Dk5_c-Co.jpg',
+      image_url: '/src/assets/food-fruit.jpg',
       created_at: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
       updated_at: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
       expires_at: new Date(Date.now() + 5 * 60 * 60 * 1000).toISOString(),
@@ -159,7 +163,7 @@ const FindFood = () => {
       description: 'Penne with herbs, vegetables, and parmesan. Comfort food at its finest!',
       location: 'Benedict Hall',
       servings: '6-8 people',
-      image_url: '/assets/dummy-pasta-B4dvg6oP.jpg',
+      image_url: '/src/assets/food-pasta.jpg',
       created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
       updated_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
       expires_at: new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString(),
@@ -312,8 +316,10 @@ const FindFood = () => {
     filteredPosts.forEach((post, index) => {
       console.log(`Processing post ${index + 1}:`, post);
       
-      // Get coordinates for the post location
-      const coordinates = findLocationCoordinates(post.location);
+      // Get coordinates for the post location (use custom position if available)
+      const postKey = `${post.id}-${post.location}`;
+      const customPosition = customPositions[postKey];
+      const coordinates = customPosition || findLocationCoordinates(post.location);
       console.log(`Coordinates for "${post.location}":`, coordinates);
       
       if (!coordinates) {
@@ -339,14 +345,17 @@ const FindFood = () => {
         draggable: true,
       });
 
-      // Add drag end listener to log new position
+      // Add drag end listener to save new position
       marker.addListener('dragend', (event: any) => {
         const newPosition = {
           lat: event.latLng.lat(),
           lng: event.latLng.lng()
         };
+        const postKey = `${post.id}-${post.location}`;
+        const updatedPositions = { ...customPositions, [postKey]: newPosition };
+        setCustomPositions(updatedPositions);
+        localStorage.setItem('food-marker-positions', JSON.stringify(updatedPositions));
         console.log(`${post.location} dragged to:`, newPosition);
-        console.log(`Update coordinates for ${post.location}: { lat: ${newPosition.lat}, lng: ${newPosition.lng} }`);
       });
 
       console.log(`Created marker for post: ${post.title} at`, coordinates);
@@ -378,7 +387,7 @@ const FindFood = () => {
             <div style="text-align: center; margin-bottom: 8px;">
               <h3 style="margin: 0 0 4px 0; font-size: 16px; font-weight: 600; color: #1f2937;">${post.title}</h3>
             </div>
-            <div style="display: flex; justify-content: space-between; font-size: 12px; color: #6b7280; margin-bottom: 6px;">
+            <div style="text-align: center; font-size: 12px; color: #6b7280; margin-bottom: 6px;">
               <span>Expires: ${expiresAt}</span>
             </div>
             <div style="text-align: center;">
@@ -393,21 +402,33 @@ const FindFood = () => {
 
       console.log(`Created info window for: ${post.title}`);
 
-      // Add click listener to marker
+      // Show info window by default (no click needed)
+      infoWindow.open(mapInstanceRef.current, marker);
+
+      // Add click listener to marker to toggle info window
       marker.addListener('click', () => {
         console.log(`Marker clicked for: ${post.title}`);
-        // Close all other info windows first
-        markersRef.current.forEach(m => {
-          if (m !== marker && (m as any).infoWindow) {
-            ((m as any).infoWindow as google.maps.InfoWindow).close();
-          }
-        });
-        // Open this info window
-        infoWindow.open(mapInstanceRef.current, marker);
+        // Toggle this info window
+        if ((marker as any).isInfoWindowOpen) {
+          infoWindow.close();
+          (marker as any).isInfoWindowOpen = false;
+        } else {
+          // Close all other info windows first
+          markersRef.current.forEach(m => {
+            if (m !== marker && (m as any).infoWindow) {
+              ((m as any).infoWindow as google.maps.InfoWindow).close();
+              (m as any).isInfoWindowOpen = false;
+            }
+          });
+          // Open this info window
+          infoWindow.open(mapInstanceRef.current, marker);
+          (marker as any).isInfoWindowOpen = true;
+        }
       });
 
       // Store info window reference on marker for later access
       (marker as any).infoWindow = infoWindow;
+      (marker as any).isInfoWindowOpen = true; // Track if info window is open
 
       markersRef.current.push(marker);
       console.log(`Added marker ${index + 1} to markers array. Total markers: ${markersRef.current.length}`);
