@@ -373,36 +373,22 @@ const FindFood = () => {
 
       const infoWindow = new google.maps.InfoWindow({
         content: `
-          <div style="padding: 16px; max-width: 220px; font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.4;">
+          <div style="padding: 12px; max-width: 200px; font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.4;">
             ${imageHtml}
-            <div style="text-align: center; margin-bottom: 12px;">
-              <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600; color: #1f2937;">${post.title}</h3>
-              <p style="margin: 0 0 8px 0; font-size: 14px; color: #4b5563; line-height: 1.4;">${post.description}</p>
+            <div style="text-align: center; margin-bottom: 8px;">
+              <h3 style="margin: 0 0 4px 0; font-size: 16px; font-weight: 600; color: #1f2937;">${post.title}</h3>
             </div>
-            <div style="background: #f9fafb; padding: 12px; border-radius: 6px; margin-bottom: 8px;">
-              <div style="display: flex; align-items: center; font-size: 13px; color: #374151; margin-bottom: 6px;">
-                <span style="margin-right: 6px; font-size: 16px;">📍</span> 
-                <span style="font-weight: 500;">${post.location}</span>
-              </div>
-              ${post.servings ? `
-                <div style="display: flex; align-items: center; font-size: 13px; color: #374151;">
-                  <span style="margin-right: 6px; font-size: 16px;">🍽️</span> 
-                  <span>Servings: ${post.servings}</span>
-                </div>
-              ` : ''}
-            </div>
-            <div style="display: flex; justify-content: space-between; font-size: 11px; color: #6b7280; margin-bottom: 8px;">
-              <span>Posted: ${timeAgo}</span>
+            <div style="display: flex; justify-content: space-between; font-size: 12px; color: #6b7280; margin-bottom: 6px;">
               <span>Expires: ${expiresAt}</span>
             </div>
             <div style="text-align: center;">
-              <span style="display: inline-block; background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);">
-                🔥 Available Now
+              <span style="display: inline-block; background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 3px 10px; border-radius: 16px; font-size: 11px; font-weight: 500;">
+                Available Now
               </span>
             </div>
           </div>
         `,
-        maxWidth: 280,
+        maxWidth: 240,
       });
 
       console.log(`Created info window for: ${post.title}`);
