@@ -35,12 +35,6 @@ const Index = () => {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 relative">
         <StarryBackground />
-        {/* TigerBites Text */}
-        <div className="absolute top-8 sm:top-12 left-1/2 transform -translate-x-1/2 z-30">
-          <h1 className="font-playfair text-4xl sm:text-5xl md:text-6xl font-bold text-white text-center tracking-wide drop-shadow-lg">
-            TigerBites
-          </h1>
-        </div>
         <OnboardingScreen 
           onBack={handleOnboardingBack}
           onProceed={handleOnboardingProceed}

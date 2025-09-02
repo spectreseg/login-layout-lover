@@ -20,7 +20,7 @@ export default function OnboardingScreen({ onBack, onProceed }: OnboardingScreen
   return (
     <div className="flex flex-col items-center justify-center min-h-screen px-6 py-8 relative overflow-hidden">
       {/* Speech Bubble */}
-      <div className={`mb-8 transition-all duration-1000 delay-700 ${
+      <div className={`mb-8 transition-all duration-1000 delay-1000 ${
         showAnimations ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
       }`}>
         <SpeechBubble text="Hi, I'm Monte. I'll help with registration. Ready to proceed?" />
@@ -28,18 +28,18 @@ export default function OnboardingScreen({ onBack, onProceed }: OnboardingScreen
 
       {/* Tiger Character */}
       <div className={`mb-12 transition-all duration-1000 ease-out ${
-        showAnimations ? 'translate-y-0 opacity-100' : 'translate-y-32 opacity-0'
+        showAnimations ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
       }`}>
         <img 
-          src="/lovable-uploads/00927cad-9b22-41ba-9858-efcf7069f623.png" 
+          src="/lovable-uploads/monte-tiger-full.png" 
           alt="Monte the Tiger" 
           className="w-64 h-64 sm:w-80 sm:h-80 object-contain"
         />
       </div>
 
       {/* Action Buttons */}
-      <div className={`flex gap-6 transition-all duration-1000 delay-500 ease-out ${
-        showAnimations ? 'translate-y-0 opacity-100' : 'translate-y-16 opacity-0'
+      <div className={`flex gap-6 transition-all duration-1000 delay-1200 ease-out ${
+        showAnimations ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
       }`}>
         <button
           onClick={onBack}
