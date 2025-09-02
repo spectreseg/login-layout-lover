@@ -748,7 +748,7 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
                         {isUserInFinishedList(post.finished_by, user?.id) ? (
                           <Button 
                             size="sm" 
-                            className="flex-1 text-sm h-9 bg-gray-500 text-white cursor-not-allowed font-inter font-medium" 
+                            className="flex-1 text-sm h-9 bg-green-600 hover:bg-green-600 text-white cursor-not-allowed font-inter font-medium" 
                             disabled
                           >
                             <CheckCircle className="h-4 w-4 mr-2" />
@@ -757,7 +757,7 @@ export default function Dashboard({ onSignOut }: DashboardProps = {}) {
                         ) : (
                           <Button 
                             size="sm" 
-                            className="flex-1 text-sm h-9 bg-green-600 hover:bg-green-700 text-white font-inter font-medium"
+                            className="flex-1 text-sm h-9 bg-primary hover:bg-primary/90 text-white font-inter font-medium"
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
