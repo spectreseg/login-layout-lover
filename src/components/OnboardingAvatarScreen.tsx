@@ -20,14 +20,15 @@ export default function OnboardingAvatarScreen({ onBack, onProceed }: Onboarding
   const [user, setUser] = useState<any>(null);
   const { toast } = useToast();
   
+  // Always call useUserProfile, even with null user
+  const { uploadAvatar } = useUserProfile(user);
+  
   // Get current user
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       setUser(user);
     });
   }, []);
-  
-  const { uploadAvatar } = useUserProfile(user);
 
   useEffect(() => {
     console.log('OnboardingAvatarScreen mounted');
