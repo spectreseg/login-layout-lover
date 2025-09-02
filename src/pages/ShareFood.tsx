@@ -134,26 +134,28 @@ export default function ShareFood() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white relative">
+      {/* Back Button - Top Right */}
+      <div className="absolute top-6 right-6 z-10">
+        <Button
+          variant="ghost"
+          onClick={handleCancel}
+          className="flex items-center gap-2 text-foreground/80 hover:text-foreground hover:bg-muted/50 transition-all duration-200 px-4 py-2 rounded-lg"
+        >
+          <ArrowLeft className="h-5 w-5" />
+          Back to Dashboard
+        </Button>
+      </div>
+
       {/* Main Content */}
-      <main className="w-full px-6 py-8">
+      <main className="w-full px-6 py-12">
         <div className="max-w-2xl mx-auto">
-          <Card className="bg-white border-border/30 shadow-xl rounded-2xl overflow-hidden">
-            <CardContent className="p-8">
-              <div className="text-center mb-8">
-                {/* Header with Back Button and Tiger */}
-                <div className="flex items-center justify-center mb-6 relative">
-                  <Button
-                    variant="ghost"
-                    onClick={handleCancel}
-                    className="absolute left-0 flex items-center gap-2 text-foreground/80 hover:text-foreground hover:bg-muted/50 transition-all duration-200"
-                  >
-                    <ArrowLeft className="h-5 w-5" />
-                    Back to Dashboard
-                  </Button>
-                  
-                  {/* Tiger Image */}
-                  <div className="w-24 h-24 animate-fade-in">
+          <Card className="bg-white border-border/20 shadow-2xl rounded-3xl overflow-hidden">
+            <CardContent className="p-10">
+              <div className="text-center mb-10">
+                {/* Tiger Image - Bigger and Centered */}
+                <div className="flex justify-center mb-8">
+                  <div className="w-32 h-32 animate-fade-in">
                     <img 
                       src="/lovable-uploads/3a3c3b4a-16c4-4156-b27c-44f006547e86.png" 
                       alt="Monte Tiger" 
@@ -162,22 +164,22 @@ export default function ShareFood() {
                   </div>
                 </div>
                 
-                <h2 className="text-4xl font-playfair font-bold text-foreground mb-3 tracking-wide animate-fade-in">
+                <h2 className="text-5xl font-playfair font-bold text-foreground mb-4 tracking-wide animate-fade-in">
                   Share Food
                 </h2>
-                <p className="text-muted-foreground font-inter text-lg leading-relaxed animate-fade-in">
-                  Help reduce waste by sharing leftover food with your community
+                <p className="text-muted-foreground font-inter text-xl leading-relaxed animate-fade-in max-w-md mx-auto">
+                  You&apos;re making Sewanee better by reducing food waste
                 </p>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-8 animate-fade-in"
+              <form onSubmit={handleSubmit} className="space-y-10 animate-fade-in"
                     style={{ animationDelay: '0.2s', animationFillMode: 'both' }}>
                 {/* Photo Upload */}
-                <div className="space-y-4">
-                  <Label className="text-lg font-inter font-semibold text-foreground">
+                <div className="space-y-5">
+                  <Label className="text-xl font-inter font-bold text-foreground">
                     Photo (Optional)
                   </Label>
-                  <div className="flex gap-6">
+                  <div className="flex gap-8 items-start">
                     <div className="flex-shrink-0">
                       <label className="block">
                         <input
@@ -187,35 +189,38 @@ export default function ShareFood() {
                           className="hidden"
                           disabled={isUploading}
                         />
-                        <div className="w-40 h-40 border-2 border-dashed border-primary/30 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-primary/50 transition-all duration-200 bg-gradient-to-br from-muted/20 to-muted/40 hover:from-muted/30 hover:to-muted/50 group">
+                        <div className="w-48 h-48 border-3 border-dashed border-primary/40 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:border-primary/60 transition-all duration-300 bg-gradient-to-br from-primary/5 to-primary/10 hover:from-primary/10 hover:to-primary/15 group shadow-lg hover:shadow-xl">
                           {isUploading ? (
                             <div className="flex flex-col items-center justify-center">
-                              <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mb-2"></div>
-                              <div className="text-muted-foreground text-sm font-medium">Processing...</div>
+                              <div className="animate-spin w-10 h-10 border-3 border-primary border-t-transparent rounded-full mb-3"></div>
+                              <div className="text-foreground text-base font-semibold">Processing...</div>
                             </div>
                           ) : (
                             <div className="flex flex-col items-center justify-center">
-                              <Camera className="h-10 w-10 text-muted-foreground group-hover:text-primary transition-colors mb-2" />
-                              <div className="text-muted-foreground text-sm font-medium">
+                              <Camera className="h-12 w-12 text-primary group-hover:text-primary/80 transition-colors mb-3" />
+                              <div className="text-foreground text-base font-semibold">
                                 Click to upload
+                              </div>
+                              <div className="text-muted-foreground text-sm mt-1">
+                                JPG, PNG, HEIC supported
                               </div>
                             </div>
                           )}
                         </div>
                       </label>
                     </div>
-                    <div className="flex-1 max-w-md">
+                    <div className="flex-1">
                       {imagePreview ? (
-                        <div className="bg-gradient-to-br from-muted/20 to-muted/40 rounded-xl p-4 h-40 flex items-center justify-center border border-border/20">
+                        <div className="bg-gradient-to-br from-muted/10 to-muted/20 rounded-2xl p-6 h-48 flex items-center justify-center border-2 border-border/10 shadow-inner">
                           <img
                             src={imagePreview}
                             alt="Preview"
-                            className="max-h-full max-w-full object-contain rounded-lg shadow-sm"
+                            className="max-h-full max-w-full object-contain rounded-xl shadow-md"
                           />
                         </div>
                       ) : (
-                        <div className="bg-gradient-to-br from-muted/20 to-muted/40 rounded-xl p-4 h-40 flex items-center justify-center border border-border/20">
-                          <span className="text-muted-foreground font-inter text-lg">Preview</span>
+                        <div className="bg-gradient-to-br from-muted/10 to-muted/20 rounded-2xl p-6 h-48 flex items-center justify-center border-2 border-border/10">
+                          <span className="text-muted-foreground font-inter text-xl">Preview will appear here</span>
                         </div>
                       )}
                     </div>
@@ -223,9 +228,9 @@ export default function ShareFood() {
                 </div>
 
                 {/* Food Title */}
-                <div className="space-y-4">
-                  <Label htmlFor="title" className="text-lg font-inter font-semibold text-foreground">
-                    Food Title <span className="text-destructive">*</span>
+                <div className="space-y-5">
+                  <Label htmlFor="title" className="text-xl font-inter font-bold text-foreground">
+                    Food Title <span className="text-destructive text-lg">*</span>
                   </Label>
                   <Input
                     id="title"
@@ -233,14 +238,14 @@ export default function ShareFood() {
                     onChange={(e) => handleInputChange('title', e.target.value)}
                     placeholder="e.g., Pizza from event, Leftover sandwiches"
                     required
-                    className="h-14 text-lg font-inter bg-white border-border/40 focus:border-primary rounded-xl shadow-sm"
+                    className="h-16 text-xl font-inter bg-white border-2 border-border/30 focus:border-primary rounded-2xl shadow-sm focus:shadow-md transition-all duration-200"
                   />
                 </div>
 
                 {/* Description */}
-                <div className="space-y-4">
-                  <Label htmlFor="description" className="text-lg font-inter font-semibold text-foreground">
-                    Description <span className="text-destructive">*</span>
+                <div className="space-y-5">
+                  <Label htmlFor="description" className="text-xl font-inter font-bold text-foreground">
+                    Description <span className="text-destructive text-lg">*</span>
                   </Label>
                   <Textarea
                     id="description"
@@ -248,16 +253,16 @@ export default function ShareFood() {
                     onChange={(e) => handleInputChange('description', e.target.value)}
                     placeholder="Describe the food, any allergens, pickup instructions..."
                     required
-                    rows={4}
-                    className="text-lg font-inter bg-white border-border/40 focus:border-primary resize-none rounded-xl shadow-sm"
+                    rows={5}
+                    className="text-xl font-inter bg-white border-2 border-border/30 focus:border-primary resize-none rounded-2xl shadow-sm focus:shadow-md transition-all duration-200 p-6"
                   />
                 </div>
 
                 {/* Pickup Location */}
-                <div className="space-y-4">
-                  <Label htmlFor="location" className="text-lg font-inter font-semibold text-foreground flex items-center gap-2">
-                    <MapPin className="h-5 w-5 text-primary" />
-                    Pickup Location <span className="text-destructive">*</span>
+                <div className="space-y-5">
+                  <Label htmlFor="location" className="text-xl font-inter font-bold text-foreground flex items-center gap-3">
+                    <MapPin className="h-6 w-6 text-primary" />
+                    Pickup Location <span className="text-destructive text-lg">*</span>
                   </Label>
                   <Input
                     id="location"
@@ -265,20 +270,20 @@ export default function ShareFood() {
                     onChange={(e) => handleInputChange('location', e.target.value)}
                     placeholder="e.g., Gailor Hall lobby, McClurg dining hall"
                     required
-                    className="h-14 text-lg font-inter bg-white border-border/40 focus:border-primary rounded-xl shadow-sm"
+                    className="h-16 text-xl font-inter bg-white border-2 border-border/30 focus:border-primary rounded-2xl shadow-sm focus:shadow-md transition-all duration-200"
                   />
                 </div>
 
                 {/* Bottom Row */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                   {/* Number of Servings */}
-                  <div className="space-y-4">
-                    <Label className="text-lg font-inter font-semibold text-foreground flex items-center gap-2">
-                      <Users className="h-5 w-5 text-primary" />
+                  <div className="space-y-5">
+                    <Label className="text-xl font-inter font-bold text-foreground flex items-center gap-3">
+                      <Users className="h-6 w-6 text-primary" />
                       Number of Servings
                     </Label>
                     <Select value={formData.servings} onValueChange={(value) => handleInputChange('servings', value)}>
-                      <SelectTrigger className="h-14 text-lg font-inter bg-white border-border/40 rounded-xl shadow-sm">
+                      <SelectTrigger className="h-16 text-xl font-inter bg-white border-2 border-border/30 rounded-2xl shadow-sm focus:shadow-md transition-all duration-200">
                         <SelectValue placeholder="Optional" />
                       </SelectTrigger>
                       <SelectContent>
@@ -292,10 +297,10 @@ export default function ShareFood() {
                   </div>
 
                   {/* Available Until */}
-                  <div className="space-y-4">
-                    <Label htmlFor="availableUntil" className="text-lg font-inter font-semibold text-foreground flex items-center gap-2">
-                      <Clock className="h-5 w-5 text-primary" />
-                      Available Until <span className="text-destructive">*</span>
+                  <div className="space-y-5">
+                    <Label htmlFor="availableUntil" className="text-xl font-inter font-bold text-foreground flex items-center gap-3">
+                      <Clock className="h-6 w-6 text-primary" />
+                      Available Until <span className="text-destructive text-lg">*</span>
                     </Label>
                     <Input
                       id="availableUntil"
@@ -303,24 +308,24 @@ export default function ShareFood() {
                       value={formData.availableUntil}
                       onChange={(e) => handleInputChange('availableUntil', e.target.value)}
                       required
-                      className="h-14 text-lg font-inter bg-white border-border/40 focus:border-primary rounded-xl shadow-sm"
+                      className="h-16 text-xl font-inter bg-white border-2 border-border/30 focus:border-primary rounded-2xl shadow-sm focus:shadow-md transition-all duration-200"
                     />
                   </div>
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex gap-6 pt-8">
+                <div className="flex gap-8 pt-10">
                   <Button
                     type="button"
                     variant="outline"
                     onClick={handleCancel}
-                    className="flex-1 h-14 text-lg font-inter font-semibold rounded-xl border-2 hover:bg-muted/50 transition-all duration-200"
+                    className="flex-1 h-16 text-xl font-inter font-bold rounded-2xl border-3 hover:bg-muted/50 transition-all duration-200 shadow-md hover:shadow-lg"
                   >
                     Cancel
                   </Button>
                   <Button
                     type="submit"
-                    className="flex-1 h-14 text-lg bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 font-inter font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 hover-scale"
+                    className="flex-1 h-16 text-xl bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 font-inter font-bold rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-200 hover-scale"
                   >
                     Share Food
                   </Button>
