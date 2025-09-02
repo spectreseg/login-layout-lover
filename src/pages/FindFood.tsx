@@ -110,7 +110,63 @@ const FindFood = () => {
   
   const [filterMode, setFilterMode] = useState<'nearby' | 'all' | 'my'>('all');
 
-  const { data: foodPosts = [], refetch } = useQuery({
+  // Dummy posts with Sewanee locations for demo
+  const dummyPosts = [
+    {
+      id: 'dummy-1',
+      user_id: 'dummy-user-1',
+      title: 'Homemade Margherita Pizza',
+      description: 'Fresh basil, mozzarella, and tomato sauce on homemade dough. Made too much for dinner tonight!',
+      location: 'Tuckaway Cafe',
+      servings: '6-8 slices',
+      image_url: '/assets/dummy-pizza-DzZu7eHL.jpg',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      expires_at: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(),
+      finished_by: [],
+    },
+    {
+      id: 'dummy-2', 
+      user_id: 'dummy-user-2',
+      title: 'Fresh Garden Salad',
+      description: 'Mixed greens with cherry tomatoes, cucumbers, and house vinaigrette. Perfect for a healthy lunch!',
+      location: 'McClurg Dining Hall',
+      servings: '4-6 people',
+      image_url: '/assets/dummy-salad-DLDokZKN.jpg',
+      created_at: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
+      updated_at: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
+      expires_at: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString(),
+      finished_by: [],
+    },
+    {
+      id: 'dummy-3',
+      user_id: 'dummy-user-3', 
+      title: 'Seasonal Fruit Bowl',
+      description: 'Fresh strawberries, blueberries, and kiwi from the farmers market. Great for sharing!',
+      location: 'Sewanee Market',
+      servings: '8-10 people',
+      image_url: '/assets/dummy-fruit-Dk5_c-Co.jpg',
+      created_at: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
+      updated_at: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
+      expires_at: new Date(Date.now() + 5 * 60 * 60 * 1000).toISOString(),
+      finished_by: [],
+    },
+    {
+      id: 'dummy-6',
+      user_id: 'dummy-user-6',
+      title: 'Creamy Italian Pasta',
+      description: 'Penne with herbs, vegetables, and parmesan. Comfort food at its finest!',
+      location: 'Benedict Hall',
+      servings: '6-8 people',
+      image_url: '/assets/dummy-pasta-B4dvg6oP.jpg',
+      created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+      updated_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+      expires_at: new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString(),
+      finished_by: [],
+    }
+  ];
+
+  const { data: realFoodPosts = [], refetch } = useQuery({
     queryKey: ['food-posts'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -122,6 +178,9 @@ const FindFood = () => {
       return data as FoodPost[];
     },
   });
+
+  // Combine real posts with dummy posts
+  const allFoodPosts = [...realFoodPosts, ...dummyPosts];
 
   // Set up real-time subscription for new posts
   useEffect(() => {
@@ -159,11 +218,11 @@ const FindFood = () => {
   }, [refetch]);
 
   const filteredPosts = React.useMemo(() => {
-    console.log('All food posts:', foodPosts);
+    console.log('All food posts (real + dummy):', allFoodPosts);
     console.log('Current user:', currentUser);
     console.log('Filter mode:', filterMode);
     
-    const activePosts = foodPosts.filter(post => 
+    const activePosts = allFoodPosts.filter(post => 
       new Date(post.expires_at) > new Date()
     );
 
@@ -182,7 +241,7 @@ const FindFood = () => {
         console.log('All posts:', activePosts);
         return activePosts;
     }
-  }, [foodPosts, filterMode, currentUser]);
+  }, [allFoodPosts, filterMode, currentUser]);
 
   useEffect(() => {
     const initializeMap = async () => {
