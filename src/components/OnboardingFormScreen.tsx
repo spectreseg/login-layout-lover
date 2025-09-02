@@ -57,6 +57,23 @@ export default function OnboardingFormScreen({ onBack, onProceed }: OnboardingFo
     }));
   };
 
+  const handleEmailChange = (value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      email: value
+    }));
+    
+    // Reset email if it doesn't end with @sewanee.edu
+    if (value && !value.endsWith('@sewanee.edu')) {
+      setTimeout(() => {
+        setFormData(prev => ({
+          ...prev,
+          email: ''
+        }));
+      }, 500);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Form submitted:', formData);
@@ -102,13 +119,13 @@ export default function OnboardingFormScreen({ onBack, onProceed }: OnboardingFo
           
         </div>
 
-        {/* Form container */}
+        {/* Form container with integrated buttons */}
         <div className={`w-full max-w-md mx-auto mb-8 transition-all duration-700 ease-out ${formVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4 relative">
             <div>
               <input
                 type="text"
-                placeholder="Name"
+                placeholder="Full name"
                 value={formData.name}
                 onChange={(e) => handleInputChange('name', e.target.value)}
                 className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
@@ -118,34 +135,38 @@ export default function OnboardingFormScreen({ onBack, onProceed }: OnboardingFo
             <div>
               <input
                 type="email"
-                placeholder="Email"
+                placeholder="your.name@sewanee.edu"
                 value={formData.email}
-                onChange={(e) => handleInputChange('email', e.target.value)}
-                className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                onChange={(e) => handleEmailChange(e.target.value)}
+                className={`w-full px-4 py-3 bg-gray-100 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all ${
+                  formData.email && !formData.email.endsWith('@sewanee.edu') 
+                    ? 'border-2 border-red-500' 
+                    : 'border border-gray-300'
+                }`}
                 required
               />
             </div>
+            
+            {/* Buttons positioned between form fields */}
+            <div className={`flex justify-between items-center pt-2 transition-all duration-700 ease-out ${buttonsVisible ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}`}>
+              {/* Back button - center left */}
+              <button
+                onClick={onBack}
+                type="button"
+                className="bg-white text-purple-600 px-6 py-2 rounded-xl text-sm font-semibold hover:bg-purple-50 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-purple-300"
+              >
+                Back
+              </button>
+              
+              {/* Proceed button - center right */}
+              <button
+                onClick={handleSubmit}
+                className="bg-purple-600 text-white px-6 py-2 rounded-xl text-sm font-semibold hover:bg-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-purple-600"
+              >
+                Proceed
+              </button>
+            </div>
           </form>
-        </div>
-        
-        {/* Action buttons */}
-        <div className={`flex flex-col md:flex-row gap-4 md:gap-60 items-center justify-center pb-4 md:pb-0 w-full max-w-sm md:max-w-none transition-all duration-700 ease-out ${buttonsVisible ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}`}>
-          {/* Proceed button first on mobile, second on desktop */}
-          <button
-            onClick={handleSubmit}
-            className="order-1 md:order-2 bg-purple-600 text-white px-8 py-2.5 md:px-10 md:py-3 rounded-xl text-base md:text-lg font-semibold hover:bg-purple-700 transition-all duration-200 shadow-xl hover:shadow-2xl transform hover:scale-105 border-2 border-purple-600 min-w-[120px] w-full md:w-auto"
-          >
-            Proceed
-          </button>
-          
-          {/* Back button second on mobile, first on desktop */}
-          <button
-            onClick={onBack}
-            type="button"
-            className="order-2 md:order-1 bg-white text-purple-600 px-8 py-2.5 md:px-10 md:py-3 rounded-xl text-base md:text-lg font-semibold hover:bg-purple-50 transition-all duration-200 shadow-xl hover:shadow-2xl transform hover:scale-105 border-2 border-purple-300 min-w-[120px] w-full md:w-auto"
-          >
-            Back
-          </button>
         </div>
         
       </div>
