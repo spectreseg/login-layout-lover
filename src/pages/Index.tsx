@@ -7,14 +7,16 @@ import OnboardingPasswordScreen from '@/components/OnboardingPasswordScreen';
 import OnboardingLocationScreen from '@/components/OnboardingLocationScreen';
 import OnboardingAvatarScreen from '@/components/OnboardingAvatarScreen';
 import OnboardingCompletionScreen from '@/components/OnboardingCompletionScreen';
+import Dashboard from '@/components/Dashboard';
 
 const Index = () => {
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const [onboardingStep, setOnboardingStep] = useState<'none' | 'intro' | 'form' | 'password' | 'location' | 'avatar' | 'completion'>('none');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const handleLogin = () => {
     console.log('Login attempted');
-    // Handle login logic here
+    setIsLoggedIn(true);
   };
 
   const handleToggleMode = (mode: 'login' | 'register') => {
@@ -101,7 +103,8 @@ const Index = () => {
 
   const handleCompletionFinish = () => {
     setOnboardingStep('none');
-    console.log('Registration completed, redirecting to dashboard');
+    setIsLoggedIn(true);
+    console.log('Registration completed, navigating to dashboard');
   };
 
   console.log('Current state - authMode:', authMode, 'onboardingStep:', onboardingStep);
@@ -153,6 +156,12 @@ const Index = () => {
         />
       </div>
     );
+  }
+
+  // Show dashboard if user is logged in
+  if (isLoggedIn) {
+    console.log('Rendering dashboard');
+    return <Dashboard />;
   }
 
   // Show completion onboarding screen
