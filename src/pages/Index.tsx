@@ -5,10 +5,12 @@ import OnboardingScreen from '@/components/OnboardingScreen';
 import OnboardingFormScreen from '@/components/OnboardingFormScreen';
 import OnboardingPasswordScreen from '@/components/OnboardingPasswordScreen';
 import OnboardingLocationScreen from '@/components/OnboardingLocationScreen';
+import OnboardingAvatarScreen from '@/components/OnboardingAvatarScreen';
+import OnboardingCompletionScreen from '@/components/OnboardingCompletionScreen';
 
 const Index = () => {
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
-  const [onboardingStep, setOnboardingStep] = useState<'none' | 'intro' | 'form' | 'password' | 'location'>('none');
+  const [onboardingStep, setOnboardingStep] = useState<'none' | 'intro' | 'form' | 'password' | 'location' | 'avatar' | 'completion'>('none');
 
   const handleLogin = () => {
     console.log('Login attempted');
@@ -25,7 +27,9 @@ const Index = () => {
   };
 
   const handleOnboardingBack = () => {
-    if (onboardingStep === 'location') {
+    if (onboardingStep === 'avatar') {
+      setOnboardingStep('location');
+    } else if (onboardingStep === 'location') {
       setOnboardingStep('password');
     } else if (onboardingStep === 'password') {
       setOnboardingStep('form');
@@ -47,9 +51,14 @@ const Index = () => {
     } else if (onboardingStep === 'password') {
       console.log('Moving to location step');
       setOnboardingStep('location');
+    } else if (onboardingStep === 'location') {
+      console.log('Moving to avatar step');
+      setOnboardingStep('avatar');
+    } else if (onboardingStep === 'avatar') {
+      console.log('Moving to completion step');
+      setOnboardingStep('completion');
     } else {
       setOnboardingStep('none');
-      // Here you would proceed to the actual registration completion
       console.log('Completing registration');
     }
   };
@@ -77,8 +86,22 @@ const Index = () => {
   };
 
   const handleLocationProceed = () => {
+    setOnboardingStep('avatar');
+    console.log('Moving to avatar step');
+  };
+
+  const handleAvatarBack = () => {
+    setOnboardingStep('location');
+  };
+
+  const handleAvatarProceed = () => {
+    setOnboardingStep('completion');
+    console.log('Moving to completion step');
+  };
+
+  const handleCompletionFinish = () => {
     setOnboardingStep('none');
-    console.log('Registration completed');
+    console.log('Registration completed, redirecting to dashboard');
   };
 
   console.log('Current state - authMode:', authMode, 'onboardingStep:', onboardingStep);
@@ -92,6 +115,33 @@ const Index = () => {
         <OnboardingScreen 
           onBack={handleOnboardingBack}
           onProceed={handleOnboardingProceed}
+        />
+      </div>
+    );
+  }
+
+  // Show avatar onboarding screen
+  if (onboardingStep === 'avatar') {
+    console.log('Rendering avatar onboarding screen');
+    return (
+      <div className="min-h-screen relative">
+        <StarryBackground />
+        <OnboardingAvatarScreen 
+          onBack={handleAvatarBack}
+          onProceed={handleAvatarProceed}
+        />
+      </div>
+    );
+  }
+
+  // Show completion onboarding screen
+  if (onboardingStep === 'completion') {
+    console.log('Rendering completion onboarding screen');
+    return (
+      <div className="min-h-screen relative">
+        <StarryBackground />
+        <OnboardingCompletionScreen 
+          onComplete={handleCompletionFinish}
         />
       </div>
     );
