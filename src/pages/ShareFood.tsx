@@ -9,8 +9,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
 import StarryBackground from '@/components/StarryBackground';
 
-// @ts-ignore - HEIC convert library
-import heic2any from 'heic-convert';
+// @ts-ignore - HEIC convert library  
+import heic2any from 'heic2any';
 
 export default function ShareFood() {
   const navigate = useNavigate();
